@@ -1,28 +1,24 @@
-/* eslint-disable react/no-unescaped-entities */
-'use client';
-
-import React, { useRef, useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { useRef, useState, useEffect } from 'react';
 import confetti from 'canvas-confetti';
 
-interface ScratchCardProps {
-  width?: number;
-  height?: number;
-  coverColor?: string;
-  text?: string;
-  revealText?: string;
+interface UseScratchCardProps {
+  width: number;
+  height: number;
+  isInteractive: boolean;
+  onComplete?: () => void;
 }
 
-const ScratchCard: React.FC<ScratchCardProps> = ({
-  width = 300,
-  height = 150,
-  coverColor = '#C0C0C0',
-  text = 'Scratch Me!',
-  revealText = 'You Won! 🎉',
-}) => {
+export const useScratchCard = ({
+  width,
+  height,
+  isInteractive,
+  onComplete
+}: UseScratchCardProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [isScratched, setIsScratched] = useState(false);
+  const [cleared, setCleared] = useState(false);
+  const hasCalledComplete = useRef(false);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -34,11 +30,21 @@ const ScratchCard: React.FC<ScratchCardProps> = ({
     canvas.width = width;
     canvas.height = height;
 
-    ctx.fillStyle = coverColor;
+    // Create gradient
+    const gradient = ctx.createLinearGradient(0, 0, width, height);
+gradient.addColorStop(0, '#FFD6F3');    // Light pastel pink
+gradient.addColorStop(0.25, '#F7B3E5'); // Warm bubblegum pink
+gradient.addColorStop(0.5, '#D0B7FF');  // Lavender-violet
+gradient.addColorStop(0.75, '#A6D3FA'); // Baby blue
+gradient.addColorStop(1, '#C7F1FF');    // Very light cyan blue
+
+    // Draw gradient
+    ctx.fillStyle = gradient;
     ctx.fillRect(0, 0, width, height);
     ctx.globalCompositeOperation = 'destination-out';
 
     const scratchHandler = (e: TouchEvent | MouseEvent) => {
+      if (!isInteractive) return;
       const rect = canvas.getBoundingClientRect();
       const x = 'touches' in e ? e.touches[0].clientX - rect.left : e.clientX - rect.left;
       const y = 'touches' in e ? e.touches[0].clientY - rect.top : e.clientY - rect.top;
@@ -46,20 +52,17 @@ const ScratchCard: React.FC<ScratchCardProps> = ({
       ctx.beginPath();
       ctx.arc(x, y, 20, 0, 2 * Math.PI);
       ctx.fill();
+      checkScratchCompletion();
     };
-    
-
 
     const touchMove = (e: TouchEvent) => {
       e.preventDefault();
       scratchHandler(e);
-      checkScratchCompletion();
     };
 
     const mouseMove = (e: MouseEvent) => {
       if (e.buttons !== 1) return;
       scratchHandler(e);
-      checkScratchCompletion();
     };
 
     canvas.addEventListener('touchmove', touchMove);
@@ -69,18 +72,12 @@ const ScratchCard: React.FC<ScratchCardProps> = ({
       canvas.removeEventListener('touchmove', touchMove);
       canvas.removeEventListener('mousemove', mouseMove);
     };
-  }, []);
-
-  useEffect( () => {
-    if(isScratched){
-        confetti();
-      }
-    }, [isScratched]);
+  }, [width, height, isInteractive]);
 
   const checkScratchCompletion = () => {
     const canvas = canvasRef.current;
     const ctx = canvas?.getContext('2d');
-    if (!canvas || !ctx) return;
+    if (!canvas || !ctx || isScratched) return;
 
     const pixels = ctx.getImageData(0, 0, canvas.width, canvas.height);
     let transparentPixels = 0;
@@ -90,37 +87,24 @@ const ScratchCard: React.FC<ScratchCardProps> = ({
     }
 
     const transparency = transparentPixels / (canvas.width * canvas.height);
-    if (transparency > 0.5 && !isScratched) {
+    if (transparency > 0.5) {
       setIsScratched(true);
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      // confetti();
+      confetti();
+
+      if (!hasCalledComplete.current && onComplete) {
+        hasCalledComplete.current = true;
+        onComplete();
+      }
+
+      setTimeout(() => setCleared(true), 300);
     }
   };
 
-  return (
-    <div
-      ref={containerRef}
-      className="relative flex items-center justify-center rounded-2xl overflow-hidden shadow-lg"
-      style={{ width, height }}
-    >
-      <motion.div
-        className="absolute inset-0 bg-white z-0 flex items-center justify-center text-center px-4 text-black text-lg font-bold"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: isScratched ? 1 : 0 }}
-      >
-        {revealText}
-      </motion.div>
-      <div className="absolute inset-0 z-10 flex items-center justify-center">
-        <span className="text-black text-lg font-bold pointer-events-none">
-          {text}
-        </span>
-      </div>
-      <canvas
-        ref={canvasRef}
-        className="absolute inset-0 z-20 touch-none rounded-2xl"
-      />
-    </div>
-  );
+  return {
+    canvasRef,
+    containerRef,
+    isScratched,
+    cleared,
+  };
 };
-
-export default ScratchCard;
