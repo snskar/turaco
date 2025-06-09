@@ -4,6 +4,7 @@ import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useSpinTheWheel } from "./utils";
 import TextBox from "@/components/ui/TextBox";
+import Image from "next/image";
 
 interface SpinTheWheelProps {
   options: string[];
@@ -32,100 +33,133 @@ const SpinTheWheel: React.FC<SpinTheWheelProps> = ({
       ref={containerRef}
       className="flex flex-col items-center justify-center p-4 relative"
     >
-      {/* Enhanced pointer triangle at top */}
-      <div className="absolute top-0 left-1/2 transform -translate-x-1/2 z-10 pointer-events-none">
-        {/* Glow effect */}
+      {/* Win Pointer */}
+      <div 
+        className="absolute z-20 transform -translate-x-1/2"
+        style={{
+          left: '50%',
+          top: '-10px', // Adjust this value to control how much the pointer overlaps
+          width: '80px', // Adjust size as needed
+          height: '80px',
+          filter: 'drop-shadow(0 2px 8px rgba(225,125,220,0.5))',
+        }}
+      >
+        <Image
+          src="/assets/ui/win-pointer.png"
+          alt="Winner Pointer"
+          width={80}
+          height={80}
+          className="w-full h-full object-contain"
+        />
+        {/* Glow effect behind the pointer */}
         <div
-          className="absolute top-0 left-1/2 transform -translate-x-1/2 blur-md"
+          className="absolute inset-0 -z-10 blur-md opacity-50"
           style={{
-            width: 40,
-            height: 40,
-            background: 'radial-gradient(circle, rgba(165,180,252,0.4) 0%, transparent 70%)',
+            background: 'radial-gradient(circle, rgba(225,125,220,0.4) 0%, transparent 70%)',
           }}
         />
-        {/* Main pointer */}
-        <div
-          className="relative"
-          style={{
-            width: 0,
-            height: 0,
-            borderLeft: '25px solid transparent',
-            borderRight: '25px solid transparent',
-            borderTop: '40px solid rgba(165, 180, 252, 0.9)',
-            filter: 'drop-shadow(0 2px 8px rgba(93,63,211,0.5))',
-          }}
-        >
-          {/* Inner highlight */}
-          <div
-            className="absolute top-[-40px] left-[-25px]"
-            style={{
-              width: 0,
-              height: 0,
-              borderLeft: '25px solid transparent',
-              borderRight: '25px solid transparent',
-              borderTop: '40px solid rgba(255,255,255,0.2)',
-              mixBlendMode: 'soft-light',
-            }}
-          />
-        </div>
       </div>
 
       {/* Wheel Container */}
       <div 
         className="relative bg-white/10 backdrop-blur-sm rounded-full p-4 shadow-xl cursor-pointer
-                   hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 mt-8"
+                   hover:shadow-2xl hover:scale-[1.02] transition-all duration-300"
         onClick={!isSpinning ? spin : undefined}
+        style={{
+          marginTop: '20px', // Adjust this to control the gap between pointer and wheel
+        }}
       >
+        {/* Shimmering overlay */}
+        <div 
+          className="absolute inset-0 rounded-full overflow-hidden pointer-events-none"
+          style={{ mixBlendMode: 'soft-light' }}
+        >
+          <motion.div
+            className="absolute inset-0 bg-gradient-to-br from-pink-200/20 via-purple-300/20 to-cyan-200/20"
+            animate={{
+              backgroundPosition: ['0% 0%', '100% 100%'],
+              scale: [1, 1.2, 1],
+            }}
+            transition={{
+              duration: 3,
+              repeat: Infinity,
+              ease: "easeInOut",
+            }}
+            style={{
+              backgroundSize: '200% 200%',
+            }}
+          />
+        </div>
+
         <svg
           ref={wheelRef}
           width={wheelSize}
           height={wheelSize}
-          className="transition-transform duration-100"
+          className="transition-transform duration-100 relative z-10"
           style={{
             borderRadius: '50%',
-            filter: 'drop-shadow(0 8px 16px rgba(0,0,0,0.15))',
           }}
         >
+          <defs>
+            {/* Holographic gradients */}
+            <linearGradient id="sectorGradient1" gradientTransform="rotate(45)">
+              <stop offset="0%" stopColor="rgba(255, 182, 193, 0.9)" />
+              <stop offset="50%" stopColor="rgba(225, 125, 220, 0.85)" />
+              <stop offset="100%" stopColor="rgba(180, 130, 255, 0.8)" />
+            </linearGradient>
+            <linearGradient id="sectorGradient2" gradientTransform="rotate(45)">
+              <stop offset="0%" stopColor="rgba(176, 224, 230, 0.9)" />
+              <stop offset="50%" stopColor="rgba(130, 180, 255, 0.85)" />
+              <stop offset="100%" stopColor="rgba(144, 238, 244, 0.8)" />
+            </linearGradient>
+            
+            {/* Iridescent overlay */}
+            <linearGradient id="iridescent" x1="0" y1="0" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="rgba(255,255,255,0.1)" />
+              <stop offset="50%" stopColor="rgba(255,255,255,0)" />
+              <stop offset="100%" stopColor="rgba(255,255,255,0.1)" />
+            </linearGradient>
+          </defs>
+
           {renderSectors().map((sector, i) => (
             <g key={i}>
               <path
                 d={sector.pathData}
-                fill={i % 2 === 0 ? 'rgba(255, 214, 235, 0.9)' : 'rgba(214, 245, 255, 0.9)'}
-                stroke="rgba(255, 255, 255, 0.5)"
+                fill={i % 2 === 0 ? 'url(#sectorGradient1)' : 'url(#sectorGradient2)'}
+                stroke="rgba(255, 255, 255, 0.3)"
                 strokeWidth="1"
-                className="transition-colors duration-200 hover:brightness-105"
+                className="transition-all duration-200"
               />
               <text
-                x={sector.textX}
-                y={sector.textY}
-                fill="#4a5568"
-                fontSize={sector.fontSize}
+                x={Number(sector.textX).toFixed(2)}
+                y={Number(sector.textY).toFixed(2)}
+                fill="white"
+                fontSize={Number(sector.fontSize).toFixed(2)}
                 fontWeight="600"
                 textAnchor="middle"
                 alignmentBaseline="middle"
-                transform={`
-                  rotate(${sector.textRotation}, ${sector.textX}, ${sector.textY})
-                `}
-                style={{
-                  filter: 'drop-shadow(1px 1px 1px rgba(255,255,255,0.5))'
-                }}
+                transform={`rotate(${Number(sector.textRotation).toFixed(2)}, ${Number(sector.textX).toFixed(2)}, ${Number(sector.textY).toFixed(2)})`}
               >
                 {sector.option}
               </text>
             </g>
           ))}
 
-          {/* Center Image */}
+          {/* Center Image with holographic effect */}
           <defs>
             <clipPath id="circleView">
               <circle cx={radius} cy={radius} r={radius * 0.28} />
             </clipPath>
+            <radialGradient id="centerGlow" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stopColor="rgba(225,125,220,0.3)" />
+              <stop offset="100%" stopColor="rgba(130,180,255,0.1)" />
+            </radialGradient>
           </defs>
           <circle 
             cx={radius} 
             cy={radius} 
             r={radius * 0.28} 
-            fill="rgba(255, 255, 255, 0.3)"
+            fill="url(#centerGlow)"
             className="backdrop-blur-sm"
           />
           <image
@@ -135,6 +169,15 @@ const SpinTheWheel: React.FC<SpinTheWheelProps> = ({
             width={radius * 0.56}
             height={radius * 0.56}
             preserveAspectRatio="xMidYMid meet"
+          />
+          
+          {/* Iridescent overlay for the entire wheel */}
+          <circle
+            cx={radius}
+            cy={radius}
+            r={radius}
+            fill="url(#iridescent)"
+            className="mix-blend-overlay opacity-50"
           />
         </svg>
       </div>
@@ -146,10 +189,13 @@ const SpinTheWheel: React.FC<SpinTheWheelProps> = ({
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="mt-6 text-xl font-bold text-white text-center p-4 rounded-lg
-                     bg-white/20 backdrop-blur-sm shadow-lg"
+            className="mt-6 text-xl font-bold text-center p-4 rounded-lg
+                     bg-gradient-to-r from-pink-400/30 via-purple-400/30 to-cyan-400/30
+                     backdrop-blur-md shadow-lg"
           >
-            🎉 {winner} 🎉
+            <span className="text-white">
+              🎉 {winner} 🎉
+            </span>
           </motion.div>
         )}
       </AnimatePresence>

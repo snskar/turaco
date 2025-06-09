@@ -143,34 +143,29 @@ export const useSpinTheWheel = ({
   const renderSectors = useCallback(() => {
     return options.map((option, i) => {
       // Calculate sector angles for clockwise rotation
-      const startAngle = i * sectorAngle;
-      const endAngle = (i + 1) * sectorAngle;
+      const startAngle = Number((i * sectorAngle).toFixed(2));
+      const endAngle = Number(((i + 1) * sectorAngle).toFixed(2));
       const largeArcFlag = sectorAngle > 180 ? 1 : 0;
 
-      // Calculate sector path
-      const x1 = radius + radius * Math.cos((startAngle * Math.PI) / 180);
-      const y1 = radius + radius * Math.sin((startAngle * Math.PI) / 180);
-      const x2 = radius + radius * Math.cos((endAngle * Math.PI) / 180);
-      const y2 = radius + radius * Math.sin((endAngle * Math.PI) / 180);
+      // Calculate sector path with fixed precision
+      const x1 = Number((radius + radius * Math.cos((startAngle * Math.PI) / 180)).toFixed(2));
+      const y1 = Number((radius + radius * Math.sin((startAngle * Math.PI) / 180)).toFixed(2));
+      const x2 = Number((radius + radius * Math.cos((endAngle * Math.PI) / 180)).toFixed(2));
+      const y2 = Number((radius + radius * Math.sin((endAngle * Math.PI) / 180)).toFixed(2));
 
-      const pathData = `
-        M ${radius} ${radius}
-        L ${x1} ${y1}
-        A ${radius} ${radius} 0 ${largeArcFlag} 1 ${x2} ${y2}
-        Z
-      `;
+      const pathData = `M ${radius.toFixed(2)} ${radius.toFixed(2)} L ${x1} ${y1} A ${radius.toFixed(2)} ${radius.toFixed(2)} 0 ${largeArcFlag} 1 ${x2} ${y2} Z`;
 
-      // Calculate text position and rotation
-      const midAngle = startAngle + (sectorAngle / 2);
-      const textRadius = radius * 0.65;
-      const textX = radius + textRadius * Math.cos((midAngle * Math.PI) / 180);
-      const textY = radius + textRadius * Math.sin((midAngle * Math.PI) / 180);
+      // Calculate text position and rotation with fixed precision
+      const midAngle = Number((startAngle + (sectorAngle / 2)).toFixed(2));
+      const textRadius = Number((radius * 0.65).toFixed(2));
+      const textX = Number((radius + textRadius * Math.cos((midAngle * Math.PI) / 180)).toFixed(2));
+      const textY = Number((radius + textRadius * Math.sin((midAngle * Math.PI) / 180)).toFixed(2));
 
-      // Calculate text rotation to be radial
-      let textRotation = (midAngle + 180) % 360;
+      // Calculate text rotation to be radial with fixed precision
+      let textRotation = Number(((midAngle + 180) % 360).toFixed(2));
       // Flip text when it would be upside down
       if (textRotation > 90 && textRotation < 270) {
-        textRotation += 180;
+        textRotation = Number((textRotation + 180).toFixed(2));
       }
 
       return {
@@ -179,7 +174,7 @@ export const useSpinTheWheel = ({
         textY,
         textRotation,
         option,
-        fontSize: getFontSize()
+        fontSize: Number(getFontSize().toFixed(2))
       };
     });
   }, [options, sectorAngle, radius, getFontSize]);

@@ -71,22 +71,6 @@ const SplashTitle: React.FC<SplashTitleProps> = ({
           {message}
         </motion.p>
       )}
-
-      {/* Decorative elements with Tailwind animations */}
-      <motion.div 
-        className="absolute -top-2 -left-2 text-2xl text-white opacity-70 animate-bounce"
-        animate={{ 
-          scale: [1, 1.2, 1],
-          rotate: [0, 15, -15, 0]
-        }}
-        transition={{ 
-          duration: 2,
-          repeat: Infinity,
-          ease: "easeInOut"
-        }}
-      >
-        ✨
-      </motion.div>
       
       <motion.div 
         className="absolute top-1/4 -right-2 text-lg text-white opacity-50"
