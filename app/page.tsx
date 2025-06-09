@@ -1,15 +1,17 @@
 // app/page.tsx or pages/index.tsx
 "use client";
 
-// import ComplimentShower from "@/components/compliment-shower/Game";
 import { CardStack } from "@/components/scratch-card/CardStack";
 import ScratchCard from "@/components/scratch-card/Card";
-import KawaiiBackground from "@/components/ui/KawaiiBackground";
 import KawaiiBackgroundDarker from "@/components/ui/KawaiiBackgroundDarker";
+import HolographicBackground from "@/components/ui/HolographicBackground";
 import ComplimentShower from "@/components/compliment-shower/Game";
-// import SpinTheWheel from "@/components/games/compliment-shower-3/SpinTheWheel";
 import SpinTheWheel from "@/components/spin-the-wheel/SpinTheWheel";
 import Slideshow from "@/components/slideshow/Slideshow";
+import SplashTitle from "@/components/ui/SplashTitle";
+import HolographicText from "@/components/ui/HolographicText";
+import HolographicBackground2 from "@/components/ui/HolographicBackground2";
+
 
 export default function Home() {
 
@@ -37,23 +39,6 @@ export default function Home() {
   "DIY home project",
   "Crafting day",
   "Try a new sport",
-  // "Play mini-golf",
-  // "Meditation retreat",
-  // "Go roller skating",
-  // "Go to a theme park",
-  // "Visit an escape room",
-  // "Host a potluck",
-  // "Try indoor rock climbing",
-  // "Plan a themed dinner",
-  // "Play laser tag",
-  // "Go bowling",
-  // "Do an art project",
-  // "Watch a sunrise",
-  // "Plan a treasure hunt",
-  // "Stargazing night",
-  // "Try ice skating",
-  // "Do a digital detox",
-  // "Create a vision board"
 ];
 
 const images = [
@@ -79,13 +64,14 @@ const images = [
     
       <main className="flex min-h-screen flex-col items-center justify-center">
         <KawaiiBackgroundDarker>
+          <SplashTitle title="Happy Birthday" name="Gopika" message="Happy Birthday, legend! May your wrinkles be few, your snacks never end, and your group chats always spicy. Keep being fabulously weird—like glitter in a world full of beige!" />
           <div className="p-7">
             <Slideshow images={images} />
           </div>
           <div className="relative mb-16">
             <ComplimentShower/>
           </div>  
-        
+
         <div className="py-40 items-center justify-center">
           <CardStack>
             <ScratchCard/>
@@ -95,8 +81,10 @@ const images = [
           </CardStack>
 
           </div>
-          <SpinTheWheel options={options} centerImageSrc="/assets/hamster.png" />
+          <SpinTheWheel options={options} centerImageSrc="/assets/hamster2.png" />
+          <HolographicText>{"Sample Text"}</HolographicText>
         </KawaiiBackgroundDarker>
+        
 
       </main>
 

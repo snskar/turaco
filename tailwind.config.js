@@ -28,6 +28,7 @@ module.exports = {
       animation: {
         'float': 'float 3s ease-in-out infinite',
         'twinkle': 'twinkle 2s ease-in-out infinite',
+        'holoShift': 'holoShift 20s ease-in-out infinite alternate',
       },
       keyframes: {
         float: {
@@ -37,6 +38,10 @@ module.exports = {
         twinkle: {
           '0%, 100%': { opacity: '0.2' },
           '50%': { opacity: '0.8' },
+        },
+        holoShift: {
+          '0%': { backgroundPosition: '0% 0%' },
+          '100%': { backgroundPosition: '100% 100%' },
         },
       },
     },

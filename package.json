@@ -15,11 +15,14 @@
     "@prisma/client": "^6.8.2",
     "@tailwindcss/cli": "^4.1.7",
     "@uidotdev/usehooks": "^2.4.1",
+    "@vercel/blob": "^1.1.1",
     "autoprefixer": "^10.4.21",
     "canvas-confetti": "^1.9.3",
     "clsx": "^2.1.1",
     "framer-motion": "^12.12.1",
+    "nanoid": "^5.1.5",
     "next": "15.3.2",
+    "pg": "^8.16.0",
     "postcss": "^8.5.3",
     "prisma": "^6.8.2",
     "react": "^19.0.0",
@@ -32,12 +35,13 @@
     "@eslint/eslintrc": "^3",
     "@tailwindcss/postcss": "^4",
     "@types/canvas-confetti": "^1.9.0",
-    "@types/node": "^20",
+    "@types/node": "^20.17.57",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "15.3.2",
     "tailwindcss": "^4.1.7",
-    "typescript": "^5"
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.3"
   }
 }

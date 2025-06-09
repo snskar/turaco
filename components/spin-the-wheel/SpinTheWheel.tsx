@@ -32,22 +32,48 @@ const SpinTheWheel: React.FC<SpinTheWheelProps> = ({
       ref={containerRef}
       className="flex flex-col items-center justify-center p-4 relative"
     >
-      {/* Fixed pointer triangle at top */}
-      <div
-        className="absolute top-4 left-1/2 transform -translate-x-1/2 z-10"
-        style={{
-          width: 0,
-          height: 0,
-          borderLeft: '15px solid transparent',
-          borderRight: '15px solid transparent',
-          borderTop: '25px solid rgba(165, 180, 252, 0.9)',
-          filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.1))'
-        }}
-      />
+      {/* Enhanced pointer triangle at top */}
+      <div className="absolute top-0 left-1/2 transform -translate-x-1/2 z-10 pointer-events-none">
+        {/* Glow effect */}
+        <div
+          className="absolute top-0 left-1/2 transform -translate-x-1/2 blur-md"
+          style={{
+            width: 40,
+            height: 40,
+            background: 'radial-gradient(circle, rgba(165,180,252,0.4) 0%, transparent 70%)',
+          }}
+        />
+        {/* Main pointer */}
+        <div
+          className="relative"
+          style={{
+            width: 0,
+            height: 0,
+            borderLeft: '25px solid transparent',
+            borderRight: '25px solid transparent',
+            borderTop: '40px solid rgba(165, 180, 252, 0.9)',
+            filter: 'drop-shadow(0 2px 8px rgba(93,63,211,0.5))',
+          }}
+        >
+          {/* Inner highlight */}
+          <div
+            className="absolute top-[-40px] left-[-25px]"
+            style={{
+              width: 0,
+              height: 0,
+              borderLeft: '25px solid transparent',
+              borderRight: '25px solid transparent',
+              borderTop: '40px solid rgba(255,255,255,0.2)',
+              mixBlendMode: 'soft-light',
+            }}
+          />
+        </div>
+      </div>
 
       {/* Wheel Container */}
       <div 
-        className="relative bg-white/10 backdrop-blur-sm rounded-full p-4 shadow-xl cursor-pointer"
+        className="relative bg-white/10 backdrop-blur-sm rounded-full p-4 shadow-xl cursor-pointer
+                   hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 mt-8"
         onClick={!isSpinning ? spin : undefined}
       >
         <svg
@@ -57,7 +83,7 @@ const SpinTheWheel: React.FC<SpinTheWheelProps> = ({
           className="transition-transform duration-100"
           style={{
             borderRadius: '50%',
-            filter: 'drop-shadow(0 4px 6px rgba(0,0,0,0.1))',
+            filter: 'drop-shadow(0 8px 16px rgba(0,0,0,0.15))',
           }}
         >
           {renderSectors().map((sector, i) => (
