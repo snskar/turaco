@@ -1,5 +1,6 @@
-// // Generic compliments
-export const COMPLIMENTS = [
+// Default compliments if none provided
+export const DEFAULT_COMPLIMENTS = {
+  COUPLE: [
     "gorgeous butt",
     "angel voice",
     "god's best creation",
@@ -25,19 +26,39 @@ export const COMPLIMENTS = [
     "sculpted arms",
     "juicy lips",
     "fluttery lashes"
-];
+], 
+OTHER: [
+  "you're the best",
+  "you're the sweetest",
+  "you're the most beautiful",
+  "you're the most handsome",
+  "you're the most intelligent",
+  "you're the most talented",
+  "you're the most amazing",
+  "you're the most wonderful",
+  "you're the most amazing",
+  "you're the most amazing",
+]
+};
 
-// // Game configuration constants
-export const DROP_INTERVAL = 1000;
+// Game settings
+export const DROP_INTERVAL = 1000; // milliseconds between drops
 export const DROP_SPEED = 200; // pixels per second
+export const JAR_SPEED = 400; // pixels per second
+
+// Drop size in pixels
+export const DROP_SIZE = {
+  width: 40,
+  height: 40
+};
+
+// Jar size in pixels
 export const JAR_SIZE = {
   width: 80,  // Fixed width in pixels
   height: 120 // Fixed height in pixels
 };
-export const DROP_SIZE = {
-  width: 60,  // Increased drop size
-  height: 60  // Increased drop size
-};
+
+// Play button size in pixels
 export const PLAY_SIZE = {
   width: 200, 
   height: 200,

@@ -4,9 +4,16 @@ import confetti from "canvas-confetti";
 interface UseSpinTheWheelProps {
   options: string[];
   onWin?: (winner: string) => void;
+  minSpins?: number;
+  maxSpins?: number;
 }
 
-export const useSpinTheWheel = ({ options, onWin }: UseSpinTheWheelProps) => {
+export const useSpinTheWheel = ({ 
+  options, 
+  onWin,
+  minSpins = 5,
+  maxSpins = 7 
+}: UseSpinTheWheelProps) => {
   const [isSpinning, setIsSpinning] = useState(false);
   const [winner, setWinner] = useState<string | null>(null);
   const [wheelSize, setWheelSize] = useState(300);
@@ -55,31 +62,46 @@ export const useSpinTheWheel = ({ options, onWin }: UseSpinTheWheelProps) => {
   }, [sectorAngle]);
 
   const triggerConfetti = useCallback(() => {
-    const duration = 2000;
-    const end = Date.now() + duration;
-
-    const colors = ['#ffd6eb', '#d6f5ff', '#f9c8d9', '#a5b4fc'];
+    if (!containerRef.current) return;
     
-    (function frame() {
+    const rect = containerRef.current.getBoundingClientRect();
+    const centerX = (rect.left + rect.right) / 2 / window.innerWidth;
+    const centerY = (rect.top + rect.bottom) / 2 / window.innerHeight;
+    
+    const duration = 1500;
+    const end = Date.now() + duration;
+    const colors = ['#ffd6eb', '#d6f5ff', '#f9c8d9', '#a5b4fc'];
+
+    const frame = () => {
       confetti({
-        particleCount: 4,
+        particleCount: 2,
         angle: 60,
-        spread: 55,
-        origin: { x: 0 },
+        spread: 45,
+        origin: { x: centerX - 0.15, y: centerY },
         colors: colors,
+        ticks: 200,
+        gravity: 1.2,
+        scalar: 0.8,
+        drift: 0,
       });
       confetti({
-        particleCount: 4,
+        particleCount: 2,
         angle: 120,
-        spread: 55,
-        origin: { x: 1 },
+        spread: 45,
+        origin: { x: centerX + 0.15, y: centerY },
         colors: colors,
+        ticks: 200,
+        gravity: 1.2,
+        scalar: 0.8,
+        drift: 0,
       });
 
       if (Date.now() < end) {
         requestAnimationFrame(frame);
       }
-    })();
+    };
+
+    frame();
   }, []);
 
   const spin = useCallback(() => {
@@ -87,36 +109,36 @@ export const useSpinTheWheel = ({ options, onWin }: UseSpinTheWheelProps) => {
     setIsSpinning(true);
     setWinner(null);
 
+    // Get the current rotation and normalize it
+    const currentRotation = rotation % 360;
+    
     // Choose a random winning index first
     const targetIndex = Math.floor(Math.random() * options.length);
     
     // Calculate spins
-    const minSpins = 5;
-    const maxSpins = 8;
     const fullSpins = minSpins + Math.random() * (maxSpins - minSpins);
     
-    // Calculate how much we need to rotate so that the target sector
-    // will contain the 90-degree mark
+    // Calculate how much we need to rotate from the current position
     const baseAngle = 360 - (targetIndex * sectorAngle);
-    const finalRotation = (fullSpins * 360) + baseAngle - 90;
+    const finalRotation = (fullSpins * 360) + baseAngle - 90 + (360 - currentRotation);
     
-    setRotation(finalRotation);
+    setRotation(prevRotation => prevRotation + finalRotation);
 
     if (wheelRef.current) {
-      wheelRef.current.style.transition = "transform 6s cubic-bezier(0.3, 0.1, 0.1, 1)";
-      wheelRef.current.style.transform = `rotate(${finalRotation}deg)`;
+      wheelRef.current.style.transition = "transform 8s cubic-bezier(0.2, 0.1, 0.1, 1)";
+      wheelRef.current.style.transform = `rotate(${rotation + finalRotation}deg)`;
     }
 
     setTimeout(() => {
-      const winningIndex = getWinningOptionIndex(finalRotation);
+      const winningIndex = getWinningOptionIndex(rotation + finalRotation);
       const winningOption = options[winningIndex];
       
       setWinner(winningOption);
       onWin?.(winningOption);
       triggerConfetti();
       setIsSpinning(false);
-    }, 6000);
-  }, [isSpinning, options, sectorAngle, getWinningOptionIndex, onWin, triggerConfetti]);
+    }, 8000);
+  }, [isSpinning, options, sectorAngle, getWinningOptionIndex, onWin, triggerConfetti, rotation, minSpins, maxSpins]);
 
   const renderSectors = useCallback(() => {
     return options.map((option, i) => {

@@ -1,0 +1,100 @@
+// This is your Prisma schema file
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum GiftRelation {
+  COUPLE
+  FATHER
+  MOTHER
+  SISTER
+  BROTHER
+  FRIEND
+  OTHER
+}
+
+enum GiftOccasion {
+  BIRTHDAY
+  NEW_YEAR
+  DIWALI
+  RAKSHA_BANDHAN
+  CHRISTMAS
+  VALENTINES
+  ANNIVERSARY
+  CONGRATULATIONS
+  GET_WELL_SOON
+  I_AM_SORRY
+  I_LOVE_YOU
+  OTHER
+}
+
+model Gift {
+  id          String       @id @default(cuid())
+  slug        String       @unique
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  // Gifter and Giftee information
+  gifterName  String
+  gifteeName  String
+  occasion    GiftOccasion @default(BIRTHDAY)
+  relation    GiftRelation @default(FRIEND)
+  message     String?
+
+  // Media and content
+  photos      Photo[]
+  spotifyTrack SpotifyTrack?
+  
+  // Interactive elements
+  activities  Activity[]
+  compliments Compliment[]
+  scratchCard ScratchCard?
+}
+
+model Photo {
+  id          String    @id @default(cuid())
+  url         String
+  giftId      String
+  gift        Gift      @relation(fields: [giftId], references: [id], onDelete: Cascade)
+}
+
+model SpotifyTrack {
+  id          String    @id @default(cuid())
+  spotifyId   String
+  type        String
+  name        String
+  artist      String?
+  imageUrl    String?
+  previewUrl  String?
+  giftId      String    @unique
+  gift        Gift      @relation(fields: [giftId], references: [id], onDelete: Cascade)
+}
+
+model Activity {
+  id          String    @id @default(cuid())
+  content     String
+  isCustom    Boolean   @default(false)
+  giftId      String
+  gift        Gift      @relation(fields: [giftId], references: [id], onDelete: Cascade)
+}
+
+model Compliment {
+  id          String    @id @default(cuid())
+  content     String
+  isCustom    Boolean   @default(false)
+  giftId      String
+  gift        Gift      @relation(fields: [giftId], references: [id], onDelete: Cascade)
+}
+
+model ScratchCard {
+  id          String    @id @default(cuid())
+  content     String
+  isCustom    Boolean   @default(false)
+  giftId      String    @unique
+  gift        Gift      @relation(fields: [giftId], references: [id], onDelete: Cascade)
+} 

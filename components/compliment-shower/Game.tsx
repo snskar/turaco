@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Drop } from './Drop';
 import { Jar } from './Jar';
 import { Play } from './Play';
-import { COMPLIMENTS } from './constants';
+import { DEFAULT_COMPLIMENTS } from './constants';
 import {
   useGameState,
   useGameRefs,
@@ -18,7 +18,15 @@ import {
   useTouchControls
 } from './hooks';
 
-export default function ComplimentShower(): ReactElement | null {
+interface ComplimentShowerProps {
+  compliments?: string[];
+  autoStart?: boolean;
+}
+
+export default function ComplimentShower({ 
+  compliments = DEFAULT_COMPLIMENTS.COUPLE,
+  autoStart = false 
+}: ComplimentShowerProps): ReactElement | null {
   // Game state using custom hooks
   const {
     hasMounted,
@@ -45,6 +53,13 @@ export default function ComplimentShower(): ReactElement | null {
     lastTimeRef,
     jarMovementRef
   } = useGameRefs();
+
+  // Start automatically if autoStart is true
+  React.useEffect(() => {
+    if (autoStart && hasMounted && !playing) {
+      setPlaying(true);
+    }
+  }, [autoStart, hasMounted, playing, setPlaying]);
 
   // Jar movement control
   const setJarPosition = useJarMovement(
@@ -80,7 +95,7 @@ export default function ComplimentShower(): ReactElement | null {
     setDrops,
     setScore,
     setCompliment,
-    COMPLIMENTS,
+    compliments,
     complimentTimeoutRef,
     animationFrameRef
   );
@@ -101,7 +116,7 @@ export default function ComplimentShower(): ReactElement | null {
 
   if (!hasMounted || viewport.width === 0) return null;
 
-  const jarX = jarXRatio * (viewport.width - 80); // 80 is JAR_SIZE.width
+  const jarX = jarXRatio * (viewport.width - 80);
 
   return (
     <div
@@ -134,24 +149,21 @@ export default function ComplimentShower(): ReactElement | null {
       </div>
 
       {!playing && (
-
         <div className="flex-col absolute inset-0 flex items-center justify-center">
           <Play/>
-        <div 
-          className="flex-col flex items-center justify-center"
-        >
-          <motion.div 
-            className="text-white text-xl md:text-3xl font-bold text-center p-4 rounded-lg"
-            initial={{ scale: 0.9, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            exit={{ scale: 0.9, opacity: 0 }}
-          >
-            {score > 0 ? "Game Paused" : "Tap to Start"}
-            <div className="text-sm md:text-base mt-2">
-              Use arrow keys or touch to move the jar
-            </div>
-          </motion.div>
-        </div>
+          <div className="flex-col flex items-center justify-center">
+            <motion.div 
+              className="text-white text-xl md:text-3xl font-bold text-center p-4 rounded-lg"
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+            >
+              {score > 0 ? "Game Paused" : "Tap to Start"}
+              <div className="text-sm md:text-base mt-2">
+                Use arrow keys or touch to move the jar
+              </div>
+            </motion.div>
+          </div>
         </div>
       )}
     </div>

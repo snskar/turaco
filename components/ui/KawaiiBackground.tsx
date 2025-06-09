@@ -1,5 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import TwinklingStars from '@/components/ui/TwinklingStars';
 
 const KawaiiBackground: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   return (
@@ -81,6 +82,9 @@ const KawaiiBackground: React.FC<{ children: React.ReactNode }> = ({ children })
           ))}
         </div>
       </div>
+
+            {/* Star field layer */}
+            <TwinklingStars starCount={75} />
 
       {/* Content */}
       <div className="relative z-10">
