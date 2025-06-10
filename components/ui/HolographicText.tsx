@@ -4,9 +4,16 @@ import { motion } from 'framer-motion';
 interface HolographicTextProps {
   children: string;
   className?: string;
+  strokeWidth?: number; // Width of the stroke in pixels
+  strokeOpacity?: number; // Opacity of the stroke
 }
 
-const HolographicText: React.FC<HolographicTextProps> = ({ children, className = '' }) => {
+const HolographicText: React.FC<HolographicTextProps> = ({ 
+  children, 
+  className = '',
+  strokeWidth,
+  strokeOpacity = 0.8,
+}) => {
   // Generate star glints at specific positions
   const starGlints = [
     { top: 0, left: 0 },
@@ -17,6 +24,33 @@ const HolographicText: React.FC<HolographicTextProps> = ({ children, className =
 
   return (
     <div className={`relative inline-block ${className}`}>
+      {/* Stroke layer (only rendered if strokeWidth is provided) */}
+      {strokeWidth && (
+        <motion.div
+          className="absolute inset-0 text-8xl font-bold tracking-wider"
+          style={{
+            color: 'transparent',
+            WebkitTextStroke: `${strokeWidth}px transparent`,
+            WebkitBackgroundClip: 'text',
+            backgroundClip: 'text',
+            backgroundImage: 'linear-gradient(135deg, rgba(147,51,234,0.8) 0%, rgba(236,72,153,0.8) 50%, rgba(99,102,241,0.8) 100%)',
+            opacity: strokeOpacity,
+            transform: 'scale(1.01)', // Slightly larger to ensure stroke is visible
+            filter: 'blur(0.3px)', // Subtle blur for smoother appearance
+          }}
+          animate={{
+            backgroundPosition: ['0% 0%', '100% 100%', '0% 0%'],
+          }}
+          transition={{
+            duration: 12,
+            repeat: Infinity,
+            ease: "linear",
+          }}
+        >
+          {children}
+        </motion.div>
+      )}
+
       {/* Main text with chrome effect */}
       <motion.div
         className="relative text-transparent bg-clip-text"

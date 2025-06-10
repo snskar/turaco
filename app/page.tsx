@@ -82,7 +82,7 @@ const images = [
 
           </div>
           <SpinTheWheel options={options} centerImageSrc="/assets/art/hamster.png" />
-          <HolographicText>{"Sample Text"}</HolographicText>
+          <HolographicText strokeWidth={20} strokeOpacity={0.7}>{"Sample Text"}</HolographicText>
         </KawaiiBackgroundDarker>
         
 
