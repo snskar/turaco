@@ -10,7 +10,7 @@ import KawaiiBackgroundDarker from "@/components/ui/KawaiiBackgroundDarker";
 import ComplimentShower from "@/components/compliment-shower/Game";
 import SpinTheWheel from "@/components/spin-the-wheel/SpinTheWheel";
 import Slideshow from "@/components/slideshow/Slideshow";
-import SplashTitle from "@/components/ui/SplashTitle";
+import SplashTitle from "@/components/ui/splash-title/SplashTitle";
 
 import { getCompliments } from '@/lib/utils';
 

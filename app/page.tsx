@@ -8,9 +8,10 @@ import HolographicBackground from "@/components/ui/HolographicBackground";
 import ComplimentShower from "@/components/compliment-shower/Game";
 import SpinTheWheel from "@/components/spin-the-wheel/SpinTheWheel";
 import Slideshow from "@/components/slideshow/Slideshow";
-import SplashTitle from "@/components/ui/SplashTitle";
+import SplashTitle from "@/components/ui/splash-title/SplashTitle";
 import HolographicText from "@/components/ui/HolographicText";
 import HolographicBackground2 from "@/components/ui/HolographicBackground2";
+import {DEFAULT_WHEEL_OPTIONS} from "@/components/spin-the-wheel/constants";
 
 
 export default function Home() {
@@ -81,7 +82,7 @@ const images = [
           </CardStack>
 
           </div>
-          <SpinTheWheel options={options} centerImageSrc="/assets/art/hamster.png" />
+          <SpinTheWheel options={DEFAULT_WHEEL_OPTIONS.COUPLE} centerImageSrc="/assets/art/hamster.png" />
           <HolographicText strokeWidth={20} strokeOpacity={0.7}>{"Sample Text"}</HolographicText>
         </KawaiiBackgroundDarker>
         

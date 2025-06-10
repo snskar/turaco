@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
-import HolographicText from './HolographicText';
+import HolographicText from '../HolographicText';
 import Image from 'next/image';
 
 interface SplashTitleProps {
@@ -9,6 +9,7 @@ interface SplashTitleProps {
   name?: string;
   message?: string;
   className?: string;
+  imgSource?: string;
 }
 
 const SplashTitle: React.FC<SplashTitleProps> = ({
@@ -16,6 +17,7 @@ const SplashTitle: React.FC<SplashTitleProps> = ({
   name,
   message,
   className,
+  imgSource, 
 }) => {
   return (
     <motion.div 
@@ -55,8 +57,8 @@ const SplashTitle: React.FC<SplashTitleProps> = ({
           transition={{ delay: 0.3, duration: 0.5 }}
         >
           <Image
-            src="/assets/art/cat.png"
-            alt="Decorative cat"
+            src={imgSource || "/assets/art/cat.png"}
+            alt="Decorative symbol"
             width={300}
             height={300}
             className="object-contain drop-shadow-lg"
