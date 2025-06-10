@@ -53,7 +53,7 @@ model Heartlink {
   // Interactive elements
   activities  Activity[]
   compliments Compliment[]
-  scratchCard ScratchCard?
+  scratchCard ScratchCard[]
 }
 
 model Photo {
@@ -95,6 +95,6 @@ model ScratchCard {
   id          String    @id @default(cuid())
   content     String
   isCustom    Boolean   @default(false)
-  heartlinkId String    @unique
+  heartlinkId String
   heartlink   Heartlink @relation(fields: [heartlinkId], references: [id], onDelete: Cascade)
 } 

@@ -4,6 +4,7 @@ import { Heartlink, Compliment, ScratchCard, Activity, Photo } from "../app/type
 import { DEFAULT_COMPLIMENTS } from "@/components/compliment-shower/constants";
 import { DEFAULT_WHEEL_OPTIONS } from "@/components/spin-the-wheel/constants";
 import { OCCASION_CONTENT_MAPPING } from "@/components/ui/splash-title/constants";
+import { DEFAULT_SCRATCH_CARD_OPTIONS } from "@/components/scratch-card/constants";
 
 // Type definitions for function returns
 export interface TitleContent {
@@ -37,8 +38,32 @@ export interface SlideshowResult {
   autoPlayInterval?: number;
 }
 
+interface ComplimentShowerProps {
+  compliments: string[];
+  autoStart?: boolean;
+}
+
+interface SpinTheWheelProps {
+  options: string[];
+  centerImageSrc: string;
+  onWin?: (winner: string) => void;
+}
+
+// Type for the return value of getScratchCard to match CardStack props
+export interface ScratchCardStackProps {
+  cards: string[];
+}
+
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
+}
+
+// Utility function to pick n random values from an array
+function pickRandomValues<T>(array: T[], n: number): T[] {
+  if (array.length <= n) return array;
+  
+  const shuffled = [...array].sort(() => 0.5 - Math.random());
+  return shuffled.slice(0, n);
 }
 
 // get title, name, message, img from the heartlink object to map to the splash title component
@@ -128,51 +153,84 @@ export function getSlideshowContent(
 }
 
 // Get compliments from the heartlink object to map to the compliment shower 
-export function getCompliments(heartlink: Heartlink): ComplimentResult {
+export function getCompliments(heartlink: Heartlink): ComplimentShowerProps {
   if (!heartlink) {
     throw new Error('Heartlink object is required for getting compliments');
   }
 
-  const { relation, compliments } = heartlink;
+  const { relation, compliments: heartlinkCompliments } = heartlink;
 
   try {
-    if (!compliments?.length) {
+    if (!heartlinkCompliments || !Array.isArray(heartlinkCompliments) || heartlinkCompliments.length === 0) {
       if (relation && relation in DEFAULT_COMPLIMENTS) {
         return {
-          content: DEFAULT_COMPLIMENTS[relation as keyof typeof DEFAULT_COMPLIMENTS],
-          source: 'default'
+          compliments: DEFAULT_COMPLIMENTS[relation as keyof typeof DEFAULT_COMPLIMENTS],
+          autoStart: false
         };
       }
       return {
-        content: DEFAULT_COMPLIMENTS.OTHER,
-        source: 'default'
+        compliments: DEFAULT_COMPLIMENTS.OTHER,
+        autoStart: false
       };
     }
 
     return {
-      content: compliments.map((c: Compliment) => c.content),
-      source: 'custom'
+      compliments: heartlinkCompliments.map((c: Compliment) => c.content),
+      autoStart: false
     };
   } catch (error) {
     console.error('Error processing compliments:', error);
     return {
-      content: DEFAULT_COMPLIMENTS.OTHER,
-      source: 'default'
+      compliments: DEFAULT_COMPLIMENTS.OTHER,
+      autoStart: false
     };
   }
 }
 
+
 // get scratch card from the heartlink object to map to the scratch card component 
-// export function getScratchCard(heartlink: Heartlink) {
-//   if(!heartlink.scratchCard || heartlink.scratchCard.length === 0) {
-//     return [];
-//   }
-//   return heartlink.scratchCard.map((c: ScratchCard) => c.content);
-// }
+export function getScratchCards(heartlink: Heartlink | null): ScratchCardStackProps {
+  // Validate input
+  if (!heartlink) {
+    console.warn('No heartlink provided, using default scratch cards');
+    return {
+      cards: pickRandomValues(DEFAULT_SCRATCH_CARD_OPTIONS.OTHER, 5)
+    };
+  }
+
+  const { relation, scratchCard } = heartlink;
+
+  try {
+    // Case 1: Custom scratch cards from heartlink
+    if (scratchCard && Array.isArray(scratchCard) && scratchCard.length > 0) {
+      return {
+        cards: pickRandomValues(scratchCard.map((card: ScratchCard) => card.content), 5)
+      };
+    }
+
+    // Case 2: Default cards based on relation
+    if (relation && relation in DEFAULT_SCRATCH_CARD_OPTIONS) {
+      return {
+        cards: pickRandomValues(DEFAULT_SCRATCH_CARD_OPTIONS[relation as keyof typeof DEFAULT_SCRATCH_CARD_OPTIONS], 5)
+      };
+    }
+
+    // Case 3: Fallback to OTHER category
+    return {
+      cards: pickRandomValues(DEFAULT_SCRATCH_CARD_OPTIONS.OTHER, 5)
+    };
+  } catch (error) {
+    console.error('Error processing scratch cards:', error);
+    // Safe fallback in case of any error
+    return {
+      cards: pickRandomValues(DEFAULT_SCRATCH_CARD_OPTIONS.OTHER, 5)
+    };
+  }
+}
 
 // get wheel options from the heartlink object to map to the spin the wheel component
 
-export function getWheelOptions(heartlink: Heartlink): WheelOptionsResult {
+export function getWheelOptions(heartlink: Heartlink): SpinTheWheelProps {
   if (!heartlink) {
     throw new Error('Heartlink object is required for getting wheel options');
   }
@@ -184,24 +242,28 @@ export function getWheelOptions(heartlink: Heartlink): WheelOptionsResult {
       if (relation && relation in DEFAULT_WHEEL_OPTIONS) {
         return {
           options: DEFAULT_WHEEL_OPTIONS[relation as keyof typeof DEFAULT_WHEEL_OPTIONS],
-          source: 'default'
+          centerImageSrc: "/assets/art/hamster.png",
+          onWin: undefined
         };
       }
       return {
         options: DEFAULT_WHEEL_OPTIONS.OTHER,
-        source: 'default'
+        centerImageSrc: "/assets/art/hamster.png",
+        onWin: undefined
       };
     }
 
     return {
       options: activities.map((a: Activity) => a.content),
-      source: 'custom'
+      centerImageSrc: "/assets/art/hamster.png",
+      onWin: undefined
     };
   } catch (error) {
     console.error('Error processing wheel options:', error);
     return {
       options: DEFAULT_WHEEL_OPTIONS.OTHER,
-      source: 'default'
+      centerImageSrc: "/assets/art/hamster.png",
+      onWin: undefined
     };
   }
 }

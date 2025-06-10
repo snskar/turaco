@@ -75,5 +75,5 @@ export interface Heartlink {
   spotifyTrack?: SpotifyTrack;
   activities?: Activity[];
   compliments?: Compliment[];
-  scratchCard?: ScratchCard;
+  scratchCard?: ScratchCard[];
 } 
