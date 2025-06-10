@@ -1,30 +1,30 @@
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
-import { Gift } from "@/app/types/gift";
+import { Heartlink, Compliment, ScratchCard } from "@/app/types/heartlink";
 import { DEFAULT_COMPLIMENTS } from "@/components/compliment-shower/constants";
  
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 } 
 
-// Get compliments from the gift object to map to the compliment shower 
-export function getCompliments(gift: Gift) {
-    const {relation} = gift;
+// Get compliments from the heartlink object to map to the compliment shower 
+export function getCompliments(heartlink: Heartlink) {
+    const {relation} = heartlink;
 
-      if(!gift.compliments || gift.compliments.length === 0) {
+      if(!heartlink.compliments || heartlink.compliments.length === 0) {
         if(relation in DEFAULT_COMPLIMENTS) {
           return DEFAULT_COMPLIMENTS[relation as keyof typeof DEFAULT_COMPLIMENTS];
         }
         return DEFAULT_COMPLIMENTS.OTHER;
       }
 
-      return gift.compliments.map(c => c.content);
+      return heartlink.compliments.map((c: Compliment) => c.content);
 }
 
-// get scratch card from the gift object to map to the scratch card component 
-export function getScratchCard(gift: Gift) {
-  if(!gift.scratchCard || gift.scratchCard.length === 0) {
+// get scratch card from the heartlink object to map to the scratch card component 
+export function getScratchCard(heartlink: Heartlink) {
+  if(!heartlink.scratchCard || heartlink.scratchCard.length === 0) {
     return [];
   }
-  return gift.scratchCard.map(c => c.content);
+  return heartlink.scratchCard.map((c: ScratchCard) => c.content);
 }

@@ -11,12 +11,12 @@ export async function POST(req: Request) {
     // Generate a unique slug
     const slug = nanoid(10);
 
-    // Create the gift with all related data
-    const gift = await prisma.gift.create({
+    // Create the heartlink with all related data
+    const heartlink = await prisma.Heartlink.create({
       data: {
         slug,
-        gifterName: data.gifterName,
-        gifteeName: data.gifteeName,
+        senderName: data.senderName,
+        recipientName: data.recipientName,
         occasion: data.occasion,
         relation: data.relation,
         message: data.message,
@@ -74,18 +74,18 @@ export async function POST(req: Request) {
 
     return NextResponse.json({ 
       success: true, 
-      data: gift,
-      slug: gift.slug 
+      data: heartlink,
+      slug: heartlink.slug 
     });
 
   } catch (error) {
-    console.error('Error creating gift:', error);
+    console.error('Error creating heartlink:', error);
     // Return more detailed error information
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     return NextResponse.json(
       { 
         success: false, 
-        error: 'Failed to create gift',
+        error: 'Failed to create heartlink',
         details: errorMessage
       },
       { status: 500 }
@@ -105,7 +105,7 @@ export async function GET(req: Request) {
       );
     }
 
-    const gift = await prisma.gift.findUnique({
+    const heartlink = await prisma.Heartlink.findUnique({
       where: { slug },
       include: {
         photos: true,
@@ -116,22 +116,22 @@ export async function GET(req: Request) {
       },
     });
 
-    if (!gift) {
+    if (!heartlink) {
       return NextResponse.json(
-        { success: false, error: 'Gift not found' },
+        { success: false, error: 'Heartlink not found' },
         { status: 404 }
       );
     }
 
-    return NextResponse.json({ success: true, data: gift });
+    return NextResponse.json({ success: true, data: heartlink });
 
   } catch (error) {
-    console.error('Error fetching gift:', error);
+    console.error('Error fetching heartlink:', error);
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     return NextResponse.json(
       { 
         success: false, 
-        error: 'Failed to fetch gift',
+        error: 'Failed to fetch heartlink',
         details: errorMessage
       },
       { status: 500 }

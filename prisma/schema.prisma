@@ -8,7 +8,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum GiftRelation {
+enum HeartlinkRelation {
   COUPLE
   FATHER
   MOTHER
@@ -18,7 +18,7 @@ enum GiftRelation {
   OTHER
 }
 
-enum GiftOccasion {
+enum HeartlinkOccasion {
   BIRTHDAY
   NEW_YEAR
   DIWALI
@@ -33,17 +33,17 @@ enum GiftOccasion {
   OTHER
 }
 
-model Gift {
+model Heartlink {
   id          String       @id @default(cuid())
   slug        String       @unique
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
 
-  // Gifter and Giftee information
-  gifterName  String
-  gifteeName  String
-  occasion    GiftOccasion @default(BIRTHDAY)
-  relation    GiftRelation @default(FRIEND)
+  // Sender and Recipient information
+  senderName  String
+  recipientName String
+  occasion    HeartlinkOccasion @default(BIRTHDAY)
+  relation    HeartlinkRelation @default(FRIEND)
   message     String?
 
   // Media and content
@@ -59,8 +59,8 @@ model Gift {
 model Photo {
   id          String    @id @default(cuid())
   url         String
-  giftId      String
-  gift        Gift      @relation(fields: [giftId], references: [id], onDelete: Cascade)
+  heartlinkId String
+  heartlink   Heartlink @relation(fields: [heartlinkId], references: [id], onDelete: Cascade)
 }
 
 model SpotifyTrack {
@@ -71,30 +71,30 @@ model SpotifyTrack {
   artist      String?
   imageUrl    String?
   previewUrl  String?
-  giftId      String    @unique
-  gift        Gift      @relation(fields: [giftId], references: [id], onDelete: Cascade)
+  heartlinkId String    @unique
+  heartlink   Heartlink @relation(fields: [heartlinkId], references: [id], onDelete: Cascade)
 }
 
 model Activity {
   id          String    @id @default(cuid())
   content     String
   isCustom    Boolean   @default(false)
-  giftId      String
-  gift        Gift      @relation(fields: [giftId], references: [id], onDelete: Cascade)
+  heartlinkId String
+  heartlink   Heartlink @relation(fields: [heartlinkId], references: [id], onDelete: Cascade)
 }
 
 model Compliment {
   id          String    @id @default(cuid())
   content     String
   isCustom    Boolean   @default(false)
-  giftId      String
-  gift        Gift      @relation(fields: [giftId], references: [id], onDelete: Cascade)
+  heartlinkId String
+  heartlink   Heartlink @relation(fields: [heartlinkId], references: [id], onDelete: Cascade)
 }
 
 model ScratchCard {
   id          String    @id @default(cuid())
   content     String
   isCustom    Boolean   @default(false)
-  giftId      String    @unique
-  gift        Gift      @relation(fields: [giftId], references: [id], onDelete: Cascade)
+  heartlinkId String    @unique
+  heartlink   Heartlink @relation(fields: [heartlinkId], references: [id], onDelete: Cascade)
 } 
