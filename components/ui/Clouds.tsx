@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState, useRef, useCallback } from 'react';
 import Image from 'next/image';
-import { motion } from 'framer-motion';
+import { motion, useAnimationControls } from 'framer-motion';
 
 interface CloudProps {
   children?: React.ReactNode;
@@ -24,6 +24,7 @@ interface Cloud {
   imageIndex: number;
   direction: 1 | -1;
   opacity: number;
+  key: string; // Add a unique key for regeneration
 }
 
 const CLOUD_IMAGES = [
@@ -34,6 +35,45 @@ const CLOUD_IMAGES = [
   '/assets/clouds/cloud5.png',
   '/assets/clouds/cloud6.png',
 ];
+
+const generateCloud = (
+  id: number,
+  width: number,
+  height: number,
+  minSize: number,
+  maxSize: number,
+  minSpeed: number,
+  maxSpeed: number,
+  opacity: number,
+  direction: 1 | -1,
+  forceSection?: number
+): Cloud => {
+  const size = minSize + Math.random() * (maxSize - minSize);
+  const speed = minSpeed + Math.random() * (maxSpeed - minSpeed);
+  
+  // If forceSection is provided, use it for vertical positioning
+  let y;
+  if (typeof forceSection === 'number') {
+    const sectionSize = height / 3;
+    const sectionStart = sectionSize * forceSection;
+    y = sectionStart + Math.random() * sectionSize;
+  } else {
+    y = Math.random() * height;
+  }
+
+  return {
+    id,
+    // Start position based on direction
+    x: direction === 1 ? -size : width,
+    y,
+    size,
+    speed,
+    imageIndex: Math.floor(Math.random() * CLOUD_IMAGES.length),
+    direction,
+    opacity: opacity * (0.7 + Math.random() * 0.3),
+    key: `cloud-${id}-${Date.now()}`, // Unique key for regeneration
+  };
+};
 
 export const Clouds: React.FC<CloudProps> = ({
   children,
@@ -61,19 +101,57 @@ export const Clouds: React.FC<CloudProps> = ({
     const area = width * height;
     const numberOfClouds = Math.max(1, Math.floor((area / 1000000) * density));
 
-    const newClouds: Cloud[] = Array.from({ length: numberOfClouds }, (_, i) => ({
-      id: i,
-      x: Math.random() * width,
-      y: Math.random() * height,
-      size: minSize + Math.random() * (maxSize - minSize),
-      speed: minSpeed + Math.random() * (maxSpeed - minSpeed),
-      imageIndex: Math.floor(Math.random() * CLOUD_IMAGES.length),
-      direction: Math.random() > 0.5 ? 1 : -1,
-      opacity: opacity * (0.7 + Math.random() * 0.3),
-    }));
+    const newClouds: Cloud[] = [];
+    
+    // Divide the height into sections to ensure better vertical distribution
+    const verticalSections = 3; // Divide height into 3 sections
+    const cloudsPerSection = Math.ceil(numberOfClouds / verticalSections);
+    
+    for (let section = 0; section < verticalSections; section++) {
+      const sectionStart = (height * section) / verticalSections;
+      const sectionEnd = (height * (section + 1)) / verticalSections;
+      
+      // Create clouds for this section
+      for (let i = 0; i < cloudsPerSection; i++) {
+        const id = section * cloudsPerSection + i;
+        const direction = Math.random() > 0.5 ? 1 : -1;
+        newClouds.push(generateCloud(
+          id,
+          width,
+          height,
+          minSize,
+          maxSize,
+          minSpeed,
+          maxSpeed,
+          opacity,
+          direction,
+          section
+        ));
+      }
+    }
 
     setClouds(newClouds);
   }, [density, minSize, maxSize, minSpeed, maxSpeed, opacity]);
+
+  // Handle cloud regeneration
+  const regenerateCloud = useCallback((cloud: Cloud) => {
+    if (!containerRef.current) return cloud;
+
+    const { width, height } = dimensions;
+    return generateCloud(
+      cloud.id,
+      width,
+      height,
+      minSize,
+      maxSize,
+      minSpeed,
+      maxSpeed,
+      opacity,
+      // Reverse the direction for the new cloud
+      cloud.direction * -1 as 1 | -1,
+      Math.floor(Math.random() * 3) // Random section
+    );
+  }, [dimensions, minSize, maxSize, minSpeed, maxSpeed, opacity]);
 
   useEffect(() => {
     // Initial setup
@@ -104,7 +182,7 @@ export const Clouds: React.FC<CloudProps> = ({
     >
       {clouds.map((cloud) => (
         <motion.div
-          key={cloud.id}
+          key={cloud.key}
           className="absolute"
           style={{
             width: cloud.size,
@@ -112,12 +190,9 @@ export const Clouds: React.FC<CloudProps> = ({
           }}
           initial={{ x: cloud.x, y: cloud.y }}
           animate={{
-            x: [
-              cloud.x,
-              cloud.direction === 1
-                ? dimensions.width + cloud.size
-                : -cloud.size,
-            ],
+            x: cloud.direction === 1
+              ? [cloud.x, dimensions.width + cloud.size]
+              : [cloud.x, -cloud.size],
             y: [
               cloud.y,
               cloud.y + Math.sin(cloud.x) * 50,
@@ -128,8 +203,14 @@ export const Clouds: React.FC<CloudProps> = ({
             x: {
               duration: (dimensions.width + cloud.size * 2) / cloud.speed,
               ease: "linear",
-              repeat: Infinity,
-              repeatType: "loop",
+              repeat: 0,
+              onComplete: () => {
+                setClouds(prevClouds => 
+                  prevClouds.map(c => 
+                    c.key === cloud.key ? regenerateCloud(cloud) : c
+                  )
+                );
+              }
             },
             y: {
               duration: 20 + Math.random() * 10,

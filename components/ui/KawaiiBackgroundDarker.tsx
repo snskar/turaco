@@ -42,12 +42,12 @@ export const KawaiiBackgroundDarker: React.FC<KawaiiBackgroundDarkerProps> = ({
         {/* Clouds Layer */}
         <div className="absolute inset-0 w-full h-full">
           <Clouds
-            density={cloudDensity}
+            density={cloudDensity * 1.5}
             opacity={cloudOpacity}
-            minSize={200}
-            maxSize={500}
-            minSpeed={12}
-            maxSpeed={35}
+            minSize={150}
+            maxSize={400}
+            minSpeed={15}
+            maxSpeed={40}
             zIndex={5}
           />
         </div>
