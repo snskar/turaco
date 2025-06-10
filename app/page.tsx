@@ -74,14 +74,13 @@ const images = [
           </div>  
 
         <div className="py-40 items-center justify-center">
-          <CardStack>
-            <ScratchCard/>
-            <ScratchCard/>
-            <ScratchCard/>
-            <ScratchCard/>
-          </CardStack>
-
-          </div>
+          <CardStack cards={[
+            "Free Hug Coupon!",
+            "30 Minutes Massage",
+            "Breakfast in Bed",
+            "Movie Night Pick"
+          ]} />
+        </div>
           <SpinTheWheel options={DEFAULT_WHEEL_OPTIONS.COUPLE} centerImageSrc="/assets/art/hamster.png" />
           <HolographicText strokeWidth={20} strokeOpacity={0.7}>{"Sample Text"}</HolographicText>
         </KawaiiBackgroundDarker>
