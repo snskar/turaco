@@ -66,7 +66,7 @@ const images = [
         <KawaiiBackgroundDarker>
           <SplashTitle title="Happy Birthday" name="Random" message="Happy Birthday, legend! May your wrinkles be few, your snacks never end, and your group chats always spicy. Keep being fabulously weird—like glitter in a world full of beige!" />
           <div className="p-7">
-            {/* <Slideshow images={images} /> */}
+            <Slideshow images={images} />
           </div>
           <div className="relative mb-16">
             <ComplimentShower/>

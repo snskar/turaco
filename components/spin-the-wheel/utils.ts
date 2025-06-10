@@ -109,26 +109,33 @@ export const useSpinTheWheel = ({
     setIsSpinning(true);
     setWinner(null);
 
+    // Lock body scroll during spin animation
+    document.body.style.overflow = 'hidden';
+    document.body.style.touchAction = 'none';
+
     // Get the current rotation and normalize it
     const currentRotation = rotation % 360;
     
     // Choose a random winning index first
     const targetIndex = Math.floor(Math.random() * options.length);
     
-    // Calculate spins
-    const fullSpins = minSpins + Math.random() * (maxSpins - minSpins);
+    // Calculate spins (more controlled range)
+    const fullSpins = minSpins + (Math.random() * (maxSpins - minSpins));
     
-    // Calculate how much we need to rotate from the current position
+    // Calculate final rotation with better precision
     const baseAngle = 360 - (targetIndex * sectorAngle);
-    const finalRotation = (fullSpins * 360) + baseAngle - 90 + (360 - currentRotation);
+    const finalRotation = Math.floor((fullSpins * 360) + baseAngle - 90 + (360 - currentRotation));
     
-    setRotation(prevRotation => prevRotation + finalRotation);
-
+    // Update wheel with optimized animation
     if (wheelRef.current) {
-      wheelRef.current.style.transition = "transform 8s cubic-bezier(0.2, 0.1, 0.1, 1)";
-      wheelRef.current.style.transform = `rotate(${rotation + finalRotation}deg)`;
+      wheelRef.current.style.transition = `transform 8s cubic-bezier(0.32, 0.06, 0.15, 1)`;
+      wheelRef.current.style.transform = `rotate(${rotation + finalRotation}deg) translateZ(0)`;
     }
 
+    // Update state
+    setRotation(prevRotation => prevRotation + finalRotation);
+
+    // Delay winner announcement slightly
     setTimeout(() => {
       const winningIndex = getWinningOptionIndex(rotation + finalRotation);
       const winningOption = options[winningIndex];
@@ -136,16 +143,55 @@ export const useSpinTheWheel = ({
       setWinner(winningOption);
       onWin?.(winningOption);
       triggerConfetti();
-      setIsSpinning(false);
-    }, 8000);
+      
+      // Restore body scroll after animation
+      document.body.style.overflow = '';
+      document.body.style.touchAction = '';
+
+      // Small delay before allowing next spin
+      setTimeout(() => {
+        setIsSpinning(false);
+      }, 500);
+    }, 8200);
   }, [isSpinning, options, sectorAngle, getWinningOptionIndex, onWin, triggerConfetti, rotation, minSpins, maxSpins]);
 
-  // Handle wheel interaction (click/tap)
+  // Debounced interaction handler with scroll prevention
   const handleInteraction = useCallback((e: React.MouseEvent | React.TouchEvent) => {
-    if (isSpinning) return;
-    e.preventDefault(); // Prevent any default behavior
-    spin();
+    if (isSpinning) {
+      e.preventDefault();
+      return;
+    }
+    
+    // Prevent any default behavior
+    e.preventDefault();
+    e.stopPropagation();
+
+    // Ensure container is in view
+    if (containerRef.current) {
+      const rect = containerRef.current.getBoundingClientRect();
+      const isInView = rect.top >= 0 && rect.bottom <= window.innerHeight;
+      
+      if (!isInView) {
+        containerRef.current.scrollIntoView({ 
+          behavior: 'smooth', 
+          block: 'center'
+        });
+      }
+    }
+    
+    // Add small delay to prevent accidental double triggers
+    requestAnimationFrame(() => {
+      spin();
+    });
   }, [isSpinning, spin]);
+
+  // Clean up function for scroll locks
+  useEffect(() => {
+    return () => {
+      document.body.style.overflow = '';
+      document.body.style.touchAction = '';
+    };
+  }, []);
 
   const renderSectors = useCallback(() => {
     return options.map((option, i) => {

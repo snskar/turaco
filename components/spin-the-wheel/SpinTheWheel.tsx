@@ -31,7 +31,12 @@ const SpinTheWheel: React.FC<SpinTheWheelProps> = ({
   return (
     <div 
       ref={containerRef}
-      className="flex flex-col items-center justify-center p-4 relative select-none"
+      className="flex flex-col items-center justify-center p-4 relative select-none overflow-hidden"
+      style={{
+        touchAction: 'none',
+        WebkitOverflowScrolling: 'touch',
+        overscrollBehavior: 'none',
+      }}
     >
       {/* Win Pointer */}
       <div 
@@ -42,6 +47,7 @@ const SpinTheWheel: React.FC<SpinTheWheelProps> = ({
           width: '80px',
           height: '80px',
           filter: 'drop-shadow(0 2px 8px rgba(225,125,220,0.5))',
+          willChange: 'transform',
         }}
       >
         <Image
@@ -61,14 +67,20 @@ const SpinTheWheel: React.FC<SpinTheWheelProps> = ({
       </div>
 
       {/* Wheel Container */}
-      <div 
+      <div
         className="relative bg-white/10 backdrop-blur-sm rounded-full p-4 shadow-xl cursor-pointer
-                   hover:shadow-2xl hover:scale-[1.02] transition-all duration-300"
+                   hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 touch-none"
         onClick={handleInteraction}
-        onTouchStart={handleInteraction}
+        onTouchEnd={handleInteraction}
+        onTouchMove={(e) => e.preventDefault()}
         style={{
           marginTop: '20px',
-          touchAction: 'none', // Prevent scrolling/zooming but allow tap
+          touchAction: 'none',
+          WebkitTapHighlightColor: 'transparent',
+          userSelect: 'none',
+          willChange: 'transform',
+          transform: 'translate3d(0,0,0)',
+          WebkitTransform: 'translate3d(0,0,0)',
         }}
       >
         {/* Shimmering overlay */}
