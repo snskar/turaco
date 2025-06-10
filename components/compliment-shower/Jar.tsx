@@ -13,7 +13,7 @@ export const Jar = ({ x }: { x: number }): ReactElement => (
       }}
     >
       <Image 
-        src="/assets/jar.png" 
+        src="/assets/art/jar.png" 
         alt="Catching jar" 
         width={JAR_SIZE.width}
         height={JAR_SIZE.height}

@@ -24,22 +24,22 @@ const SpinTheWheel: React.FC<SpinTheWheelProps> = ({
     wheelRef,
     containerRef,
     radius,
-    spin,
+    handleInteraction,
     renderSectors
   } = useSpinTheWheel({ options, onWin });
 
   return (
     <div 
       ref={containerRef}
-      className="flex flex-col items-center justify-center p-4 relative"
+      className="flex flex-col items-center justify-center p-4 relative select-none"
     >
       {/* Win Pointer */}
       <div 
-        className="absolute z-20 transform -translate-x-1/2"
+        className="absolute z-20 transform -translate-x-1/2 pointer-events-none"
         style={{
           left: '50%',
-          top: '-10px', // Adjust this value to control how much the pointer overlaps
-          width: '80px', // Adjust size as needed
+          top: '-10px',
+          width: '80px',
           height: '80px',
           filter: 'drop-shadow(0 2px 8px rgba(225,125,220,0.5))',
         }}
@@ -50,8 +50,8 @@ const SpinTheWheel: React.FC<SpinTheWheelProps> = ({
           width={80}
           height={80}
           className="w-full h-full object-contain"
+          draggable={false}
         />
-        {/* Glow effect behind the pointer */}
         <div
           className="absolute inset-0 -z-10 blur-md opacity-50"
           style={{
@@ -64,9 +64,11 @@ const SpinTheWheel: React.FC<SpinTheWheelProps> = ({
       <div 
         className="relative bg-white/10 backdrop-blur-sm rounded-full p-4 shadow-xl cursor-pointer
                    hover:shadow-2xl hover:scale-[1.02] transition-all duration-300"
-        onClick={!isSpinning ? spin : undefined}
+        onClick={handleInteraction}
+        onTouchStart={handleInteraction}
         style={{
-          marginTop: '20px', // Adjust this to control the gap between pointer and wheel
+          marginTop: '20px',
+          touchAction: 'none', // Prevent scrolling/zooming but allow tap
         }}
       >
         {/* Shimmering overlay */}

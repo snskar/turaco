@@ -140,6 +140,13 @@ export const useSpinTheWheel = ({
     }, 8000);
   }, [isSpinning, options, sectorAngle, getWinningOptionIndex, onWin, triggerConfetti, rotation, minSpins, maxSpins]);
 
+  // Handle wheel interaction (click/tap)
+  const handleInteraction = useCallback((e: React.MouseEvent | React.TouchEvent) => {
+    if (isSpinning) return;
+    e.preventDefault(); // Prevent any default behavior
+    spin();
+  }, [isSpinning, spin]);
+
   const renderSectors = useCallback(() => {
     return options.map((option, i) => {
       // Calculate sector angles for clockwise rotation
@@ -188,6 +195,7 @@ export const useSpinTheWheel = ({
     containerRef,
     radius,
     spin,
+    handleInteraction,
     renderSectors
   };
 };

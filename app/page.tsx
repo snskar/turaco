@@ -81,7 +81,7 @@ const images = [
           </CardStack>
 
           </div>
-          <SpinTheWheel options={options} centerImageSrc="/assets/hamster2.png" />
+          <SpinTheWheel options={options} centerImageSrc="/assets/art/hamster.png" />
           <HolographicText>{"Sample Text"}</HolographicText>
         </KawaiiBackgroundDarker>
         
