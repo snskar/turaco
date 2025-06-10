@@ -1,6 +1,6 @@
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
-import { Heartlink, Compliment, ScratchCard, Activity } from "../app/types/heartlink";
+import { Heartlink, Compliment, ScratchCard, Activity, Photo } from "../app/types/heartlink";
 import { DEFAULT_COMPLIMENTS } from "@/components/compliment-shower/constants";
 import { DEFAULT_WHEEL_OPTIONS } from "@/components/spin-the-wheel/constants";
 import { OCCASION_CONTENT_MAPPING } from "@/components/ui/splash-title/constants";
@@ -21,6 +21,20 @@ export interface ComplimentResult {
 export interface WheelOptionsResult {
   options: string[];
   source: 'custom' | 'default';
+}
+
+// Type definitions for slideshow
+export interface SlideshowImage {
+  src: string;
+  alt: string;
+}
+
+export interface SlideshowResult {
+  images: SlideshowImage[];
+  width?: string | number;
+  height?: string | number;
+  autoPlay?: boolean;
+  autoPlayInterval?: number;
 }
 
 export function cn(...inputs: ClassValue[]) {
@@ -58,6 +72,57 @@ export function getTitleContent(heartlink: Heartlink): TitleContent {
       ...OCCASION_CONTENT_MAPPING.OTHER,
       name: 'My Favourite Person',
       message: OCCASION_CONTENT_MAPPING.OTHER.displayMessage
+    };
+  }
+}
+
+// Get slideshow content from the heartlink object
+export function getSlideshowContent(
+  heartlink: Heartlink,
+  options: Partial<Omit<SlideshowResult, 'images'>> = {}
+): SlideshowResult {
+  if (!heartlink) {
+    throw new Error('Heartlink object is required for getting slideshow content');
+  }
+
+  try {
+    const { photos } = heartlink;
+    const defaultOptions = {
+      width: '100%',
+      height: 400,
+      autoPlay: true,
+      autoPlayInterval: 3000,
+      ...options
+    };
+
+    // If no photos, return empty state but with default options
+    if (!photos?.length) {
+      return {
+        images: [],
+        ...defaultOptions
+      };
+    }
+
+    // Map photos to slideshow format
+    const images = photos.map((photo: Photo) => ({
+      src: photo.url,
+      alt: `Photo shared by ${heartlink.senderName}`
+    }));
+
+    return {
+      images,
+      ...defaultOptions
+    };
+  } catch (error) {
+    console.error('Error processing slideshow content:', error);
+    // Return empty state with default options on error
+    return {
+      images: [],
+      width: '100%',
+      height: 400,
+      autoPlay: true,
+      autoPlayInterval: 3000,
+      ...options
     };
   }
 }
