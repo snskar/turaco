@@ -200,16 +200,11 @@ const SpinTheWheel: React.FC<SpinTheWheelProps> = ({
       <AnimatePresence>
         {winner && (
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            className="mt-6 text-xl font-bold text-center p-4 rounded-lg
-                     bg-gradient-to-r from-pink-400/30 via-purple-400/30 to-cyan-400/30
-                     backdrop-blur-md shadow-lg"
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="mt-8 text-2xl font-bold text-white drop-shadow-glow"
           >
-            <span className="text-white">
-              🎉 {winner} 🎉
-            </span>
+            {winner}
           </motion.div>
         )}
       </AnimatePresence>

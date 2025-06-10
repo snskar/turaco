@@ -59,11 +59,9 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 // Utility function to pick n random values from an array
-function pickRandomValues<T>(array: T[], n: number): T[] {
-  if (array.length <= n) return array;
-  
+export function pickRandomValues<T>(array: T[], count: number): T[] {
   const shuffled = [...array].sort(() => 0.5 - Math.random());
-  return shuffled.slice(0, n);
+  return shuffled.slice(0, count);
 }
 
 // get title, name, message, img from the heartlink object to map to the splash title component

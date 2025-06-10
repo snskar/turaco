@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import ScratchCard from "./Card";
 import { AnimatedImageButton } from "@/components/ui/AnimatedImageButton";
+import { ComponentHeader } from "../ui/ComponentHeader";
 
 type CardStackProps = {
   cards: string[];  // List of reveal texts

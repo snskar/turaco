@@ -12,35 +12,14 @@ import SplashTitle from "@/components/ui/splash-title/SplashTitle";
 import HolographicText from "@/components/ui/HolographicText";
 import HolographicBackground2 from "@/components/ui/HolographicBackground2";
 import {DEFAULT_WHEEL_OPTIONS} from "@/components/spin-the-wheel/constants";
+import { ComponentHeader } from "../components/ui/ComponentHeader/ComponentHeader";
+import { COMPONENT_HEADERS } from "../components/ui/ComponentHeader/constants";
+import {DEFAULT_SCRATCH_CARD_OPTIONS} from "@/components/scratch-card/constants";
+import {pickRandomValues} from "@/lib/utils";
 
 
 export default function Home() {
 
-  const options = [
-  "Go on a trip",
-  "Pottery class",
-  "Movie marathon",
-  "Hiking adventure",
-  "Picnic in the park",
-  "Karaoke night",
-  "Board game day",
-  "Visit a museum",
-  "Go to the beach",
-  "Attend a live concert",
-  "Volunteer locally",
-  "Photography challenge",
-  "Spa day at home",
-  "Learn a new recipe",
-  "Write a short story",
-  "Bike ride adventure",
-  "Do a puzzle",
-  "Attend a dance class",
-  "Plant a garden",
-  "Yoga session",
-  "DIY home project",
-  "Crafting day",
-  "Try a new sport",
-];
 
 const images = [
   {
@@ -66,23 +45,36 @@ const images = [
       <main className="flex min-h-screen flex-col items-center justify-center">
         <KawaiiBackgroundDarker>
           <SplashTitle title="Happy Birthday" name="Random" message="Happy Birthday, legend! May your wrinkles be few, your snacks never end, and your group chats always spicy. Keep being fabulously weird—like glitter in a world full of beige!" />
-          <div className="p-7">
-            <Slideshow images={images} />
+          <div className="relative mb-16">
+            <ComponentHeader 
+              title={COMPONENT_HEADERS.SLIDESHOW.title}
+              subtitle={COMPONENT_HEADERS.SLIDESHOW.subtitle}
+            />
+            <div className="m-6">
+              <Slideshow images={images} />
+            </div>
           </div>
           <div className="relative mb-16">
+            <ComponentHeader 
+              title={COMPONENT_HEADERS.COMPLIMENT_SHOWER.title}
+              subtitle={COMPONENT_HEADERS.COMPLIMENT_SHOWER.subtitle}
+            />
             <ComplimentShower/>
           </div>  
 
-        <div className="py-40 items-center justify-center">
-          <CardStack cards={[
-            "Free Hug Coupon!",
-            "30 Minutes Massage",
-            "Breakfast in Bed",
-            "Movie Night Pick"
-          ]} />
-        </div>
+          <ComponentHeader 
+            title={COMPONENT_HEADERS.SCRATCH_CARD.title}
+            subtitle={COMPONENT_HEADERS.SCRATCH_CARD.subtitle}
+          />
+          <div className="py-40 items-center justify-center">
+            <CardStack cards={pickRandomValues(DEFAULT_SCRATCH_CARD_OPTIONS.OTHER, 5)} />
+          </div>
+
+          <ComponentHeader 
+            title={COMPONENT_HEADERS.SPIN_THE_WHEEL.title}
+            subtitle={COMPONENT_HEADERS.SPIN_THE_WHEEL.subtitle}
+          />
           <SpinTheWheel options={DEFAULT_WHEEL_OPTIONS.COUPLE} centerImageSrc="/assets/art/hamster.png" />
-          <HolographicText strokeWidth={20} strokeOpacity={0.7}>{"Sample Text"}</HolographicText>
         </KawaiiBackgroundDarker>
         
 
