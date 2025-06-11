@@ -5,53 +5,18 @@ import { DEFAULT_COMPLIMENTS } from "@/components/compliment-shower/constants";
 import { DEFAULT_WHEEL_OPTIONS } from "@/components/spin-the-wheel/constants";
 import { OCCASION_CONTENT_MAPPING } from "@/components/ui/splash-title/constants";
 import { DEFAULT_SCRATCH_CARD_OPTIONS } from "@/components/scratch-card/constants";
+import { SpinTheWheelProps } from "@/components/spin-the-wheel/types";
+import { SplashTitleProps } from "@/components/ui/splash-title/types";
+import { SlideshowProps } from "@/components/slideshow/types";
+import { ComplimentShowerProps } from "@/components/compliment-shower/types";
+import { CardStackProps } from "@/components/scratch-card/types";
 
-// Type definitions for function returns
-export interface TitleContent {
-  title: string;
-  name: string;
-  message: string;
-  img: string;
-}
-
-export interface ComplimentResult {
-  content: string[];
-  source: 'custom' | 'default';
-}
-
-export interface WheelOptionsResult {
-  options: string[];
-  source: 'custom' | 'default';
-}
-
-// Type definitions for slideshow
-export interface SlideshowImage {
-  src: string;
-  alt: string;
-}
-
-export interface SlideshowResult {
-  images: SlideshowImage[];
-  width?: string | number;
-  height?: string | number;
-  autoPlay?: boolean;
-  autoPlayInterval?: number;
-}
-
-interface ComplimentShowerProps {
-  compliments: string[];
-  autoStart?: boolean;
-}
-
-interface SpinTheWheelProps {
-  options: string[];
-  centerImageSrc: string;
-  onWin?: (winner: string) => void;
-}
-
-// Type for the return value of getScratchCard to match CardStack props
-export interface ScratchCardStackProps {
-  cards: string[];
+export interface PropifiedHeartlink {
+  splashTitleProps: SplashTitleProps, 
+  slideshowProps: SlideshowProps,
+  complimentShowerProps: ComplimentShowerProps, 
+  cardStackProps: CardStackProps, 
+  spinTheWheelProps: SpinTheWheelProps, 
 }
 
 export function cn(...inputs: ClassValue[]) {
@@ -65,8 +30,7 @@ export function pickRandomValues<T>(array: T[], count: number): T[] {
 }
 
 // get title, name, message, img from the heartlink object to map to the splash title component
-
-export function getTitleContent(heartlink: Heartlink): TitleContent {
+export function getTitleContent(heartlink: Heartlink): SplashTitleProps {
   if (!heartlink) {
     throw new Error('Heartlink object is required for getting title content');
   }
@@ -87,7 +51,7 @@ export function getTitleContent(heartlink: Heartlink): TitleContent {
       title,
       name: recipientName ?? 'My Favourite Person',
       message: message ?? displayMessage,
-      img
+      imgSource: img
     };
   } catch (error) {
     console.error('Error processing title content:', error);
@@ -102,27 +66,18 @@ export function getTitleContent(heartlink: Heartlink): TitleContent {
 // Get slideshow content from the heartlink object
 export function getSlideshowContent(
   heartlink: Heartlink,
-  options: Partial<Omit<SlideshowResult, 'images'>> = {}
-): SlideshowResult {
+): SlideshowProps {
   if (!heartlink) {
     throw new Error('Heartlink object is required for getting slideshow content');
   }
 
   try {
     const { photos } = heartlink;
-    const defaultOptions = {
-      width: '100%',
-      height: 400,
-      autoPlay: true,
-      autoPlayInterval: 3000,
-      ...options
-    };
 
     // If no photos, return empty state but with default options
     if (!photos?.length) {
       return {
         images: [],
-        ...defaultOptions
       };
     }
 
@@ -134,18 +89,12 @@ export function getSlideshowContent(
 
     return {
       images,
-      ...defaultOptions
     };
   } catch (error) {
     console.error('Error processing slideshow content:', error);
     // Return empty state with default options on error
     return {
-      images: [],
-      width: '100%',
-      height: 400,
-      autoPlay: true,
-      autoPlayInterval: 3000,
-      ...options
+      images: []
     };
   }
 }
@@ -185,9 +134,8 @@ export function getCompliments(heartlink: Heartlink): ComplimentShowerProps {
   }
 }
 
-
 // get scratch card from the heartlink object to map to the scratch card component 
-export function getScratchCards(heartlink: Heartlink | null): ScratchCardStackProps {
+export function getScratchCards(heartlink: Heartlink | null): CardStackProps {
   // Validate input
   if (!heartlink) {
     console.warn('No heartlink provided, using default scratch cards');
@@ -227,7 +175,6 @@ export function getScratchCards(heartlink: Heartlink | null): ScratchCardStackPr
 }
 
 // get wheel options from the heartlink object to map to the spin the wheel component
-
 export function getWheelOptions(heartlink: Heartlink): SpinTheWheelProps {
   if (!heartlink) {
     throw new Error('Heartlink object is required for getting wheel options');
@@ -265,3 +212,26 @@ export function getWheelOptions(heartlink: Heartlink): SpinTheWheelProps {
     };
   }
 }
+
+// A function that gets all the props from the heartlink object and makes digestible packs for the comps
+export function getPropifiedHeartlink(heartlink: Heartlink): PropifiedHeartlink {
+  
+  if (!heartlink) {
+    throw new Error('Heartlink object is required for getting wheel options');
+  }
+
+  const splashTitleProps = getTitleContent(heartlink);
+  const slideshowProps = getSlideshowContent(heartlink);
+  const complimentShowerProps = getCompliments(heartlink);
+  const cardStackProps = getScratchCards(heartlink);
+  const spinTheWheelProps = getWheelOptions(heartlink);
+
+  return {
+    splashTitleProps, 
+    slideshowProps, 
+    complimentShowerProps,
+    cardStackProps, 
+    spinTheWheelProps, 
+  };
+}
+

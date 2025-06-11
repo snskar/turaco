@@ -3,14 +3,7 @@ import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import HolographicText from '../HolographicText';
 import Image from 'next/image';
-
-interface SplashTitleProps {
-  title: string;
-  name?: string;
-  message?: string;
-  className?: string;
-  imgSource?: string;
-}
+import { SplashTitleProps } from './types';
 
 const SplashTitle: React.FC<SplashTitleProps> = ({
   title,

@@ -8,3 +8,7 @@ export interface ScratchCardProps {
     isInteractive?: boolean;
     isScratched?: boolean;
 };
+
+export interface CardStackProps  {
+    cards: string[];
+};

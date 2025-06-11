@@ -16,69 +16,132 @@ import { ComponentHeader } from "../components/ui/ComponentHeader/ComponentHeade
 import { COMPONENT_HEADERS } from "../components/ui/ComponentHeader/constants";
 import {DEFAULT_SCRATCH_CARD_OPTIONS} from "@/components/scratch-card/constants";
 import {pickRandomValues} from "@/lib/utils";
+import { SpotifyEmbed } from "@/components/spotify/SpotifyEmbed";
+import { vanillaBirthdayCouple } from "./mock/vanillaBirthdayCouple";
+import { getPropifiedHeartlink } from "@/lib/utils";
 
 
 export default function Home() {
 
 
-const images = [
-  {
-    src: "/sample_photos/g_prime_1.jpg", 
-    alt: "hamster"
-  },
-  {
-    src: "/sample_photos/g_prime_2.jpg", 
-    alt: "hamster"
-  },
-  {
-    src: "/sample_photos/g_prime_3.jpg", 
-    alt: "hamster"
-  },
-  {
-    src: "/sample_photos/g_prime_4.jpg", 
-    alt: "hamster"
-  },
-]
+// const images = [
+//   {
+//     src: "/sample_photos/g_prime_1.jpg", 
+//     alt: "hamster"
+//   },
+//   {
+//     src: "/sample_photos/g_prime_2.jpg", 
+//     alt: "hamster"
+//   },
+//   {
+//     src: "/sample_photos/g_prime_3.jpg", 
+//     alt: "hamster"
+//   },
+//   {
+//     src: "/sample_photos/g_prime_4.jpg", 
+//     alt: "hamster"
+//   },
+// ]
 
-  return (
+  // return (
     
-      <main className="flex min-h-screen flex-col items-center justify-center">
-        <KawaiiBackgroundDarker>
-          <SplashTitle title="Happy Birthday" name="Random" message="Happy Birthday, legend! May your wrinkles be few, your snacks never end, and your group chats always spicy. Keep being fabulously weird—like glitter in a world full of beige!" />
-          <div className="relative mb-16">
-            <ComponentHeader 
-              title={COMPONENT_HEADERS.SLIDESHOW.title}
-              subtitle={COMPONENT_HEADERS.SLIDESHOW.subtitle}
-            />
-            <div className="m-6">
-              <Slideshow images={images} />
-            </div>
-          </div>
-          <div className="relative mb-16">
-            <ComponentHeader 
-              title={COMPONENT_HEADERS.COMPLIMENT_SHOWER.title}
-              subtitle={COMPONENT_HEADERS.COMPLIMENT_SHOWER.subtitle}
-            />
-            <ComplimentShower/>
-          </div>  
+  //     <main className="flex min-h-screen flex-col items-center justify-center">
+  //       <KawaiiBackgroundDarker>
+  //         <SplashTitle title="Happy Birthday" name="Random" message="Happy Birthday, legend! May your wrinkles be few, your snacks never end, and your group chats always spicy. Keep being fabulously weird—like glitter in a world full of beige!" />
+  //         <div className="relative mb-16">
+  //           <ComponentHeader 
+  //             title={COMPONENT_HEADERS.SLIDESHOW.title}
+  //             subtitle={COMPONENT_HEADERS.SLIDESHOW.subtitle}
+  //           />
+  //           <div className="my-4">
+  //             <Slideshow images={images} />
+  //           </div>
+  //         </div>
+  //         <div className="relative mb-16">
+  //           <ComponentHeader 
+  //             title={COMPONENT_HEADERS.COMPLIMENT_SHOWER.title}
+  //             subtitle={COMPONENT_HEADERS.COMPLIMENT_SHOWER.subtitle}
+  //           />
+  //           <ComplimentShower/>
+  //         </div>  
 
-          <ComponentHeader 
-            title={COMPONENT_HEADERS.SCRATCH_CARD.title}
-            subtitle={COMPONENT_HEADERS.SCRATCH_CARD.subtitle}
-          />
-          <div className="py-40 items-center justify-center">
-            <CardStack cards={pickRandomValues(DEFAULT_SCRATCH_CARD_OPTIONS.OTHER, 5)} />
-          </div>
 
-          <ComponentHeader 
-            title={COMPONENT_HEADERS.SPIN_THE_WHEEL.title}
-            subtitle={COMPONENT_HEADERS.SPIN_THE_WHEEL.subtitle}
-          />
-          <SpinTheWheel options={DEFAULT_WHEEL_OPTIONS.COUPLE} centerImageSrc="/assets/art/hamster.png" />
-        </KawaiiBackgroundDarker>
+
+  //         <ComponentHeader 
+  //           title={COMPONENT_HEADERS.SCRATCH_CARD.title}
+  //           subtitle={COMPONENT_HEADERS.SCRATCH_CARD.subtitle}
+  //         />
+  //         <div className="py-50 items-center justify-center">
+  //           <CardStack cards={pickRandomValues(DEFAULT_SCRATCH_CARD_OPTIONS.OTHER, 5)} />
+  //         </div>
+
+  //         <ComponentHeader 
+  //           title={COMPONENT_HEADERS.SPIN_THE_WHEEL.title}
+  //           subtitle={COMPONENT_HEADERS.SPIN_THE_WHEEL.subtitle}
+  //         />
+  //         <SpinTheWheel options={DEFAULT_WHEEL_OPTIONS.COUPLE} centerImageSrc="/assets/art/hamster.png" />
+          
+  //         <div className="mt-16">
+  //           <SpotifyEmbed trackId="7ouMYWpwJ422jRcDASZB7P" />
+  //         </div>
+  //       </KawaiiBackgroundDarker>
         
 
-      </main>
+  //     </main>
+
+const {
+  splashTitleProps, 
+  slideshowProps, 
+  complimentShowerProps, 
+  cardStackProps, 
+  spinTheWheelProps, 
+} = getPropifiedHeartlink(vanillaBirthdayCouple);
+
+return (
+    
+  <main className="flex min-h-screen flex-col items-center justify-center">
+    <KawaiiBackgroundDarker>
+      <SplashTitle {...splashTitleProps} />
+      <div className="relative mb-16">
+        <ComponentHeader 
+          title={COMPONENT_HEADERS.SLIDESHOW.title}
+          subtitle={COMPONENT_HEADERS.SLIDESHOW.subtitle}
+        />
+        <div className="my-4">
+          <Slideshow {...slideshowProps} />
+        </div>
+      </div>
+      <div className="relative mb-16">
+        <ComponentHeader 
+          title={COMPONENT_HEADERS.COMPLIMENT_SHOWER.title}
+          subtitle={COMPONENT_HEADERS.COMPLIMENT_SHOWER.subtitle}
+        />
+        <ComplimentShower {...complimentShowerProps} />
+      </div>  
+
+
+
+      <ComponentHeader 
+        title={COMPONENT_HEADERS.SCRATCH_CARD.title}
+        subtitle={COMPONENT_HEADERS.SCRATCH_CARD.subtitle}
+      />
+      <div className="py-50 items-center justify-center">
+        <CardStack {...cardStackProps} />
+      </div>
+
+      <ComponentHeader 
+        title={COMPONENT_HEADERS.SPIN_THE_WHEEL.title}
+        subtitle={COMPONENT_HEADERS.SPIN_THE_WHEEL.subtitle}
+      />
+      <SpinTheWheel {...spinTheWheelProps} />
+      
+      <div className="mt-16">
+        <SpotifyEmbed trackId="7ouMYWpwJ422jRcDASZB7P" />
+      </div>
+    </KawaiiBackgroundDarker>
+    
+
+  </main>
 
   );
 }

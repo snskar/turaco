@@ -17,11 +17,7 @@ import {
   useKeyboardControls,
   useTouchControls
 } from './hooks';
-
-interface ComplimentShowerProps {
-  compliments?: string[];
-  autoStart?: boolean;
-}
+import { ComplimentShowerProps } from "./types";
 
 export default function ComplimentShower({ 
   compliments = DEFAULT_COMPLIMENTS.OTHER,

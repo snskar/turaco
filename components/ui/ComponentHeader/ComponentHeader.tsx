@@ -1,11 +1,7 @@
 import React from 'react';
 import HolographicText from '../HolographicText';
 import { motion } from 'framer-motion';
-
-interface ComponentHeaderProps {
-    title: string;
-    subtitle?: string;
-}
+import { ComponentHeaderProps } from './types';
 
 export const ComponentHeader: React.FC<ComponentHeaderProps> = ({ title, subtitle }) => {
     return (

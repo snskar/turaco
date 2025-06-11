@@ -5,12 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useSpinTheWheel } from "./utils";
 import TextBox from "@/components/ui/TextBox";
 import Image from "next/image";
-
-interface SpinTheWheelProps {
-  options: string[];
-  centerImageSrc: string;
-  onWin?: (winner: string) => void;
-}
+import { SpinTheWheelProps } from "./types";
 
 const SpinTheWheel: React.FC<SpinTheWheelProps> = ({ 
   options, 
