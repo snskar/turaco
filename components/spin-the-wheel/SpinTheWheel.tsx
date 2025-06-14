@@ -25,11 +25,6 @@ const SpinTheWheel: React.FC<SpinTheWheelProps> = ({
     <div 
       ref={containerRef}
       className="flex flex-col items-center justify-center p-4 relative select-none overflow-hidden"
-      style={{
-        touchAction: 'none',
-        WebkitOverflowScrolling: 'touch',
-        overscrollBehavior: 'none',
-      }}
     >
       {/* Win Pointer */}
       <div 
@@ -62,13 +57,11 @@ const SpinTheWheel: React.FC<SpinTheWheelProps> = ({
       {/* Wheel Container */}
       <div
         className="relative bg-white/10 backdrop-blur-sm rounded-full p-4 shadow-xl cursor-pointer
-                   hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 touch-none"
+                   hover:shadow-2xl hover:scale-[1.02] transition-all duration-300"
         onClick={handleInteraction}
         onTouchEnd={handleInteraction}
-        onTouchMove={(e) => e.preventDefault()}
         style={{
           marginTop: '20px',
-          touchAction: 'none',
           WebkitTapHighlightColor: 'transparent',
           userSelect: 'none',
           willChange: 'transform',
