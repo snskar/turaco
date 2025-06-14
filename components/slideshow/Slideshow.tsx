@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
 import { SlideshowProps } from './types';
+import Image from 'next/image';
 
 const Slideshow: React.FC<SlideshowProps> = ({ images }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -54,10 +55,13 @@ const Slideshow: React.FC<SlideshowProps> = ({ images }) => {
               }}
               className="absolute inset-0"
             >
-              <img
+              <Image
                 src={images[currentIndex].src}
                 alt={images[currentIndex].alt}
                 className="w-full h-full object-cover"
+                fill
+                sizes="(max-width: 640px) 100vw, 640px"
+                priority
               />
             </motion.div>
           </AnimatePresence>

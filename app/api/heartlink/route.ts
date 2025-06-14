@@ -1,8 +1,7 @@
 import { NextResponse } from 'next/server';
-import { PrismaClient, Prisma } from '@prisma/client';
+import { PrismaClient } from '@prisma/client';
 import { nanoid } from 'nanoid';
 import { z } from 'zod'; // For validation
-import { HeartlinkOccasion, HeartlinkRelation } from '@/types/heartlink';
 import { headers } from 'next/headers';
 
 const prisma = new PrismaClient();

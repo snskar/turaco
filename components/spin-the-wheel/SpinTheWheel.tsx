@@ -3,7 +3,6 @@
 import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useSpinTheWheel } from "./utils";
-import TextBox from "@/components/ui/TextBox";
 import Image from "next/image";
 import { SpinTheWheelProps } from "./types";
 
@@ -13,7 +12,6 @@ const SpinTheWheel: React.FC<SpinTheWheelProps> = ({
   onWin 
 }) => {
   const {
-    isSpinning,
     winner,
     wheelSize,
     wheelRef,

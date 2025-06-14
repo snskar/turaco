@@ -2,13 +2,11 @@ import React from 'react';
 
 interface SpotifyEmbedProps {
   trackId: string;
-  width?: number;
   height?: number;
 }
 
 export const SpotifyEmbed: React.FC<SpotifyEmbedProps> = ({ 
   trackId, 
-  width = 400,
   height = 152
 }) => {
   return (

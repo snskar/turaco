@@ -14,7 +14,6 @@ const ScratchCard: React.FC<ScratchCardProps> = ({
   const {
     canvasRef,
     containerRef,
-    isScratched,
     cleared,
   } = useScratchCard({
     width,

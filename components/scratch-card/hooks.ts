@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect } from 'react';
+import { useRef, useState, useEffect, useCallback } from 'react';
 import confetti from 'canvas-confetti';
 
 interface UseScratchCardProps {
@@ -20,6 +20,76 @@ export const useScratchCard = ({
   const [cleared, setCleared] = useState(false);
   const hasCalledComplete = useRef(false);
   const lastPoint = useRef<{ x: number; y: number } | null>(null);
+
+  const triggerConfetti = useCallback(() => {
+    if (!containerRef.current) return;
+    
+    const rect = containerRef.current.getBoundingClientRect();
+    const centerX = (rect.left + rect.right) / 2 / window.innerWidth;
+    const centerY = (rect.top + rect.bottom) / 2 / window.innerHeight;
+    
+    const duration = 1500;
+    const end = Date.now() + duration;
+    const colors = ['#ffd6eb', '#d6f5ff', '#f9c8d9', '#a5b4fc'];
+
+    const frame = () => {
+      confetti({
+        particleCount: 2,
+        angle: 60,
+        spread: 45,
+        origin: { x: centerX - 0.15, y: centerY },
+        colors: colors,
+        ticks: 200,
+        gravity: 1.2,
+        scalar: 0.8,
+        drift: 0,
+      });
+      confetti({
+        particleCount: 2,
+        angle: 120,
+        spread: 45,
+        origin: { x: centerX + 0.15, y: centerY },
+        colors: colors,
+        ticks: 200,
+        gravity: 1.2,
+        scalar: 0.8,
+        drift: 0,
+      });
+
+      if (Date.now() < end) {
+        requestAnimationFrame(frame);
+      }
+    };
+
+    frame();
+  }, [containerRef]);
+
+  const checkScratchCompletion = useCallback(() => {
+    const canvas = canvasRef.current;
+    const ctx = canvas?.getContext('2d');
+    if (!canvas || !ctx || isScratched) return;
+
+    const pixels = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    let transparentPixels = 0;
+
+    for (let i = 3; i < pixels.data.length; i += 4) {
+      if (pixels.data[i] < 128) transparentPixels++;
+    }
+
+    const transparency = transparentPixels / (canvas.width * canvas.height);
+    if (transparency > 0.5) {
+      setIsScratched(true);
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      triggerConfetti();
+
+      if (!hasCalledComplete.current && onComplete) {
+        hasCalledComplete.current = true;
+        onComplete();
+      }
+
+      setTimeout(() => setCleared(true), 300);
+    }
+  }, [canvasRef, isScratched, onComplete, triggerConfetti, setIsScratched, setCleared, hasCalledComplete]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -117,77 +187,7 @@ export const useScratchCard = ({
       canvas.removeEventListener('mouseup', endHandler);
       canvas.removeEventListener('mouseleave', endHandler);
     };
-  }, [width, height, isInteractive]);
-
-  const triggerConfetti = () => {
-    if (!containerRef.current) return;
-    
-    const rect = containerRef.current.getBoundingClientRect();
-    const centerX = (rect.left + rect.right) / 2 / window.innerWidth;
-    const centerY = (rect.top + rect.bottom) / 2 / window.innerHeight;
-    
-    const duration = 1500;
-    const end = Date.now() + duration;
-    const colors = ['#ffd6eb', '#d6f5ff', '#f9c8d9', '#a5b4fc'];
-
-    const frame = () => {
-      confetti({
-        particleCount: 2,
-        angle: 60,
-        spread: 45,
-        origin: { x: centerX - 0.15, y: centerY },
-        colors: colors,
-        ticks: 200,
-        gravity: 1.2,
-        scalar: 0.8,
-        drift: 0,
-      });
-      confetti({
-        particleCount: 2,
-        angle: 120,
-        spread: 45,
-        origin: { x: centerX + 0.15, y: centerY },
-        colors: colors,
-        ticks: 200,
-        gravity: 1.2,
-        scalar: 0.8,
-        drift: 0,
-      });
-
-      if (Date.now() < end) {
-        requestAnimationFrame(frame);
-      }
-    };
-
-    frame();
-  };
-
-  const checkScratchCompletion = () => {
-    const canvas = canvasRef.current;
-    const ctx = canvas?.getContext('2d');
-    if (!canvas || !ctx || isScratched) return;
-
-    const pixels = ctx.getImageData(0, 0, canvas.width, canvas.height);
-    let transparentPixels = 0;
-
-    for (let i = 3; i < pixels.data.length; i += 4) {
-      if (pixels.data[i] < 128) transparentPixels++;
-    }
-
-    const transparency = transparentPixels / (canvas.width * canvas.height);
-    if (transparency > 0.5) {
-      setIsScratched(true);
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      triggerConfetti();
-
-      if (!hasCalledComplete.current && onComplete) {
-        hasCalledComplete.current = true;
-        onComplete();
-      }
-
-      setTimeout(() => setCleared(true), 300);
-    }
-  };
+  }, [width, height, isInteractive, checkScratchCompletion]);
 
   return {
     canvasRef,

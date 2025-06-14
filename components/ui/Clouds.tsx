@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState, useRef, useCallback } from 'react';
 import Image from 'next/image';
-import { motion, useAnimationControls } from 'framer-motion';
+import { motion } from 'framer-motion';
 
 interface CloudProps {
   children?: React.ReactNode;
@@ -108,9 +108,6 @@ export const Clouds: React.FC<CloudProps> = ({
     const cloudsPerSection = Math.ceil(numberOfClouds / verticalSections);
     
     for (let section = 0; section < verticalSections; section++) {
-      const sectionStart = (height * section) / verticalSections;
-      const sectionEnd = (height * (section + 1)) / verticalSections;
-      
       // Create clouds for this section
       for (let i = 0; i < cloudsPerSection; i++) {
         const id = section * cloudsPerSection + i;
@@ -162,13 +159,14 @@ export const Clouds: React.FC<CloudProps> = ({
       initializeClouds();
     });
 
-    if (containerRef.current) {
-      observer.observe(containerRef.current);
+    const currentContainer = containerRef.current;
+    if (currentContainer) {
+      observer.observe(currentContainer);
     }
 
     return () => {
-      if (containerRef.current) {
-        observer.unobserve(containerRef.current);
+      if (currentContainer) {
+        observer.unobserve(currentContainer);
       }
       observer.disconnect();
     };
