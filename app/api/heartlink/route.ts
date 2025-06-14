@@ -48,8 +48,8 @@ const HeartlinkFormSchema = z.object({
 type HeartlinkFormData = z.infer<typeof HeartlinkFormSchema>;
 
 // Add CORS headers to response
-function corsResponse(response: NextResponse) {
-  const headersList = headers();
+async function corsResponse(response: NextResponse) {
+  const headersList = await headers();
   const origin = headersList.get('origin') || '';
   
   // Verify if the request is coming from your Shopify store

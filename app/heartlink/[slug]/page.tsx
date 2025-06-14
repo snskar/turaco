@@ -1,113 +1,136 @@
+// app/page.tsx or pages/index.tsx
 "use client";
 
-import { notFound } from 'next/navigation';
-import { useEffect, useState, use } from 'react';
-import { Heartlink, Photo, Activity } from '@/app/types/heartlink';
-import { config } from '@/app/config';
 import { CardStack } from "@/components/scratch-card/CardStack";
-import ScratchCard from "@/components/scratch-card/Card";
 import KawaiiBackgroundDarker from "@/components/ui/KawaiiBackgroundDarker";
 import ComplimentShower from "@/components/compliment-shower/Game";
 import SpinTheWheel from "@/components/spin-the-wheel/SpinTheWheel";
 import Slideshow from "@/components/slideshow/Slideshow";
 import SplashTitle from "@/components/ui/splash-title/SplashTitle";
+import { ComponentHeader } from "@/components/ui/ComponentHeader/ComponentHeader";
+import { COMPONENT_HEADERS } from "@/components/ui/ComponentHeader/constants";
+import { fathersDay } from "@/lib/mocks/fathersDay";
+import { getPropifiedHeartlink } from "@/lib/utils";
+import { motion } from "framer-motion";
+import { cn } from "@/lib/utils";
 
-import { getCompliments } from '@/lib/utils';
 
-async function getHeartlink(slug: string): Promise<Heartlink | null> {
-  try {
-    const res = await fetch(`${config.appUrl}${config.api.heartlink.get}?slug=${slug}`);
-    if (!res.ok) return null;
-    const data = await res.json();
-    return data.success ? data.data : null;
-  } catch (error) {
-    console.error('Error fetching heartlink:', error);
-    return null;
-  }
-}
+export default function Home() {
 
-export default function HeartlinkPage({ params }: { params: Promise<{ slug: string }> }) {
-  const resolvedParams = use(params);
-  const [heartlink, setHeartlink] = useState<Heartlink | null>(null);
-  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    async function loadHeartlink() {
-      const data = await getHeartlink(resolvedParams.slug);
-      setHeartlink(data);
-      setLoading(false);
-    }
-    loadHeartlink();
-  }, [resolvedParams.slug]);
+  // return (
+    
+  //     <main className="flex min-h-screen flex-col items-center justify-center">
+  //       <KawaiiBackgroundDarker>
+  //         <SplashTitle title="Happy Birthday" name="Random" message="Happy Birthday, legend! May your wrinkles be few, your snacks never end, and your group chats always spicy. Keep being fabulously weird—like glitter in a world full of beige!" />
+  //         <div className="relative mb-16">
+  //           <ComponentHeader 
+  //             title={COMPONENT_HEADERS.SLIDESHOW.title}
+  //             subtitle={COMPONENT_HEADERS.SLIDESHOW.subtitle}
+  //           />
+  //           <div className="my-4">
+  //             <Slideshow images={images} />
+  //           </div>
+  //         </div>
+  //         <div className="relative mb-16">
+  //           <ComponentHeader 
+  //             title={COMPONENT_HEADERS.COMPLIMENT_SHOWER.title}
+  //             subtitle={COMPONENT_HEADERS.COMPLIMENT_SHOWER.subtitle}
+  //           />
+  //           <ComplimentShower/>
+  //         </div>  
 
-  if (loading) {
-    return (
-      <main className="flex min-h-screen flex-col items-center justify-center">
-        <div className="animate-pulse text-2xl">Loading your special message...</div>
-      </main>
-    );
-  }
 
-  if (!heartlink) {
-    notFound();
-  }
 
-  const slideshowImages = heartlink.photos?.map((photo: Photo) => ({
-    src: photo.url,
-    alt: "Photo"
-  })) || [];
+  //         <ComponentHeader 
+  //           title={COMPONENT_HEADERS.SCRATCH_CARD.title}
+  //           subtitle={COMPONENT_HEADERS.SCRATCH_CARD.subtitle}
+  //         />
+  //         <div className="py-50 items-center justify-center">
+  //           <CardStack cards={pickRandomValues(DEFAULT_SCRATCH_CARD_OPTIONS.OTHER, 5)} />
+  //         </div>
 
-  const wheelOptions = heartlink.activities?.map((activity: Activity) => activity.content) || [];
+  //         <ComponentHeader 
+  //           title={COMPONENT_HEADERS.SPIN_THE_WHEEL.title}
+  //           subtitle={COMPONENT_HEADERS.SPIN_THE_WHEEL.subtitle}
+  //         />
+  //         <SpinTheWheel options={DEFAULT_WHEEL_OPTIONS.COUPLE} centerImageSrc="/assets/art/hamster.png" />
+          
+  //         <div className="mt-16">
+  //           <SpotifyEmbed trackId="7ouMYWpwJ422jRcDASZB7P" />
+  //         </div>
+  //       </KawaiiBackgroundDarker>
+        
 
-  const scratchCards = heartlink.scratchCard ? Array(4).fill(
-    <ScratchCard 
-      key={heartlink.scratchCard.id}
-      text={heartlink.scratchCard.content}
-      onComplete={() => console.log('Scratch complete')}
-    />
-  ) : [];
+  //     </main>
 
-  const compliments = getCompliments(heartlink);
+const {
+  splashTitleProps, 
+  slideshowProps, 
+  complimentShowerProps, 
+  cardStackProps, 
+  spinTheWheelProps, 
+} = getPropifiedHeartlink(fathersDay);
 
-  return (
-    <main className="flex min-h-screen flex-col items-center justify-center">
-      <KawaiiBackgroundDarker>
-        <SplashTitle 
-          title={heartlink.occasion}
-          name={heartlink.recipientName}
-          message={heartlink.message || `A special message from ${heartlink.senderName}`}
+const message2 = "Thanks for always being so supportive, trusting me and having confidence in me when I don't in myself. You're a role model in everything you do - your job, being the best son to dada dadi, being an amazing husband to mommy and being an absolutely father to Maadhav and I - even when we are nowhere near being good children. You're an inspiration (to all my friends who sometimes like hanging out with you more than me). Thanks for being such a kind and joyful spirit, spreading happiness wherever you are!";
+
+return (
+    
+  <main className="flex min-h-screen flex-col items-center justify-center">
+    <KawaiiBackgroundDarker>
+      <SplashTitle {...splashTitleProps} />
+      <div className="relative mb-16">
+        <ComponentHeader 
+          title={COMPONENT_HEADERS.SLIDESHOW.title}
+          subtitle={COMPONENT_HEADERS.SLIDESHOW.subtitle}
         />
+        <div className="my-4">
+          <Slideshow {...slideshowProps} />
+        </div>
+      </div>
+      <div className="relative mb-16">
+        <ComponentHeader 
+          title={COMPONENT_HEADERS.COMPLIMENT_SHOWER.title}
+          subtitle={COMPONENT_HEADERS.COMPLIMENT_SHOWER.subtitle}
+        />
+        <ComplimentShower {...complimentShowerProps} />
+      </div>  
 
-        {slideshowImages.length > 0 && (
-          <div className="p-7">
-            <Slideshow images={slideshowImages} />
-          </div>
-        )}
 
-        {compliments.length > 0 && (
-          <div className="relative mb-16">
-            <ComplimentShower 
-              compliments={compliments}
-              autoStart={true}
-            />
-          </div>
-        )}
 
-        {scratchCards.length > 0 && (
-          <div className="py-40 items-center justify-center">
-            <CardStack>
-              {scratchCards}
-            </CardStack>
-          </div>
-        )}
+      <ComponentHeader 
+        title={COMPONENT_HEADERS.SCRATCH_CARD.title}
+        subtitle={COMPONENT_HEADERS.SCRATCH_CARD.subtitle}
+      />
+      <div className="py-50 items-center justify-center">
+        <CardStack {...cardStackProps} />
+      </div>
 
-        {wheelOptions.length > 0 && (
-          <SpinTheWheel 
-            options={wheelOptions} 
-            centerImageSrc="/assets/hamster.png"
-          />
-        )}
-      </KawaiiBackgroundDarker>
-    </main>
+      <ComponentHeader 
+        title={COMPONENT_HEADERS.SPIN_THE_WHEEL.title}
+        subtitle={COMPONENT_HEADERS.SPIN_THE_WHEEL.subtitle}
+      />
+      <SpinTheWheel {...spinTheWheelProps} />
+
+      <motion.p 
+              className={cn(
+                "text-base sm:text-lg md:text-xl",
+                "text-white/90 font-medium mt-4",
+                "max-w-[90%]",
+                "drop-shadow-[0_2px_4px_rgba(0,0,0,0.3)]",
+                "text-center",
+                "m-16"
+              )}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4 }}
+            >
+              {message2}
+              </motion.p>
+    </KawaiiBackgroundDarker>
+    
+
+  </main>
+
   );
-} 
+}

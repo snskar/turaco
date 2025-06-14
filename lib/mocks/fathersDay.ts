@@ -1,5 +1,4 @@
-import { Prisma } from "@prisma/client";
-import { HeartlinkOccasion, HeartlinkRelation } from "../types/heartlink";
+import { HeartlinkOccasion, HeartlinkRelation } from "./types";
 
 export const fathersDay = {
     id: "mock-id",

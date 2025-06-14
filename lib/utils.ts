@@ -35,7 +35,7 @@ export function getTitleContent(heartlink: Heartlink): SplashTitleProps {
     throw new Error('Heartlink object is required for getting title content');
   }
 
-  const { occasion, recipientName, senderName, message } = heartlink;
+  const { occasion, recipientName, message } = heartlink;
 
   try {
     let { title, displayMessage, img } = OCCASION_CONTENT_MAPPING.OTHER;
