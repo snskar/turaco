@@ -125,7 +125,7 @@ export const fathersDay = {
     ],
         
         scratchCard: [
-        { id: "scratch-1", content: "Breakfast in bed", isCustom: false, heartlinkId: "fathers-day-2024" },
+        { id: "scratch-1", content: "Head scratches", isCustom: false, heartlinkId: "fathers-day-2024" },
         { id: "scratch-2", content: "Mandir cleaning service", isCustom: false, heartlinkId: "fathers-day-2024" },
         { id: "scratch-3", content: "Hug Coupon", isCustom: false, heartlinkId: "fathers-day-2024" },
         { id: "scratch-4", content: "I'll be chef", isCustom: false, heartlinkId: "fathers-day-2024" }
