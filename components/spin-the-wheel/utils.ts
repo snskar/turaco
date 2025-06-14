@@ -109,10 +109,6 @@ export const useSpinTheWheel = ({
     setIsSpinning(true);
     setWinner(null);
 
-    // Lock body scroll during spin animation
-    document.body.style.overflow = 'hidden';
-    document.body.style.touchAction = 'none';
-
     // Get the current rotation and normalize it
     const currentRotation = rotation % 360;
     
@@ -144,10 +140,6 @@ export const useSpinTheWheel = ({
       onWin?.(winningOption);
       triggerConfetti();
       
-      // Restore body scroll after animation
-      document.body.style.overflow = '';
-      document.body.style.touchAction = '';
-
       // Small delay before allowing next spin
       setTimeout(() => {
         setIsSpinning(false);
@@ -155,7 +147,7 @@ export const useSpinTheWheel = ({
     }, 8200);
   }, [isSpinning, options, sectorAngle, getWinningOptionIndex, onWin, triggerConfetti, rotation, minSpins, maxSpins]);
 
-  // Debounced interaction handler with scroll prevention
+  // Debounced interaction handler
   const handleInteraction = useCallback((e: React.MouseEvent | React.TouchEvent) => {
     if (isSpinning) {
       e.preventDefault();
@@ -185,11 +177,10 @@ export const useSpinTheWheel = ({
     });
   }, [isSpinning, spin]);
 
-  // Clean up function for scroll locks
+  // Clean up function
   useEffect(() => {
     return () => {
-      document.body.style.overflow = '';
-      document.body.style.touchAction = '';
+      // No cleanup needed since we're not locking scroll anymore
     };
   }, []);
 

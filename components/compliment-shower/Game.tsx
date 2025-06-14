@@ -116,10 +116,14 @@ export default function ComplimentShower({
 
   return (
     <div
-      className="relative w-full h-[90vh] overflow-hidden touch-none"
+      className="relative w-full h-[90vh] overflow-hidden"
       onClick={() => setPlaying(!playing)}
-      onTouchMove={handleTouchMove}
-      onTouchStart={(e) => e.preventDefault()}
+      onTouchMove={(e) => {
+        // Only handle touch move if the game is playing
+        if (playing) {
+          handleTouchMove(e);
+        }
+      }}
     >
       <AnimatePresence>
         {drops.map((drop) => (
