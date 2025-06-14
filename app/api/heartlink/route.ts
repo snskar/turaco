@@ -1,8 +1,7 @@
 import { NextResponse } from 'next/server';
-import { PrismaClient, Prisma } from '@prisma/client';
+import { PrismaClient } from '@prisma/client';
 import { nanoid } from 'nanoid';
 import { z } from 'zod'; // For validation
-import { HeartlinkOccasion, HeartlinkRelation } from '@/types/heartlink';
 import { headers } from 'next/headers';
 
 const prisma = new PrismaClient();
@@ -48,8 +47,8 @@ const HeartlinkFormSchema = z.object({
 type HeartlinkFormData = z.infer<typeof HeartlinkFormSchema>;
 
 // Add CORS headers to response
-function corsResponse(response: NextResponse) {
-  const headersList = headers();
+async function corsResponse(response: NextResponse) {
+  const headersList = await headers();
   const origin = headersList.get('origin') || '';
   
   // Verify if the request is coming from your Shopify store

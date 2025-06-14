@@ -19,6 +19,17 @@ function verifyShopifyWebhook(data: string, hmac: string | null) {
   );
 }
 
+// Define types for line items and properties
+interface LineItem {
+  product_id: string;
+  properties: Property[];
+}
+
+interface Property {
+  name: string;
+  value: string;
+}
+
 export async function POST(req: Request) {
   try {
     // Get the HMAC header
@@ -37,7 +48,7 @@ export async function POST(req: Request) {
     
     // Check if this is a Heartlink product
     const heartlinkLineItem = data.line_items.find(
-      (item: any) => item.product_id === process.env.SHOPIFY_HEARTLINK_PRODUCT_ID
+      (item: LineItem) => item.product_id === process.env.SHOPIFY_HEARTLINK_PRODUCT_ID
     );
 
     if (!heartlinkLineItem) {
@@ -45,7 +56,7 @@ export async function POST(req: Request) {
     }
 
     // Extract Heartlink properties from line item
-    const properties = heartlinkLineItem.properties.reduce((acc: any, prop: any) => {
+    const properties = heartlinkLineItem.properties.reduce((acc: Record<string, string>, prop: Property) => {
       acc[prop.name] = prop.value;
       return acc;
     }, {});

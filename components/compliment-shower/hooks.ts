@@ -147,12 +147,8 @@ export const useGameAnimation = (
   useEffect(() => {
     if (!playing) return;
 
-    let lastFrameTime = Date.now();
-
     const animate = (): void => {
       const currentTime = Date.now();
-      const deltaTime = (currentTime - lastFrameTime) / 1000;
-      lastFrameTime = currentTime;
 
       setDrops((prev) => {
         return prev
