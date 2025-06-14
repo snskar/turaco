@@ -17,7 +17,7 @@ export const Play = (): ReactElement => (
       transition={{ type: "spring", stiffness: 400, damping: 17 }}
     >
       <Image 
-        src="/assets/play.png" 
+        src="/assets/ui/play.png" 
         alt="Catching jar" 
         width={PLAY_SIZE.width}
         height={PLAY_SIZE.height}

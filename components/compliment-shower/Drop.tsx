@@ -24,7 +24,7 @@ export interface DropType {
       transition={{ duration: 0.3 }}
     >
       <Image 
-        src="/assets/drop.png" 
+        src="/assets/art/drop.png" 
         alt="Falling compliment drop" 
         width={DROP_SIZE.width}
         height={DROP_SIZE.height}

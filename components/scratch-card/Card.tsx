@@ -42,7 +42,7 @@ const ScratchCard: React.FC<ScratchCardProps> = ({
           <div className="absolute inset-0 z-10">
             <canvas
               ref={canvasRef}
-              className={`absolute inset-0 z-20 touch-none rounded-2xl ${!isInteractive ? 'pointer-events-none' : ''}`}
+              className={`absolute inset-0 z-20 touch-none touch-action-none rounded-2xl ${!isInteractive ? 'pointer-events-none' : ''}`}
             />
             <div
               className="absolute inset-0 z-30 flex items-center justify-center text-center px-4 text-lg font-bold pointer-events-none"

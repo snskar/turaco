@@ -1,0 +1,271 @@
+{{ 'section-contact-form.css' | asset_url | stylesheet_tag }}
+
+<style>
+  /* Increase vertical padding */
+  .section-{{ section.id }}-padding {
+    padding-top: 60px;
+    padding-bottom: 60px;
+  }
+
+  /* Grid layout for Page 1 fields */
+  .contact__fields {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+  }
+
+  /* Make the message textarea span both columns */
+  .message-field {
+    grid-column: 1 / -1;
+  }
+
+  /* Descriptions above inputs */
+  .field-description {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 6px;
+  }
+
+  /* Fix dropdown arrow & padding */
+  select.field__input {
+    appearance: none;
+    padding-right: 30px !important;
+    background: url("data:image/svg+xml;utf8,<svg fill='black' height='10' viewBox='0 0 24 24' width='10' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/></svg>") no-repeat right 10px center;
+    background-color: #fff;
+    background-size: 10px;
+  }
+
+  /* Page 2 descriptions */
+  .page2-description {
+    font-size: 14px;
+    color: #666;
+    margin: 12px 0 6px;
+  }
+
+  /* Rest of your existing styles */
+  .cross-off-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+  .cross-off-chip { display: inline-flex; align-items: center; background:#f5f5f5; border-radius:16px; padding:6px 12px; font-size:14px; }
+  .cross-off-chip button { background:none; border:none; margin-left:6px; cursor:pointer; font-size:16px; }
+  .cross-off-add { display:inline-flex; align-items:center; border:1px solid #ccc; border-radius:16px; padding:6px 12px; font-size:14px; }
+  .cross-off-add input { border:none; outline:none; background:transparent; width:80px; font-size:14px; }
+  .photo-previews img { max-width:100px; margin:5px; border-radius:6px; box-shadow:0 2px 6px rgba(0,0,0,0.1); }
+  .button-row { display:flex; justify-content:space-between; margin-top:20px; gap:10px; }
+  .button-row .button { flex:1; }
+
+  select.field__input {
+  /* give more breathing room top+bottom */
+  padding: 12px 30px 12px 12px !important;
+  /* ensure the control is tall enough for its font */
+  min-height: 48px;
+  /* comfortable line-height */
+  line-height: 1.3;
+  /* keep your custom arrow */
+  background-position: right 12px center;
+
+  
+}
+
+</style>
+
+<div class="color-{{ section.settings.color_scheme }} gradient">
+  <div class="contact page-width page-width--narrow section-{{ section.id }}-padding">
+    <div id="custom-form-app">
+      
+      <!-- PAGE 1 -->
+      <div id="page-1">
+        <h2 class="title title-wrapper--no-top-margin inline-richtext">Gift Details</h2>
+        <div class="contact__fields">
+
+          <!-- Gifter Name -->
+          <div>
+            <p class="field-description">Name of the person giving the gift.</p>
+            <div class="field">
+              <input class="field__input" type="text" id="gifter_name" maxlength="20" required placeholder="Gifter Name">
+              <label class="field__label" for="gifter_name">Gifter Name (max 20)</label>
+            </div>
+          </div>
+
+          <!-- Giftee Name -->
+          <div>
+            <p class="field-description">Name of the person receiving the gift.</p>
+            <div class="field">
+              <input class="field__input" type="text" id="giftee_name" maxlength="20" required placeholder="Giftee Name">
+              <label class="field__label" for="giftee_name">Giftee Name (max 20)</label>
+            </div>
+          </div>
+
+          <!-- Relation -->
+          <div>
+            <p class="field-description">Relationship between the gifter and giftee.</p>
+            <div class="field">
+              <select class="field__input" id="relation" required>
+                <option value="">Select Relation</option>
+                <option>Friend</option>
+                <option>Family</option>
+                <option>Partner</option>
+              </select>
+              <!-- <label class="field__label" for="relation">Relation</label> -->
+            </div>
+          </div>
+
+          <!-- Occasion -->
+          <div>
+            <p class="field-description">The occasion for the gift.</p>
+            <div class="field">
+              <select class="field__input" id="occasion" required>
+                <option value="">Select Occasion</option>
+                <option>Birthday</option>
+                <option>Anniversary</option>
+                <option>Other</option>
+              </select>
+              <!-- <label class="field__label" for="occasion">Occasion</label> -->
+            </div>
+          </div>
+
+          <!-- Message -->
+          <div class="message-field">
+            <p class="field-description">A personal message to accompany the gift.</p>
+            <div class="field">
+              <textarea class="text-area field__input" id="message" maxlength="150" placeholder="Your message (optional)"></textarea>
+              <label class="field__label" for="message">Message (150 char max)</label>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="button-row">
+          <div></div>
+          <button type="button" class="button" onclick="goToPage(2)">Next →</button>
+        </div>
+      </div>
+
+      <!-- PAGE 2 -->
+      <div id="page-2" style="display:none;">
+        <h2 class="title title-wrapper--no-top-margin inline-richtext">Personalize It</h2>
+
+        <!-- Photo Upload -->
+        <p class="page2-description">Upload up to 10 photos for the gift experience.</p>
+        <div class="field">
+          <button type="button" class="button" id="cloudinary_upload_button">Upload Photos (max 10)</button>
+          <div class="photo-previews" id="photo_previews"></div>
+        </div>
+
+        <!-- Cross-off List -->
+        <h3 style="margin-top:20px;">Select or Remove Items</h3>
+        <p class="page2-description">Customize the gift experience by selecting or removing items below.</p>
+        <div class="cross-off-chips" id="cross_off_list"></div>
+        <div class="cross-off-add">
+          <input type="text" id="custom_list_item" placeholder="Add item">
+          <button type="button" onclick="addCustomItem()">+</button>
+        </div>
+
+        <!-- Navigation Buttons -->
+        <div class="button-row">
+          <button type="button" class="button" onclick="goToPage(1)">← Back</button>
+          <button type="button" class="button" onclick="saveFormData()">Save & Proceed to Checkout</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- Cloudinary Widget -->
+<script src="https://widget.cloudinary.com/v2.0/global/all.js"></script>
+<script>
+  function goToPage(page) {
+    if (page === 2) {
+      // Autofill items based on relation
+      const rel = document.getElementById('relation').value;
+      if (rel === 'Friend') {
+        predefinedList = ["Movie Tickets","Coffee Voucher","Photo Album","T-Shirt"];
+      } else if (rel === 'Partner') {
+        predefinedList = ["Roses","Chocolate Box","Love Letter","Candle Set"];
+      } else if (rel === 'Family') {
+        predefinedList = ["Cake","Greeting Card","Blanket","Books"];
+      } else {
+        predefinedList = ["Gift Card","Balloons","Cupcakes","Socks"];
+      }
+      renderCrossOffList();
+    }
+    document.getElementById('page-1').style.display = page === 1 ? 'block' : 'none';
+    document.getElementById('page-2').style.display = page === 2 ? 'block' : 'none';
+  }
+
+  let predefinedList = [];
+  const crossOffListContainer = document.getElementById('cross_off_list');
+
+  function renderCrossOffList() {
+    crossOffListContainer.innerHTML = '';
+    predefinedList.forEach((item, i) => {
+      const chip = document.createElement('div');
+      chip.className = 'cross-off-chip';
+      chip.innerHTML = `${item}<button onclick="removeItem(${i})">&times;</button>`;
+      crossOffListContainer.appendChild(chip);
+    });
+  }
+
+  function removeItem(i) {
+    predefinedList.splice(i,1);
+    renderCrossOffList();
+  }
+
+  function addCustomItem() {
+    const val = document.getElementById('custom_list_item').value.trim();
+    if (val && val.length <= 20) {
+      predefinedList.push(val);
+      document.getElementById('custom_list_item').value = '';
+      renderCrossOffList();
+    } else {
+      alert('Please enter a valid item (max 20 chars)');
+    }
+  }
+
+  // Cloudinary Upload
+  const uploadedImages = [];
+  const widget = cloudinary.createUploadWidget({
+    cloudName: 'YOUR_CLOUD_NAME',
+    uploadPreset: 'YOUR_UPLOAD_PRESET',
+    multiple: true,
+    maxFiles: 10,
+    cropping: true,
+    croppingAspectRatio: 1,
+    showSkipCropButton: true
+  }, (err, res) => {
+    if (!err && res.event === 'success') {
+      uploadedImages.push(res.info.secure_url);
+      const img = document.createElement('img');
+      img.src = res.info.secure_url;
+      document.getElementById('photo_previews').appendChild(img);
+    }
+  });
+
+  document.getElementById('cloudinary_upload_button').addEventListener('click', e => {
+    e.preventDefault();
+    widget.open();
+  });
+
+  // Save to cart attributes
+  function saveFormData() {
+    const payload = {
+      gifter_name: document.getElementById('gifter_name').value,
+      giftee_name: document.getElementById('giftee_name').value,
+      relation: document.getElementById('relation').value,
+      occasion: document.getElementById('occasion').value,
+      message: document.getElementById('message').value,
+      cross_off_list: predefinedList,
+      image_urls: uploadedImages
+    };
+
+    fetch('/cart/update.js', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ attributes: { custom_form_data: JSON.stringify(payload) } })
+    })
+    .then(r => r.json())
+    .then(()=> {
+      alert('Form data saved! Proceed to checkout.');
+      window.location.href = '/cart';
+    });
+  }
+</script>

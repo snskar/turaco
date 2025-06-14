@@ -17,14 +17,10 @@ import {
   useKeyboardControls,
   useTouchControls
 } from './hooks';
-
-interface ComplimentShowerProps {
-  compliments?: string[];
-  autoStart?: boolean;
-}
+import { ComplimentShowerProps } from "./types";
 
 export default function ComplimentShower({ 
-  compliments = DEFAULT_COMPLIMENTS.COUPLE,
+  compliments = DEFAULT_COMPLIMENTS.OTHER,
   autoStart = false 
 }: ComplimentShowerProps): ReactElement | null {
   // Game state using custom hooks

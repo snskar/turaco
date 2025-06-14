@@ -1,9 +1,9 @@
 export const config = {
   appUrl: process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000',
   api: {
-    gift: {
-      create: '/api/gift',
-      get: '/api/gift',
+    heartlink: {
+      create: '/api/heartlink',
+      get: '/api/heartlink',
     }
   },
   defaultImages: {

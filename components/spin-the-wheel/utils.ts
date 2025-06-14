@@ -109,26 +109,33 @@ export const useSpinTheWheel = ({
     setIsSpinning(true);
     setWinner(null);
 
+    // Lock body scroll during spin animation
+    document.body.style.overflow = 'hidden';
+    document.body.style.touchAction = 'none';
+
     // Get the current rotation and normalize it
     const currentRotation = rotation % 360;
     
     // Choose a random winning index first
     const targetIndex = Math.floor(Math.random() * options.length);
     
-    // Calculate spins
-    const fullSpins = minSpins + Math.random() * (maxSpins - minSpins);
+    // Calculate spins (more controlled range)
+    const fullSpins = minSpins + (Math.random() * (maxSpins - minSpins));
     
-    // Calculate how much we need to rotate from the current position
+    // Calculate final rotation with better precision
     const baseAngle = 360 - (targetIndex * sectorAngle);
-    const finalRotation = (fullSpins * 360) + baseAngle - 90 + (360 - currentRotation);
+    const finalRotation = Math.floor((fullSpins * 360) + baseAngle - 90 + (360 - currentRotation));
     
-    setRotation(prevRotation => prevRotation + finalRotation);
-
+    // Update wheel with optimized animation
     if (wheelRef.current) {
-      wheelRef.current.style.transition = "transform 8s cubic-bezier(0.2, 0.1, 0.1, 1)";
-      wheelRef.current.style.transform = `rotate(${rotation + finalRotation}deg)`;
+      wheelRef.current.style.transition = `transform 8s cubic-bezier(0.32, 0.06, 0.15, 1)`;
+      wheelRef.current.style.transform = `rotate(${rotation + finalRotation}deg) translateZ(0)`;
     }
 
+    // Update state
+    setRotation(prevRotation => prevRotation + finalRotation);
+
+    // Delay winner announcement slightly
     setTimeout(() => {
       const winningIndex = getWinningOptionIndex(rotation + finalRotation);
       const winningOption = options[winningIndex];
@@ -136,41 +143,82 @@ export const useSpinTheWheel = ({
       setWinner(winningOption);
       onWin?.(winningOption);
       triggerConfetti();
-      setIsSpinning(false);
-    }, 8000);
+      
+      // Restore body scroll after animation
+      document.body.style.overflow = '';
+      document.body.style.touchAction = '';
+
+      // Small delay before allowing next spin
+      setTimeout(() => {
+        setIsSpinning(false);
+      }, 500);
+    }, 8200);
   }, [isSpinning, options, sectorAngle, getWinningOptionIndex, onWin, triggerConfetti, rotation, minSpins, maxSpins]);
+
+  // Debounced interaction handler with scroll prevention
+  const handleInteraction = useCallback((e: React.MouseEvent | React.TouchEvent) => {
+    if (isSpinning) {
+      e.preventDefault();
+      return;
+    }
+    
+    // Prevent any default behavior
+    e.preventDefault();
+    e.stopPropagation();
+
+    // Ensure container is in view
+    if (containerRef.current) {
+      const rect = containerRef.current.getBoundingClientRect();
+      const isInView = rect.top >= 0 && rect.bottom <= window.innerHeight;
+      
+      if (!isInView) {
+        containerRef.current.scrollIntoView({ 
+          behavior: 'smooth', 
+          block: 'center'
+        });
+      }
+    }
+    
+    // Add small delay to prevent accidental double triggers
+    requestAnimationFrame(() => {
+      spin();
+    });
+  }, [isSpinning, spin]);
+
+  // Clean up function for scroll locks
+  useEffect(() => {
+    return () => {
+      document.body.style.overflow = '';
+      document.body.style.touchAction = '';
+    };
+  }, []);
 
   const renderSectors = useCallback(() => {
     return options.map((option, i) => {
       // Calculate sector angles for clockwise rotation
-      const startAngle = i * sectorAngle;
-      const endAngle = (i + 1) * sectorAngle;
+      const startAngle = Number((i * sectorAngle).toFixed(2));
+      const endAngle = Number(((i + 1) * sectorAngle).toFixed(2));
       const largeArcFlag = sectorAngle > 180 ? 1 : 0;
 
-      // Calculate sector path
-      const x1 = radius + radius * Math.cos((startAngle * Math.PI) / 180);
-      const y1 = radius + radius * Math.sin((startAngle * Math.PI) / 180);
-      const x2 = radius + radius * Math.cos((endAngle * Math.PI) / 180);
-      const y2 = radius + radius * Math.sin((endAngle * Math.PI) / 180);
+      // Calculate sector path with fixed precision
+      const x1 = Number((radius + radius * Math.cos((startAngle * Math.PI) / 180)).toFixed(2));
+      const y1 = Number((radius + radius * Math.sin((startAngle * Math.PI) / 180)).toFixed(2));
+      const x2 = Number((radius + radius * Math.cos((endAngle * Math.PI) / 180)).toFixed(2));
+      const y2 = Number((radius + radius * Math.sin((endAngle * Math.PI) / 180)).toFixed(2));
 
-      const pathData = `
-        M ${radius} ${radius}
-        L ${x1} ${y1}
-        A ${radius} ${radius} 0 ${largeArcFlag} 1 ${x2} ${y2}
-        Z
-      `;
+      const pathData = `M ${radius.toFixed(2)} ${radius.toFixed(2)} L ${x1} ${y1} A ${radius.toFixed(2)} ${radius.toFixed(2)} 0 ${largeArcFlag} 1 ${x2} ${y2} Z`;
 
-      // Calculate text position and rotation
-      const midAngle = startAngle + (sectorAngle / 2);
-      const textRadius = radius * 0.65;
-      const textX = radius + textRadius * Math.cos((midAngle * Math.PI) / 180);
-      const textY = radius + textRadius * Math.sin((midAngle * Math.PI) / 180);
+      // Calculate text position and rotation with fixed precision
+      const midAngle = Number((startAngle + (sectorAngle / 2)).toFixed(2));
+      const textRadius = Number((radius * 0.65).toFixed(2));
+      const textX = Number((radius + textRadius * Math.cos((midAngle * Math.PI) / 180)).toFixed(2));
+      const textY = Number((radius + textRadius * Math.sin((midAngle * Math.PI) / 180)).toFixed(2));
 
-      // Calculate text rotation to be radial
-      let textRotation = (midAngle + 180) % 360;
+      // Calculate text rotation to be radial with fixed precision
+      let textRotation = Number(((midAngle + 180) % 360).toFixed(2));
       // Flip text when it would be upside down
       if (textRotation > 90 && textRotation < 270) {
-        textRotation += 180;
+        textRotation = Number((textRotation + 180).toFixed(2));
       }
 
       return {
@@ -179,7 +227,7 @@ export const useSpinTheWheel = ({
         textY,
         textRotation,
         option,
-        fontSize: getFontSize()
+        fontSize: Number(getFontSize().toFixed(2))
       };
     });
   }, [options, sectorAngle, radius, getFontSize]);
@@ -193,6 +241,7 @@ export const useSpinTheWheel = ({
     containerRef,
     radius,
     spin,
+    handleInteraction,
     renderSectors
   };
 };

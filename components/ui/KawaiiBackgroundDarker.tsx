@@ -1,10 +1,27 @@
+"use client";
+
 import React from 'react';
 import { motion } from 'framer-motion';
 import TwinklingStars from './TwinklingStars';
+import { Clouds } from './Clouds';
 
-const KawaiiBackgroundDarker: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+interface KawaiiBackgroundDarkerProps {
+  children: React.ReactNode;
+  className?: string;
+  cloudDensity?: number;
+  cloudOpacity?: number;
+}
+
+export const KawaiiBackgroundDarker: React.FC<KawaiiBackgroundDarkerProps> = ({
+  children,
+  className = '',
+  cloudDensity = 5,
+  cloudOpacity = 0.3,
+}) => {
   return (
-    <div className="min-h-screen w-full relative">
+    <div
+      className={`relative min-h-screen w-full bg-gradient-to-b from-purple-900/80 to-pink-900/80 ${className}`}
+    >
       {/* Background wrapper - fixed position */}
       <div className="fixed inset-0 w-full h-full overflow-hidden">
         {/* Base gradient - darker and more saturated */}
@@ -19,43 +36,19 @@ const KawaiiBackgroundDarker: React.FC<{ children: React.ReactNode }> = ({ child
           }}
         />
 
-        {/* Animated Clouds */}
-        <div className="absolute inset-0 pointer-events-none overflow-hidden">
-          <motion.div
-            className="absolute w-24 h-16 bg-white/40 rounded-full blur-sm"
-            animate={{
-              x: ['-100%', '100%'],
-              y: ['0%', '5%', '0%']
-            }}
-            transition={{
-              x: { duration: 20, repeat: Infinity, ease: 'linear' },
-              y: { duration: 3, repeat: Infinity, ease: 'easeInOut' }
-            }}
-            style={{ top: '15%', left: '-10%' }}
-          />
-          <motion.div
-            className="absolute w-32 h-20 bg-white/30 rounded-full blur-sm"
-            animate={{
-              x: ['100%', '-100%'],
-              y: ['0%', '-7%', '0%']
-            }}
-            transition={{
-              x: { duration: 25, repeat: Infinity, ease: 'linear' },
-              y: { duration: 4, repeat: Infinity, ease: 'easeInOut' }
-            }}
-            style={{ top: '40%', right: '-10%' }}
-          />
-          <motion.div
-            className="absolute w-28 h-16 bg-white/35 rounded-full blur-sm"
-            animate={{
-              x: ['-100%', '100%'],
-              y: ['0%', '3%', '0%']
-            }}
-            transition={{
-              x: { duration: 22, repeat: Infinity, ease: 'linear' },
-              y: { duration: 3.5, repeat: Infinity, ease: 'easeInOut' }
-            }}
-            style={{ top: '65%', left: '-10%' }}
+        {/* Star field layer */}
+        <TwinklingStars starCount={75} />
+
+        {/* Clouds Layer */}
+        <div className="absolute inset-0 w-full h-full">
+          <Clouds
+            density={cloudDensity * 1.5}
+            opacity={cloudOpacity}
+            minSize={150}
+            maxSize={400}
+            minSpeed={15}
+            maxSpeed={40}
+            zIndex={5}
           />
         </div>
 
@@ -83,11 +76,8 @@ const KawaiiBackgroundDarker: React.FC<{ children: React.ReactNode }> = ({ child
         </div>
       </div>
 
-      {/* Star field layer */}
-      <TwinklingStars starCount={75} />
-
       {/* Content */}
-      <div className="relative z-10">
+      <div className="relative z-20">
         {children}
       </div>
     </div>
