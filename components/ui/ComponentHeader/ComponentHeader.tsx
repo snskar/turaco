@@ -16,7 +16,7 @@ export const ComponentHeader: React.FC<ComponentHeaderProps> = ({ title, subtitl
                     <HolographicText strokeWidth={2}>{title}</HolographicText>
                 </div>
                 {subtitle && (
-                    <div className="text-lg md:text-xl -mt-1 text-white font-semibold text-center">
+                    <div className="text-sm md:text-base -mt-1 text-white font-semibold text-center">
                         {subtitle}
                     </div>
                 )}

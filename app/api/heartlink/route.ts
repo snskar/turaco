@@ -3,6 +3,7 @@ import { PrismaClient, Prisma } from '@prisma/client';
 import { nanoid } from 'nanoid';
 import { z } from 'zod'; // For validation
 import { HeartlinkOccasion, HeartlinkRelation } from '@/types/heartlink';
+import { headers } from 'next/headers';
 
 const prisma = new PrismaClient();
 
@@ -45,6 +46,35 @@ const HeartlinkFormSchema = z.object({
 
 // Infer the TypeScript type from our schema
 type HeartlinkFormData = z.infer<typeof HeartlinkFormSchema>;
+
+// Add CORS headers to response
+function corsResponse(response: NextResponse) {
+  const headersList = headers();
+  const origin = headersList.get('origin') || '';
+  
+  // Verify if the request is coming from your Shopify store
+  const allowedOrigins = [
+    process.env.SHOPIFY_STORE_URL,
+    'https://your-store.myshopify.com'
+  ];
+
+  if (allowedOrigins.includes(origin)) {
+    response.headers.set('Access-Control-Allow-Origin', origin);
+    response.headers.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+    response.headers.set('Access-Control-Allow-Headers', 'Content-Type');
+  }
+  
+  return response;
+}
+
+// Handle OPTIONS request for CORS
+export async function OPTIONS() {
+  return corsResponse(
+    new NextResponse(null, {
+      status: 204,
+    })
+  );
+}
 
 export async function POST(req: Request) {
   try {
@@ -107,36 +137,42 @@ export async function POST(req: Request) {
       },
     });
 
-    return NextResponse.json({ 
-      success: true, 
-      data: heartlink,
-      slug: heartlink.slug 
-    });
+    return corsResponse(
+      NextResponse.json({ 
+        success: true, 
+        data: heartlink,
+        slug: heartlink.slug 
+      })
+    );
 
   } catch (error: unknown) {
     console.error('Error creating heartlink:', error);
     
     // Handle validation errors specifically
     if (error instanceof z.ZodError) {
-      return NextResponse.json(
-        { 
-          success: false, 
-          error: 'Validation failed',
-          details: error.errors 
-        },
-        { status: 400 }
+      return corsResponse(
+        NextResponse.json(
+          { 
+            success: false, 
+            error: 'Validation failed',
+            details: error.errors 
+          },
+          { status: 400 }
+        )
       );
     }
     
     // Handle other errors
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    return NextResponse.json(
-      { 
-        success: false, 
-        error: 'Failed to create heartlink',
-        details: errorMessage
-      },
-      { status: 500 }
+    return corsResponse(
+      NextResponse.json(
+        { 
+          success: false, 
+          error: 'Failed to create heartlink',
+          details: errorMessage
+        },
+        { status: 500 }
+      )
     );
   }
 }
@@ -147,9 +183,11 @@ export async function GET(req: Request) {
     const slug = searchParams.get('slug');
 
     if (!slug) {
-      return NextResponse.json(
-        { success: false, error: 'Slug is required' },
-        { status: 400 }
+      return corsResponse(
+        NextResponse.json(
+          { success: false, error: 'Slug is required' },
+          { status: 400 }
+        )
       );
     }
 
@@ -165,24 +203,30 @@ export async function GET(req: Request) {
     });
 
     if (!heartlink) {
-      return NextResponse.json(
-        { success: false, error: 'Heartlink not found' },
-        { status: 404 }
+      return corsResponse(
+        NextResponse.json(
+          { success: false, error: 'Heartlink not found' },
+          { status: 404 }
+        )
       );
     }
 
-    return NextResponse.json({ success: true, data: heartlink });
+    return corsResponse(
+      NextResponse.json({ success: true, data: heartlink })
+    );
 
   } catch (error: unknown) {
     console.error('Error fetching heartlink:', error);
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    return NextResponse.json(
-      { 
-        success: false, 
-        error: 'Failed to fetch heartlink',
-        details: errorMessage
-      },
-      { status: 500 }
+    return corsResponse(
+      NextResponse.json(
+        { 
+          success: false, 
+          error: 'Failed to fetch heartlink',
+          details: errorMessage
+        },
+        { status: 500 }
+      )
     );
   }
 } 

@@ -44,6 +44,11 @@ export const OCCASION_CONTENT_MAPPING = {
         displayMessage: "I'm Sorry, legend! May your wrinkles be few, your snacks never end, and your group chats always spicy. Keep being fabulously weird—like glitter in a world full of beige!",
         img: "/assets/art/cat.png",
     },
+    FATHERS_DAY: {
+        title: "Happy Father's Day",
+        displayMessage: "I'm Sorry, legend! May your wrinkles be few, your snacks never end, and your group chats always spicy. Keep being fabulously weird—like glitter in a world full of beige!",
+        img: "/assets/art/papa_bear.png",
+    },
     OTHER: {
         title: "I love you ", 
         displayMessage: "I love you ", 

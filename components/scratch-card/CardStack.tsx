@@ -114,7 +114,7 @@ export const CardStack: React.FC<CardStackProps> = ({ cards }) => {
             className="flex flex-col items-center gap-4 mt-8"
           >
             <div className="flex flex-col items-center gap-2 p-6 rounded-xl bg-white/10 backdrop-blur-sm">
-              <h3 className="text-xl font-bold text-white mb-2">Revealed Cards</h3>
+              <h3 className="text-xl font-bold text-white mb-2">You Win</h3>
               {revealedCards.map((card, index) => (
                 <motion.div
                   key={`revealed-${index}`}

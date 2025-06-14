@@ -10,7 +10,8 @@ export enum HeartlinkOccasion {
   GET_WELL_SOON = "GET_WELL_SOON",
   I_AM_SORRY = "I_AM_SORRY",
   I_LOVE_YOU = "I_LOVE_YOU",
-  OTHER = "OTHER"
+  OTHER = "OTHER", 
+  FATHERS_DAY = "FATHERS_DAY"
 }
 
 export enum HeartlinkRelation {

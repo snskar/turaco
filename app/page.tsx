@@ -18,30 +18,33 @@ import {DEFAULT_SCRATCH_CARD_OPTIONS} from "@/components/scratch-card/constants"
 import {pickRandomValues} from "@/lib/utils";
 import { SpotifyEmbed } from "@/components/spotify/SpotifyEmbed";
 import { vanillaBirthdayCouple } from "./mock/vanillaBirthdayCouple";
+import { fathersDay } from "./mock/fathersDay";
 import { getPropifiedHeartlink } from "@/lib/utils";
+import { motion } from "framer-motion";
+import { cn } from "@/lib/utils";
 
 
 export default function Home() {
 
 
-// const images = [
-//   {
-//     src: "/sample_photos/g_prime_1.jpg", 
-//     alt: "hamster"
-//   },
-//   {
-//     src: "/sample_photos/g_prime_2.jpg", 
-//     alt: "hamster"
-//   },
-//   {
-//     src: "/sample_photos/g_prime_3.jpg", 
-//     alt: "hamster"
-//   },
-//   {
-//     src: "/sample_photos/g_prime_4.jpg", 
-//     alt: "hamster"
-//   },
-// ]
+const images = [
+  {
+    src: "/sample_photos/g_prime_1.jpg", 
+    alt: "hamster"
+  },
+  {
+    src: "/sample_photos/g_prime_2.jpg", 
+    alt: "hamster"
+  },
+  {
+    src: "/sample_photos/g_prime_3.jpg", 
+    alt: "hamster"
+  },
+  {
+    src: "/sample_photos/g_prime_4.jpg", 
+    alt: "hamster"
+  },
+]
 
   // return (
     
@@ -95,7 +98,9 @@ const {
   complimentShowerProps, 
   cardStackProps, 
   spinTheWheelProps, 
-} = getPropifiedHeartlink(vanillaBirthdayCouple);
+} = getPropifiedHeartlink(fathersDay);
+
+const message2 = "Thanks for always being so supportive, trusting me and having confidence in me when I don't in myself. You're a role model in everything you do - your job, being the best son to dada dadi, being an amazing husband to mommy and being an absolutely father to Maadhav and I - even when we are nowhere near being good children. You're an inspiration (to all my friends who sometimes like hanging out with you more than me). Thanks for being such a kind and joyful spirit, spreading happiness wherever you are!";
 
 return (
     
@@ -134,10 +139,22 @@ return (
         subtitle={COMPONENT_HEADERS.SPIN_THE_WHEEL.subtitle}
       />
       <SpinTheWheel {...spinTheWheelProps} />
-      
-      <div className="mt-16">
-        <SpotifyEmbed trackId="7ouMYWpwJ422jRcDASZB7P" />
-      </div>
+
+      <motion.p 
+              className={cn(
+                "text-base sm:text-lg md:text-xl",
+                "text-white/90 font-medium mt-4",
+                "max-w-[90%]",
+                "drop-shadow-[0_2px_4px_rgba(0,0,0,0.3)]",
+                "text-center",
+                "m-16"
+              )}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4 }}
+            >
+              {message2}
+              </motion.p>
     </KawaiiBackgroundDarker>
     
 
