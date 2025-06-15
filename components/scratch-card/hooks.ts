@@ -30,31 +30,20 @@ export const useScratchCard = ({
     const centerX = (rect.left + rect.right) / 2 / window.innerWidth;
     const centerY = (rect.top + rect.bottom) / 2 / window.innerHeight;
     
-    const duration = 1500;
+    const duration = 1000;
     const end = Date.now() + duration;
     const colors = ['#ffd6eb', '#d6f5ff', '#f9c8d9', '#a5b4fc'];
 
     const frame = () => {
       confetti({
-        particleCount: 2,
-        angle: 60,
-        spread: 45,
-        origin: { x: centerX - 0.15, y: centerY },
+        particleCount: 3,
+        angle: 90,
+        spread: 30,
+        origin: { x: centerX, y: centerY },
         colors: colors,
-        ticks: 200,
-        gravity: 1.2,
-        scalar: 0.8,
-        drift: 0,
-      });
-      confetti({
-        particleCount: 2,
-        angle: 120,
-        spread: 45,
-        origin: { x: centerX + 0.15, y: centerY },
-        colors: colors,
-        ticks: 200,
-        gravity: 1.2,
-        scalar: 0.8,
+        ticks: 150,
+        gravity: 1.5,
+        scalar: 0.7,
         drift: 0,
       });
 

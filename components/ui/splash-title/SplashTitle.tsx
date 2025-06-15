@@ -16,7 +16,7 @@ const SplashTitle: React.FC<SplashTitleProps> = ({
     <motion.div 
       className={cn(
         "flex flex-col justify-center",
-        "relative w-full max-w-[640px] mx-auto",
+        "relative w-full max-w-4xl mx-auto",
         "py-8 px-6",
         className
       )}
@@ -102,8 +102,9 @@ const SplashTitle: React.FC<SplashTitleProps> = ({
               className={cn(
                 "text-base sm:text-lg md:text-xl",
                 "text-white/90 font-medium mt-4",
-                "max-w-[90%]",
-                "drop-shadow-[0_2px_4px_rgba(0,0,0,0.3)]"
+                "max-w-4xl mx-auto",
+                "drop-shadow-[0_2px_4px_rgba(0,0,0,0.3)]",
+                "text-justify"
               )}
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}

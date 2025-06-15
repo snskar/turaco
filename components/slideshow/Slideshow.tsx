@@ -53,7 +53,7 @@ const Slideshow: React.FC<SlideshowProps> = ({ images }) => {
 
   return (
     <div className="container mx-auto px-4">
-      <div className="max-w-[640px] mx-auto relative">
+      <div className="w-full max-w-4xl mx-auto relative">
         <div className="aspect-[4/5] md:aspect-[16/9] relative overflow-hidden rounded-2xl bg-gray-100">
           <AnimatePresence initial={false} custom={direction}>
             <motion.div
