@@ -1,6 +1,6 @@
 "use client";
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import { motion } from 'framer-motion';
 
 // Updated star paths to match the sharp four-pointed star design
@@ -33,24 +33,22 @@ function mulberry32(a: number) {
 }
 
 const generateStars = (count: number) => {
-  const rand = mulberry32(count); // Seed with starCount for consistency
-  const variants = ['sharp', 'minimal', 'sharpSmall'];
+  const rand = mulberry32(count);
+  const variants = ['sharp', 'minimal', 'sharpSmall'] as const;
   
-  return Array.from({ length: count }, (_, i) => {
-    return {
-      variant: variants[Math.floor(rand() * 3)] as StarProps['variant'],
-      size: 10 + rand() * 15,
-      position: {
-        x: rand() * 100,
-        y: rand() * 100
-      },
-      delay: rand() * 2,
-      rotation: rand() * 360
-    };
-  });
+  return Array.from({ length: count }, (_, i) => ({
+    variant: variants[Math.floor(rand() * 3)],
+    size: 10 + rand() * 15,
+    position: {
+      x: rand() * 100,
+      y: rand() * 100
+    },
+    delay: rand() * 2,
+    rotation: rand() * 360
+  }));
 };
 
-const Star: React.FC<StarProps> = ({ variant, size, position, delay, rotation = 0 }) => {
+const Star: React.FC<StarProps> = React.memo(({ variant, size, position, delay, rotation = 0 }) => {
   return (
     <motion.div
       style={{
@@ -70,6 +68,7 @@ const Star: React.FC<StarProps> = ({ variant, size, position, delay, rotation = 
         delay,
         ease: "easeInOut",
       }}
+      layoutId={`star-${position.x}-${position.y}`}
     >
       <svg
         width={size}
@@ -83,12 +82,34 @@ const Star: React.FC<StarProps> = ({ variant, size, position, delay, rotation = 
       </svg>
     </motion.div>
   );
-};
+});
+
+Star.displayName = 'Star';
 
 const TwinklingStars: React.FC<TwinklingStarsProps> = ({ starCount = 40 }) => {
   // Generate stars with deterministic values
-  const stars = React.useMemo(() => generateStars(starCount), [starCount]);
-  const rand = mulberry32(starCount + 1000); // Different seed for glows and tiny stars
+  const stars = useMemo(() => generateStars(starCount), [starCount]);
+  const rand = useMemo(() => mulberry32(starCount + 1000), [starCount]);
+
+  // Memoize glow effects
+  const glowEffects = useMemo(() => 
+    Array.from({ length: 8 }, (_, i) => ({
+      key: `glow-${i}`,
+      left: `${rand() * 100}%`,
+      top: `${rand() * 100}%`,
+      delay: i * 0.5
+    })), 
+  [rand]);
+
+  // Memoize tiny stars
+  const tinyStars = useMemo(() => 
+    Array.from({ length: 20 }, (_, i) => ({
+      key: `tiny-${i}`,
+      left: `${rand() * 100}%`,
+      top: `${rand() * 100}%`,
+      delay: i * 0.1
+    })),
+  [rand]);
 
   return (
     <div className="fixed inset-0 pointer-events-none z-[1]">
@@ -98,15 +119,15 @@ const TwinklingStars: React.FC<TwinklingStarsProps> = ({ starCount = 40 }) => {
       ))}
 
       {/* Subtle glow effects */}
-      {Array.from({ length: 8 }).map((_, i) => (
+      {glowEffects.map((glow) => (
         <motion.div
-          key={`glow-${i}`}
+          key={glow.key}
           className="absolute"
           style={{
             width: '150px',
             height: '150px',
-            left: `${rand() * 100}%`,
-            top: `${rand() * 100}%`,
+            left: glow.left,
+            top: glow.top,
             background: 'radial-gradient(circle, rgba(255,255,255,0.05) 0%, transparent 70%)',
             filter: 'blur(8px)',
           }}
@@ -117,22 +138,23 @@ const TwinklingStars: React.FC<TwinklingStarsProps> = ({ starCount = 40 }) => {
           transition={{
             duration: 5,
             repeat: Infinity,
-            delay: i * 0.5,
+            delay: glow.delay,
             ease: "easeInOut",
           }}
+          layoutId={glow.key}
         />
       ))}
 
       {/* Tiny background stars */}
-      {Array.from({ length: 20 }).map((_, i) => (
+      {tinyStars.map((star) => (
         <motion.div
-          key={`tiny-${i}`}
+          key={star.key}
           className="absolute bg-white"
           style={{
             width: '1px',
             height: '1px',
-            left: `${rand() * 100}%`,
-            top: `${rand() * 100}%`,
+            left: star.left,
+            top: star.top,
             boxShadow: '0 0 2px rgba(255,255,255,0.5)',
           }}
           animate={{
@@ -141,13 +163,14 @@ const TwinklingStars: React.FC<TwinklingStarsProps> = ({ starCount = 40 }) => {
           transition={{
             duration: 2,
             repeat: Infinity,
-            delay: i * 0.1,
+            delay: star.delay,
             ease: "easeInOut",
           }}
+          layoutId={star.key}
         />
       ))}
     </div>
   );
 };
 
-export default TwinklingStars; 
+export default React.memo(TwinklingStars); 

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState, useRef, useCallback } from 'react';
+import React, { useEffect, useState, useRef, useCallback, useMemo } from 'react';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
 
@@ -87,32 +87,37 @@ export const Clouds: React.FC<CloudProps> = ({
 }) => {
   const [clouds, setClouds] = useState<Cloud[]>([]);
   const containerRef = useRef<HTMLDivElement>(null);
-  const [dimensions, setDimensions] = useState({ width: 1000, height: 1000 }); // Default size to prevent initial flash
+  const [dimensions, setDimensions] = useState({ width: 1000, height: 1000 });
+  const isInitialized = useRef(false);
+
+  // Preload cloud images
+  useEffect(() => {
+    CLOUD_IMAGES.forEach(src => {
+      const img = new window.Image();
+      img.src = src;
+    });
+  }, []);
 
   const initializeClouds = useCallback(() => {
     if (!containerRef.current) return;
 
     const { width, height } = containerRef.current.getBoundingClientRect();
-    if (width === 0 || height === 0) return; // Don't initialize if container has no size
+    if (width === 0 || height === 0) return;
 
     setDimensions({ width, height });
 
-    // Calculate number of clouds based on density and area
     const area = width * height;
     const numberOfClouds = Math.max(1, Math.floor((area / 1000000) * density));
 
     const newClouds: Cloud[] = [];
-    
-    // Divide the height into sections to ensure better vertical distribution
-    const verticalSections = 3; // Divide height into 3 sections
+    const verticalSections = 3;
     const cloudsPerSection = Math.ceil(numberOfClouds / verticalSections);
     
     for (let section = 0; section < verticalSections; section++) {
-      // Create clouds for this section
       for (let i = 0; i < cloudsPerSection; i++) {
         const id = section * cloudsPerSection + i;
         const direction = Math.random() > 0.5 ? 1 : -1;
-        newClouds.push(generateCloud(
+        const cloud = generateCloud(
           id,
           width,
           height,
@@ -123,14 +128,15 @@ export const Clouds: React.FC<CloudProps> = ({
           opacity,
           direction,
           section
-        ));
+        );
+        newClouds.push(cloud);
       }
     }
 
     setClouds(newClouds);
+    isInitialized.current = true;
   }, [density, minSize, maxSize, minSpeed, maxSpeed, opacity]);
 
-  // Handle cloud regeneration
   const regenerateCloud = useCallback((cloud: Cloud) => {
     if (!containerRef.current) return cloud;
 
@@ -144,19 +150,28 @@ export const Clouds: React.FC<CloudProps> = ({
       minSpeed,
       maxSpeed,
       opacity,
-      // Reverse the direction for the new cloud
       cloud.direction * -1 as 1 | -1,
-      Math.floor(Math.random() * 3) // Random section
+      Math.floor(Math.random() * 3)
     );
   }, [dimensions, minSize, maxSize, minSpeed, maxSpeed, opacity]);
 
-  useEffect(() => {
-    // Initial setup
-    initializeClouds();
+  const handleAnimationComplete = useCallback((cloud: Cloud) => {
+    setClouds(prevClouds => 
+      prevClouds.map(c => 
+        c.key === cloud.key ? regenerateCloud(cloud) : c
+      )
+    );
+  }, [regenerateCloud]);
 
-    // Setup resize observer
-    const observer = new ResizeObserver(() => {
+  useEffect(() => {
+    if (!isInitialized.current) {
       initializeClouds();
+    }
+
+    const observer = new ResizeObserver(() => {
+      if (containerRef.current) {
+        initializeClouds();
+      }
     });
 
     const currentContainer = containerRef.current;
@@ -172,13 +187,41 @@ export const Clouds: React.FC<CloudProps> = ({
     };
   }, [initializeClouds]);
 
+  const cloudAnimations = useMemo(() => 
+    clouds.map((cloud) => ({
+      initial: { x: cloud.x, y: cloud.y },
+      animate: {
+        x: cloud.direction === 1
+          ? [cloud.x, dimensions.width + cloud.size]
+          : [cloud.x, -cloud.size],
+        y: [
+          cloud.y,
+          cloud.y + Math.sin(cloud.x) * 50,
+          cloud.y,
+        ],
+      },
+      transition: {
+        x: {
+          duration: (dimensions.width + cloud.size * 2) / cloud.speed,
+          ease: "linear",
+          repeat: 0,
+        },
+        y: {
+          duration: 20 + Math.random() * 10,
+          ease: "easeInOut",
+          repeat: Infinity,
+          repeatType: "reverse",
+        },
+      },
+    })), [clouds, dimensions]);
+
   return (
     <div 
       ref={containerRef} 
       className="absolute inset-0 w-full h-full overflow-hidden"
       style={{ zIndex }}
     >
-      {clouds.map((cloud) => (
+      {clouds.map((cloud, index) => (
         <motion.div
           key={cloud.key}
           className="absolute"
@@ -186,37 +229,8 @@ export const Clouds: React.FC<CloudProps> = ({
             width: cloud.size,
             height: cloud.size,
           }}
-          initial={{ x: cloud.x, y: cloud.y }}
-          animate={{
-            x: cloud.direction === 1
-              ? [cloud.x, dimensions.width + cloud.size]
-              : [cloud.x, -cloud.size],
-            y: [
-              cloud.y,
-              cloud.y + Math.sin(cloud.x) * 50,
-              cloud.y,
-            ],
-          }}
-          transition={{
-            x: {
-              duration: (dimensions.width + cloud.size * 2) / cloud.speed,
-              ease: "linear",
-              repeat: 0,
-              onComplete: () => {
-                setClouds(prevClouds => 
-                  prevClouds.map(c => 
-                    c.key === cloud.key ? regenerateCloud(cloud) : c
-                  )
-                );
-              }
-            },
-            y: {
-              duration: 20 + Math.random() * 10,
-              ease: "easeInOut",
-              repeat: Infinity,
-              repeatType: "reverse",
-            },
-          }}
+          {...cloudAnimations[index]}
+          onAnimationComplete={() => handleAnimationComplete(cloud)}
         >
           <Image
             src={CLOUD_IMAGES[cloud.imageIndex]}
@@ -224,8 +238,8 @@ export const Clouds: React.FC<CloudProps> = ({
             fill
             className="object-contain select-none pointer-events-none"
             style={{ opacity: cloud.opacity }}
-            priority={false}
-            unoptimized // Use this to prevent Next.js image optimization which might cause issues with cloud images
+            priority={index < 3} // Prioritize loading first few clouds
+            unoptimized
           />
         </motion.div>
       ))}
