@@ -97,6 +97,7 @@ return (
     
   <main className="flex min-h-screen flex-col items-center justify-center">
     <KawaiiBackgroundDarker>
+      <div className="p-3">
       <SplashTitle {...splashTitleProps} />
       <div className="relative mb-16">
         <ComponentHeader 
@@ -135,10 +136,10 @@ return (
               className={cn(
                 "text-base sm:text-lg md:text-xl",
                 "text-white/90 font-medium mt-4",
-                "max-w-[90%]",
+                "max-w-4xl mx-auto",
                 "drop-shadow-[0_2px_4px_rgba(0,0,0,0.3)]",
-                "text-center",
-                "m-16"
+                "text-justify",
+                "m-5"
               )}
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
@@ -146,6 +147,7 @@ return (
             >
               {message2}
               </motion.p>
+              </div>
     </KawaiiBackgroundDarker>
     
 

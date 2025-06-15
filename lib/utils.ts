@@ -140,7 +140,7 @@ export function getScratchCards(heartlink: Heartlink | null): CardStackProps {
   if (!heartlink) {
     console.warn('No heartlink provided, using default scratch cards');
     return {
-      cards: pickRandomValues(DEFAULT_SCRATCH_CARD_OPTIONS.OTHER, 5)
+      cards: DEFAULT_SCRATCH_CARD_OPTIONS.OTHER.slice(0, 5)
     };
   }
 
@@ -150,26 +150,26 @@ export function getScratchCards(heartlink: Heartlink | null): CardStackProps {
     // Case 1: Custom scratch cards from heartlink
     if (scratchCard && Array.isArray(scratchCard) && scratchCard.length > 0) {
       return {
-        cards: pickRandomValues(scratchCard.map((card: ScratchCard) => card.content), 5)
+        cards: scratchCard.slice(0, 5).map((card: ScratchCard) => card.content)
       };
     }
 
     // Case 2: Default cards based on relation
     if (relation && relation in DEFAULT_SCRATCH_CARD_OPTIONS) {
       return {
-        cards: pickRandomValues(DEFAULT_SCRATCH_CARD_OPTIONS[relation as keyof typeof DEFAULT_SCRATCH_CARD_OPTIONS], 5)
+        cards: DEFAULT_SCRATCH_CARD_OPTIONS[relation as keyof typeof DEFAULT_SCRATCH_CARD_OPTIONS].slice(0, 5)
       };
     }
 
     // Case 3: Fallback to OTHER category
     return {
-      cards: pickRandomValues(DEFAULT_SCRATCH_CARD_OPTIONS.OTHER, 5)
+      cards: DEFAULT_SCRATCH_CARD_OPTIONS.OTHER.slice(0, 5)
     };
   } catch (error) {
     console.error('Error processing scratch cards:', error);
     // Safe fallback in case of any error
     return {
-      cards: pickRandomValues(DEFAULT_SCRATCH_CARD_OPTIONS.OTHER, 5)
+      cards: DEFAULT_SCRATCH_CARD_OPTIONS.OTHER.slice(0, 5)
     };
   }
 }

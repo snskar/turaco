@@ -16,7 +16,7 @@ const SplashTitle: React.FC<SplashTitleProps> = ({
     <motion.div 
       className={cn(
         "flex flex-col justify-center",
-        "relative w-full max-w-[640px] mx-auto",
+        "relative w-full max-w-4xl mx-auto",
         "py-8 px-6",
         className
       )}
@@ -42,9 +42,9 @@ const SplashTitle: React.FC<SplashTitleProps> = ({
           </div>
         </div>
 
-        {/* Cat artwork - positioned to overlap with text */}
+        {/* Cat artwork - positioned behind text */}
         <motion.div 
-          className="absolute -top-4 -right-4 w-40 sm:w-48 md:w-56 h-48 sm:h-64 md:h-56 z-20 pointer-events-none"
+          className="absolute -top-4 -right-4 w-40 sm:w-48 md:w-56 h-48 sm:h-64 md:h-56 z-0 pointer-events-none"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.3, duration: 0.5 }}
@@ -102,8 +102,9 @@ const SplashTitle: React.FC<SplashTitleProps> = ({
               className={cn(
                 "text-base sm:text-lg md:text-xl",
                 "text-white/90 font-medium mt-4",
-                "max-w-[90%]",
-                "drop-shadow-[0_2px_4px_rgba(0,0,0,0.3)]"
+                "max-w-4xl mx-auto",
+                "drop-shadow-[0_2px_4px_rgba(0,0,0,0.3)]",
+                "text-justify"
               )}
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}

@@ -20,6 +20,7 @@ const ScratchCard: React.FC<ScratchCardProps> = ({
     height,
     isInteractive,
     onComplete,
+    text,
   });
 
   return (
@@ -43,15 +44,6 @@ const ScratchCard: React.FC<ScratchCardProps> = ({
               ref={canvasRef}
               className={`absolute inset-0 z-20 touch-none touch-action-none rounded-2xl ${!isInteractive ? 'pointer-events-none' : ''}`}
             />
-            <div
-              className="absolute inset-0 z-30 flex items-center justify-center text-center px-4 text-lg font-bold pointer-events-none"
-              style={{
-                color: '#fff',
-                textShadow: '2px 2px 4px rgba(0,0,0,0.15)'
-              }}
-            >
-              {text}
-            </div>
           </div>
         )}
       </motion.div>
