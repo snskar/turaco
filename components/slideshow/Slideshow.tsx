@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useDragControls } from 'framer-motion';
 import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
 import { SlideshowProps } from './types';
 import Image from 'next/image';
@@ -9,6 +9,7 @@ import Image from 'next/image';
 const Slideshow: React.FC<SlideshowProps> = ({ images }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [direction, setDirection] = useState(0);
+  const dragControls = useDragControls();
 
   const slideVariants = {
     enter: (direction: number) => ({
@@ -37,6 +38,19 @@ const Slideshow: React.FC<SlideshowProps> = ({ images }) => {
     });
   };
 
+  const handleDragEnd = (event: any, info: any) => {
+    const swipeThreshold = 50; // minimum distance for swipe
+    const { offset } = info;
+
+    if (Math.abs(offset.x) > swipeThreshold) {
+      if (offset.x > 0) {
+        paginate(-1); // swipe right -> previous
+      } else {
+        paginate(1); // swipe left -> next
+      }
+    }
+  };
+
   return (
     <div className="container mx-auto px-4">
       <div className="max-w-[640px] mx-auto relative">
@@ -54,14 +68,21 @@ const Slideshow: React.FC<SlideshowProps> = ({ images }) => {
                 opacity: { duration: 0.2 }
               }}
               className="absolute inset-0"
+              drag="x"
+              dragControls={dragControls}
+              dragConstraints={{ left: 0, right: 0 }}
+              dragElastic={0.2}
+              onDragEnd={handleDragEnd}
+              whileTap={{ cursor: "grabbing" }}
             >
               <Image
                 src={images[currentIndex].src}
                 alt={images[currentIndex].alt}
-                className="w-full h-full object-cover"
+                className="w-full h-full object-cover select-none"
                 fill
                 sizes="(max-width: 640px) 100vw, 640px"
                 priority
+                draggable={false}
               />
             </motion.div>
           </AnimatePresence>

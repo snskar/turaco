@@ -25,7 +25,7 @@ export const fathersDay = {
       { id: "photo-7", url: "/sample_photos/father/father_7.JPG", heartlinkId: "mock-id" },
       { id: "photo-8", url: "/sample_photos/father/father_8.JPG", heartlinkId: "mock-id" },
       { id: "photo-9", url: "/sample_photos/father/father_9.JPG", heartlinkId: "mock-id" },
-      { id: "photo-10", url: "/sample_photos/father/father_10.JPG", heartlinkId: "mock-id" },
+      { id: "photo-10", url: "/sample_photos/father/father_10.jpg", heartlinkId: "mock-id" },
     ],
     
     // spotifyTrack: {
