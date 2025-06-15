@@ -42,9 +42,9 @@ const SplashTitle: React.FC<SplashTitleProps> = ({
           </div>
         </div>
 
-        {/* Cat artwork - positioned to overlap with text */}
+        {/* Cat artwork - positioned behind text */}
         <motion.div 
-          className="absolute -top-4 -right-4 w-40 sm:w-48 md:w-56 h-48 sm:h-64 md:h-56 z-20 pointer-events-none"
+          className="absolute -top-4 -right-4 w-40 sm:w-48 md:w-56 h-48 sm:h-64 md:h-56 z-0 pointer-events-none"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.3, duration: 0.5 }}
