@@ -6,13 +6,15 @@ interface UseScratchCardProps {
   height: number;
   isInteractive: boolean;
   onComplete?: () => void;
+  text: string;
 }
 
 export const useScratchCard = ({
   width,
   height,
   isInteractive,
-  onComplete
+  onComplete,
+  text
 }: UseScratchCardProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -98,8 +100,19 @@ export const useScratchCard = ({
     const ctx = canvas.getContext('2d', { willReadFrequently: true });
     if (!ctx) return;
 
-    canvas.width = width;
-    canvas.height = height;
+    // Get device pixel ratio
+    const dpr = window.devicePixelRatio || 1;
+    
+    // Set canvas dimensions accounting for pixel ratio
+    canvas.width = width * dpr;
+    canvas.height = height * dpr;
+    
+    // Scale canvas context to match pixel ratio
+    ctx.scale(dpr, dpr);
+    
+    // Set canvas display size
+    canvas.style.width = `${width}px`;
+    canvas.style.height = `${height}px`;
 
     // Create gradient
     const gradient = ctx.createLinearGradient(0, 0, width, height);
@@ -112,6 +125,23 @@ export const useScratchCard = ({
     // Draw gradient
     ctx.fillStyle = gradient;
     ctx.fillRect(0, 0, width, height);
+
+    // Enable text antialiasing
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = 'high';
+
+    // Draw text
+    ctx.font = 'bold 18px "Baloo 2", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
+    ctx.fillStyle = '#fff';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.shadowColor = 'rgba(0,0,0,0.15)';
+    ctx.shadowBlur = 4;
+    ctx.shadowOffsetX = 2;
+    ctx.shadowOffsetY = 2;
+    ctx.fillText(text, width / 2, height / 2);
+
+    // Set composite operation for scratching
     ctx.globalCompositeOperation = 'destination-out';
 
     const drawLine = (startX: number, startY: number, endX: number, endY: number) => {
@@ -187,7 +217,7 @@ export const useScratchCard = ({
       canvas.removeEventListener('mouseup', endHandler);
       canvas.removeEventListener('mouseleave', endHandler);
     };
-  }, [width, height, isInteractive, checkScratchCompletion]);
+  }, [width, height, isInteractive, checkScratchCompletion, text]);
 
   return {
     canvasRef,
