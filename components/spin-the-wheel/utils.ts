@@ -200,19 +200,6 @@ export const useSpinTheWheel = ({
       e.preventDefault();
       e.stopPropagation();
 
-      // Ensure container is in view
-      if (containerRef.current) {
-        const rect = containerRef.current.getBoundingClientRect();
-        const isInView = rect.top >= 0 && rect.bottom <= window.innerHeight;
-
-        if (!isInView) {
-          containerRef.current.scrollIntoView({
-            behavior: 'smooth',
-            block: 'center',
-          });
-        }
-      }
-
       // Add small delay to prevent accidental double triggers
       requestAnimationFrame(() => {
         spin();
