@@ -1,5 +1,5 @@
 import React from 'react';
-import { cn } from "@/lib/utils";
+import { cn } from '@/lib/utils';
 
 interface TextBoxProps {
   children: React.ReactNode;
@@ -8,17 +8,19 @@ interface TextBoxProps {
 
 const TextBox: React.FC<TextBoxProps> = ({ children, className }) => {
   return (
-    <div className={cn(
-      "relative p-6 rounded-[2rem] inline-block",
-      "bg-gradient-to-br from-blue-400/90 via-purple-400/90 to-pink-400/90",
-      "backdrop-blur-sm",
-      className
-    )}>
+    <div
+      className={cn(
+        'relative p-6 rounded-[2rem] inline-block',
+        'bg-gradient-to-br from-blue-400/40 via-purple-400/40 to-pink-400/40',
+        'backdrop-blur-sm',
+        className
+      )}
+    >
       {/* White border container */}
-      <div className="absolute inset-0 rounded-[2rem] border-2 border-white/80" />
-      
+      <div className="absolute inset-0 rounded-[2rem] border border-white/80" />
+
       {/* Content */}
-      <div className="relative text-white text-center font-semibold text-lg">
+      <div className="relative text-white text-justify font-semibold text-lg">
         {children}
       </div>
 
