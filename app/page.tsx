@@ -86,7 +86,7 @@ export default function Home() {
   } = getPropifiedHeartlink(rajkumarRao);
 
   const message2 =
-    'Your performances from Bareilly Ki Barfi to Badhaai Ho, have left a lasting impact. It’s refreshing to see someone not only excel on screen but also use their influence for good, supporting causes and inspiring change with quiet grace.';
+    'Your performances from Bareilly Ki Barfi to Badhaai Do, have left a lasting impact. It’s refreshing to see someone not only excel on screen but also use their influence for good, supporting causes and inspiring change with quiet grace.';
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center">
