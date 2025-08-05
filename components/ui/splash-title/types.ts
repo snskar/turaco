@@ -5,3 +5,7 @@ export interface SplashTitleProps {
     className?: string;
     imgSource?: string;
   }
+
+  export interface ScratchCardStackProps {
+    cards: string[];
+}

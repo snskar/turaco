@@ -1,8 +1,60 @@
-import React from 'react';
+"use client";
+
+import React, { useMemo } from 'react';
 import { motion } from 'framer-motion';
-import TwinklingStars from '@/components/ui/TwinklingStars';
 
 const KawaiiBackground: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  // Memoize the stars array to prevent regeneration on re-renders
+  const stars = useMemo(() => 
+    Array.from({ length: 20 }, (_, i) => ({
+      key: i,
+      left: `${(i * 13 + 7) % 100}%`,
+      top: `${(i * 17 + 3) % 100}%`,
+      duration: 2 + (i % 2),
+      delay: i * 0.1
+    })), 
+  []);
+
+  // Memoize cloud configurations
+  const clouds = useMemo(() => [
+    {
+      className: "absolute w-24 h-16 bg-white/30 rounded-full blur-sm",
+      animate: {
+        x: ['-100%', '100%'],
+        y: ['0%', '5%', '0%']
+      },
+      transition: {
+        x: { duration: 20, repeat: Infinity, ease: 'linear' },
+        y: { duration: 3, repeat: Infinity, ease: 'easeInOut' }
+      },
+      style: { top: '15%', left: '-10%' }
+    },
+    {
+      className: "absolute w-32 h-20 bg-white/20 rounded-full blur-sm",
+      animate: {
+        x: ['100%', '-100%'],
+        y: ['0%', '-7%', '0%']
+      },
+      transition: {
+        x: { duration: 25, repeat: Infinity, ease: 'linear' },
+        y: { duration: 4, repeat: Infinity, ease: 'easeInOut' }
+      },
+      style: { top: '40%', right: '-10%' }
+    },
+    {
+      className: "absolute w-28 h-16 bg-white/25 rounded-full blur-sm",
+      animate: {
+        x: ['-100%', '100%'],
+        y: ['0%', '3%', '0%']
+      },
+      transition: {
+        x: { duration: 22, repeat: Infinity, ease: 'linear' },
+        y: { duration: 3.5, repeat: Infinity, ease: 'easeInOut' }
+      },
+      style: { top: '65%', left: '-10%' }
+    }
+  ], []);
+
   return (
     <div className="min-h-screen w-full relative">
       {/* Background wrapper - fixed position */}
@@ -21,70 +73,42 @@ const KawaiiBackground: React.FC<{ children: React.ReactNode }> = ({ children })
 
         {/* Animated Clouds */}
         <div className="absolute inset-0 pointer-events-none overflow-hidden">
-          <motion.div
-            className="absolute w-24 h-16 bg-white/30 rounded-full blur-sm"
-            animate={{
-              x: ['-100%', '100%'],
-              y: ['0%', '5%', '0%']
-            }}
-            transition={{
-              x: { duration: 20, repeat: Infinity, ease: 'linear' },
-              y: { duration: 3, repeat: Infinity, ease: 'easeInOut' }
-            }}
-            style={{ top: '15%', left: '-10%' }}
-          />
-          <motion.div
-            className="absolute w-32 h-20 bg-white/20 rounded-full blur-sm"
-            animate={{
-              x: ['100%', '-100%'],
-              y: ['0%', '-7%', '0%']
-            }}
-            transition={{
-              x: { duration: 25, repeat: Infinity, ease: 'linear' },
-              y: { duration: 4, repeat: Infinity, ease: 'easeInOut' }
-            }}
-            style={{ top: '40%', right: '-10%' }}
-          />
-          <motion.div
-            className="absolute w-28 h-16 bg-white/25 rounded-full blur-sm"
-            animate={{
-              x: ['-100%', '100%'],
-              y: ['0%', '3%', '0%']
-            }}
-            transition={{
-              x: { duration: 22, repeat: Infinity, ease: 'linear' },
-              y: { duration: 3.5, repeat: Infinity, ease: 'easeInOut' }
-            }}
-            style={{ top: '65%', left: '-10%' }}
-          />
+          {clouds.map((cloud, index) => (
+            <motion.div
+              key={`cloud-${index}`}
+              className={cloud.className}
+              animate={cloud.animate}
+              transition={cloud.transition}
+              style={cloud.style}
+              layoutId={`cloud-${index}`}
+            />
+          ))}
         </div>
 
         {/* Stars */}
         <div className="absolute inset-0 pointer-events-none">
-          {[...Array(20)].map((_, i) => (
+          {stars.map((star) => (
             <motion.div
-              key={i}
+              key={star.key}
               className="absolute w-1 h-1 bg-white rounded-full"
               animate={{
                 opacity: [0.2, 0.8, 0.2],
                 scale: [1, 1.2, 1]
               }}
               transition={{
-                duration: 2 + (i % 2),
+                duration: star.duration,
                 repeat: Infinity,
-                delay: i * 0.1
+                delay: star.delay
               }}
               style={{
-                left: `${(i * 13 + 7) % 100}%`,
-                top: `${(i * 17 + 3) % 100}%`
+                left: star.left,
+                top: star.top
               }}
+              layoutId={`star-${star.key}`}
             />
           ))}
         </div>
       </div>
-
-            {/* Star field layer */}
-            <TwinklingStars starCount={75} />
 
       {/* Content */}
       <div className="relative z-10">

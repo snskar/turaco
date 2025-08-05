@@ -1,5 +1,5 @@
-import { useState, useRef, useCallback, useEffect } from "react";
-import confetti from "canvas-confetti";
+import { useState, useRef, useCallback, useEffect } from 'react';
+import confetti from 'canvas-confetti';
 
 interface UseSpinTheWheelProps {
   options: string[];
@@ -8,14 +8,18 @@ interface UseSpinTheWheelProps {
   maxSpins?: number;
 }
 
-export const useSpinTheWheel = ({ 
-  options, 
+export const useSpinTheWheel = ({
+  options,
   onWin,
   minSpins = 5,
-  maxSpins = 7 
+  maxSpins = 7,
 }: UseSpinTheWheelProps) => {
   const [isSpinning, setIsSpinning] = useState(false);
   const [winner, setWinner] = useState<string | null>(null);
+  const [isWonState, setIsWonState] = useState(false);
+  const [winningSectorIndex, setWinningSectorIndex] = useState<number | null>(
+    null
+  );
   const [wheelSize, setWheelSize] = useState(300);
   const [rotation, setRotation] = useState(0);
   const wheelRef = useRef<SVGSVGElement>(null);
@@ -48,26 +52,29 @@ export const useSpinTheWheel = ({
     return () => window.removeEventListener('resize', updateSize);
   }, []);
 
-  const getWinningOptionIndex = useCallback((currentRotation: number) => {
-    // Normalize the rotation to 0-360 degrees
-    const normalizedRotation = ((currentRotation % 360) + 360) % 360;
-    
-    // Find which sector contains exactly 90 degrees after rotation
-    // We subtract the rotation because we rotate clockwise
-    const targetAngle = (360 - normalizedRotation + 270) % 360;
-    
-    // Calculate which sector contains this angle
-    const sectorIndex = Math.floor(targetAngle / sectorAngle);
-    return sectorIndex;
-  }, [sectorAngle]);
+  const getWinningOptionIndex = useCallback(
+    (currentRotation: number) => {
+      // Normalize the rotation to 0-360 degrees
+      const normalizedRotation = ((currentRotation % 360) + 360) % 360;
+
+      // Find which sector contains exactly 90 degrees after rotation
+      // We subtract the rotation because we rotate clockwise
+      const targetAngle = (360 - normalizedRotation + 270) % 360;
+
+      // Calculate which sector contains this angle
+      const sectorIndex = Math.floor(targetAngle / sectorAngle);
+      return sectorIndex;
+    },
+    [sectorAngle]
+  );
 
   const triggerConfetti = useCallback(() => {
     if (!containerRef.current) return;
-    
+
     const rect = containerRef.current.getBoundingClientRect();
     const centerX = (rect.left + rect.right) / 2 / window.innerWidth;
     const centerY = (rect.top + rect.bottom) / 2 / window.innerHeight;
-    
+
     const duration = 1500;
     const end = Date.now() + duration;
     const colors = ['#ffd6eb', '#d6f5ff', '#f9c8d9', '#a5b4fc'];
@@ -104,6 +111,18 @@ export const useSpinTheWheel = ({
     frame();
   }, []);
 
+  const resetWheel = useCallback(() => {
+    if (wheelRef.current) {
+      wheelRef.current.style.transition =
+        'transform 1s cubic-bezier(0.4, 0, 0.2, 1)';
+      wheelRef.current.style.transform = 'rotate(0deg) translateZ(0)';
+    }
+    setRotation(0);
+    setWinner(null);
+    setIsWonState(false);
+    setWinningSectorIndex(null);
+  }, []);
+
   const spin = useCallback(() => {
     if (isSpinning) return;
     setIsSpinning(true);
@@ -111,17 +130,19 @@ export const useSpinTheWheel = ({
 
     // Get the current rotation and normalize it
     const currentRotation = rotation % 360;
-    
+
     // Choose a random winning index first
     const targetIndex = Math.floor(Math.random() * options.length);
-    
+
     // Calculate spins (more controlled range)
-    const fullSpins = minSpins + (Math.random() * (maxSpins - minSpins));
-    
+    const fullSpins = minSpins + Math.random() * (maxSpins - minSpins);
+
     // Calculate final rotation with better precision
-    const baseAngle = 360 - (targetIndex * sectorAngle);
-    const finalRotation = Math.floor((fullSpins * 360) + baseAngle - 90 + (360 - currentRotation));
-    
+    const baseAngle = 360 - targetIndex * sectorAngle;
+    const finalRotation = Math.floor(
+      fullSpins * 360 + baseAngle - 90 + (360 - currentRotation)
+    );
+
     // Update wheel with optimized animation
     if (wheelRef.current) {
       wheelRef.current.style.transition = `transform 8s cubic-bezier(0.32, 0.06, 0.15, 1)`;
@@ -135,47 +156,57 @@ export const useSpinTheWheel = ({
     setTimeout(() => {
       const winningIndex = getWinningOptionIndex(rotation + finalRotation);
       const winningOption = options[winningIndex];
-      
+
       setWinner(winningOption);
+      setWinningSectorIndex(winningIndex);
+      setIsWonState(true);
       onWin?.(winningOption);
       triggerConfetti();
-      
+
       // Small delay before allowing next spin
       setTimeout(() => {
         setIsSpinning(false);
       }, 500);
     }, 8200);
-  }, [isSpinning, options, sectorAngle, getWinningOptionIndex, onWin, triggerConfetti, rotation, minSpins, maxSpins]);
+  }, [
+    isSpinning,
+    options,
+    sectorAngle,
+    getWinningOptionIndex,
+    onWin,
+    triggerConfetti,
+    rotation,
+    minSpins,
+    maxSpins,
+  ]);
 
   // Debounced interaction handler
-  const handleInteraction = useCallback((e: React.MouseEvent | React.TouchEvent) => {
-    if (isSpinning) {
-      e.preventDefault();
-      return;
-    }
-    
-    // Prevent any default behavior
-    e.preventDefault();
-    e.stopPropagation();
-
-    // Ensure container is in view
-    if (containerRef.current) {
-      const rect = containerRef.current.getBoundingClientRect();
-      const isInView = rect.top >= 0 && rect.bottom <= window.innerHeight;
-      
-      if (!isInView) {
-        containerRef.current.scrollIntoView({ 
-          behavior: 'smooth', 
-          block: 'center'
-        });
+  const handleInteraction = useCallback(
+    (e: React.MouseEvent | React.TouchEvent) => {
+      if (isSpinning) {
+        e.preventDefault();
+        return;
       }
-    }
-    
-    // Add small delay to prevent accidental double triggers
-    requestAnimationFrame(() => {
-      spin();
-    });
-  }, [isSpinning, spin]);
+
+      // If in won state, reset the wheel
+      if (isWonState) {
+        e.preventDefault();
+        e.stopPropagation();
+        resetWheel();
+        return;
+      }
+
+      // Prevent any default behavior
+      e.preventDefault();
+      e.stopPropagation();
+
+      // Add small delay to prevent accidental double triggers
+      requestAnimationFrame(() => {
+        spin();
+      });
+    },
+    [isSpinning, isWonState, spin, resetWheel]
+  );
 
   // Clean up function
   useEffect(() => {
@@ -186,30 +217,87 @@ export const useSpinTheWheel = ({
 
   const renderSectors = useCallback(() => {
     return options.map((option, i) => {
-      // Calculate sector angles for clockwise rotation
-      const startAngle = Number((i * sectorAngle).toFixed(2));
-      const endAngle = Number(((i + 1) * sectorAngle).toFixed(2));
-      const largeArcFlag = sectorAngle > 180 ? 1 : 0;
+      let startAngle, endAngle, largeArcFlag;
+
+      if (isWonState && winningSectorIndex === i) {
+        // Expand the winning sector to fill the entire wheel
+        startAngle = 0;
+        endAngle = 360;
+        largeArcFlag = 1;
+      } else if (isWonState) {
+        // Hide other sectors when in won state
+        startAngle = 0;
+        endAngle = 0;
+        largeArcFlag = 0;
+      } else {
+        // Normal sector calculation
+        startAngle = Number((i * sectorAngle).toFixed(2));
+        endAngle = Number(((i + 1) * sectorAngle).toFixed(2));
+        largeArcFlag = sectorAngle > 180 ? 1 : 0;
+      }
 
       // Calculate sector path with fixed precision
-      const x1 = Number((radius + radius * Math.cos((startAngle * Math.PI) / 180)).toFixed(2));
-      const y1 = Number((radius + radius * Math.sin((startAngle * Math.PI) / 180)).toFixed(2));
-      const x2 = Number((radius + radius * Math.cos((endAngle * Math.PI) / 180)).toFixed(2));
-      const y2 = Number((radius + radius * Math.sin((endAngle * Math.PI) / 180)).toFixed(2));
+      const x1 = Number(
+        (radius + radius * Math.cos((startAngle * Math.PI) / 180)).toFixed(2)
+      );
+      const y1 = Number(
+        (radius + radius * Math.sin((startAngle * Math.PI) / 180)).toFixed(2)
+      );
+      const x2 = Number(
+        (radius + radius * Math.cos((endAngle * Math.PI) / 180)).toFixed(2)
+      );
+      const y2 = Number(
+        (radius + radius * Math.sin((endAngle * Math.PI) / 180)).toFixed(2)
+      );
 
       const pathData = `M ${radius.toFixed(2)} ${radius.toFixed(2)} L ${x1} ${y1} A ${radius.toFixed(2)} ${radius.toFixed(2)} 0 ${largeArcFlag} 1 ${x2} ${y2} Z`;
 
       // Calculate text position and rotation with fixed precision
-      const midAngle = Number((startAngle + (sectorAngle / 2)).toFixed(2));
-      const textRadius = Number((radius * 0.65).toFixed(2));
-      const textX = Number((radius + textRadius * Math.cos((midAngle * Math.PI) / 180)).toFixed(2));
-      const textY = Number((radius + textRadius * Math.sin((midAngle * Math.PI) / 180)).toFixed(2));
+      let midAngle, textX, textY, textRotation, textRadius;
 
-      // Calculate text rotation to be radial with fixed precision
-      let textRotation = Number(((midAngle + 180) % 360).toFixed(2));
-      // Flip text when it would be upside down
-      if (textRotation > 90 && textRotation < 270) {
-        textRotation = Number((textRotation + 180).toFixed(2));
+      if (isWonState && winningSectorIndex === i) {
+        // Center the text for the expanded winning sector
+        midAngle = 180; // Center at bottom
+        textRadius = Number((radius * 0.4).toFixed(2)); // Closer to center
+        textX = Number(
+          (radius + textRadius * Math.cos((midAngle * Math.PI) / 180)).toFixed(
+            2
+          )
+        );
+        textY = Number(
+          (radius + textRadius * Math.sin((midAngle * Math.PI) / 180)).toFixed(
+            2
+          )
+        );
+        textRotation = 0; // Horizontal text
+      } else if (isWonState) {
+        // Hide text for other sectors - position at center but don't render
+        midAngle = 0;
+        textRadius = Number((radius * 0.1).toFixed(2)); // Small radius to avoid division by zero
+        textX = radius;
+        textY = radius;
+        textRotation = 0;
+      } else {
+        // Normal text positioning
+        midAngle = Number((startAngle + sectorAngle / 2).toFixed(2));
+        textRadius = Number((radius * 0.65).toFixed(2));
+        textX = Number(
+          (radius + textRadius * Math.cos((midAngle * Math.PI) / 180)).toFixed(
+            2
+          )
+        );
+        textY = Number(
+          (radius + textRadius * Math.sin((midAngle * Math.PI) / 180)).toFixed(
+            2
+          )
+        );
+
+        // Calculate text rotation to be radial with fixed precision
+        textRotation = Number(((midAngle + 180) % 360).toFixed(2));
+        // Flip text when it would be upside down
+        if (textRotation > 90 && textRotation < 270) {
+          textRotation = Number((textRotation + 180).toFixed(2));
+        }
       }
 
       return {
@@ -218,14 +306,25 @@ export const useSpinTheWheel = ({
         textY,
         textRotation,
         option,
-        fontSize: Number(getFontSize().toFixed(2))
+        fontSize: Number(getFontSize().toFixed(2)),
+        isWinningSector: isWonState && winningSectorIndex === i,
+        shouldRender: !isWonState || winningSectorIndex === i,
       };
     });
-  }, [options, sectorAngle, radius, getFontSize]);
+  }, [
+    options,
+    sectorAngle,
+    radius,
+    getFontSize,
+    isWonState,
+    winningSectorIndex,
+  ]);
 
   return {
     isSpinning,
     winner,
+    isWonState,
+    winningSectorIndex,
     wheelSize,
     rotation,
     wheelRef,
@@ -233,6 +332,7 @@ export const useSpinTheWheel = ({
     radius,
     spin,
     handleInteraction,
-    renderSectors
+    resetWheel,
+    renderSectors,
   };
 };

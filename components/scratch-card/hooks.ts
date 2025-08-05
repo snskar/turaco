@@ -60,15 +60,29 @@ export const useScratchCard = ({
     const ctx = canvas?.getContext('2d');
     if (!canvas || !ctx || isScratched) return;
 
-    const pixels = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    // Define the area around the central text to check
+    const centerX = canvas.width / 2;
+    const centerY = canvas.height / 2;
+    const checkRadius = 80; // Increased radius to require more scratching
+
+    // Get the pixels in the area around the text
+    const pixels = ctx.getImageData(
+      centerX - checkRadius,
+      centerY - checkRadius,
+      checkRadius * 2,
+      checkRadius * 2
+    );
+
     let transparentPixels = 0;
+    const totalPixels = pixels.width * pixels.height;
 
     for (let i = 3; i < pixels.data.length; i += 4) {
       if (pixels.data[i] < 128) transparentPixels++;
     }
 
-    const transparency = transparentPixels / (canvas.width * canvas.height);
-    if (transparency > 0.5) {
+    // Check if enough of the area around the text is scratched
+    const transparency = transparentPixels / totalPixels;
+    if (transparency > 0.9) { // Increased threshold to 90% to require almost complete scratching
       setIsScratched(true);
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       triggerConfetti();

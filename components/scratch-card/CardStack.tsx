@@ -1,8 +1,8 @@
-import React, { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import ScratchCard from "./Card";
-import { AnimatedImageButton } from "@/components/ui/AnimatedImageButton";
-import { CardStackProps } from "./types";
+import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import ScratchCard from './Card';
+import { AnimatedImageButton } from '@/components/ui/AnimatedImageButton';
+import { CardStackProps } from './types';
 
 export const CardStack: React.FC<CardStackProps> = ({ cards }) => {
   const [remainingCards, setRemainingCards] = useState<string[]>(cards);
@@ -14,7 +14,7 @@ export const CardStack: React.FC<CardStackProps> = ({ cards }) => {
     if (isProcessing) return;
     setScratchedIndex(0);
     setIsProcessing(true);
-    
+
     const revealedCard = remainingCards[0];
     if (revealedCard) {
       setTimeout(() => {
@@ -41,7 +41,7 @@ export const CardStack: React.FC<CardStackProps> = ({ cards }) => {
             remainingCards.map((revealText, index) => {
               const isTopCard = index === 0;
               const isScratched = index === scratchedIndex;
-              
+
               // Spiral effect calculations
               const angle = index * 10;
               const radius = index * 8;
@@ -55,31 +55,35 @@ export const CardStack: React.FC<CardStackProps> = ({ cards }) => {
                   style={{
                     zIndex: remainingCards.length - index,
                   }}
-                  initial={{ 
-                    opacity: 1, 
+                  initial={{
+                    opacity: 1,
                     scale: 0.95,
                     x,
                     y,
-                    rotate: angle 
+                    rotate: angle,
                   }}
-                  animate={{ 
+                  animate={{
                     opacity: isTopCard ? 1 : 0.6,
                     scale: isTopCard ? 1 : 0.95,
                     x,
                     y,
                     rotate: angle,
-                    transition: { duration: 0.3 }
+                    transition: { duration: 0.3 },
                   }}
-                  exit={{ 
+                  exit={{
                     opacity: 0,
                     scale: 0.8,
                     x: x + 50,
                     y: y - 50,
                     rotate: angle + 15,
-                    transition: { duration: 0.3 }
+                    transition: { duration: 0.3 },
                   }}
-                  whileHover={isTopCard && !isProcessing ? { scale: 1.05 } : undefined}
-                  whileTap={isTopCard && !isProcessing ? { scale: 0.95 } : undefined}
+                  whileHover={
+                    isTopCard && !isProcessing ? { scale: 1.05 } : undefined
+                  }
+                  whileTap={
+                    isTopCard && !isProcessing ? { scale: 0.95 } : undefined
+                  }
                 >
                   <ScratchCard
                     text="Scratch Me!"
@@ -114,7 +118,7 @@ export const CardStack: React.FC<CardStackProps> = ({ cards }) => {
             className="flex flex-col items-center gap-4 mt-8"
           >
             <div className="flex flex-col items-center gap-2 p-6 rounded-xl bg-white/10 backdrop-blur-sm">
-              <h3 className="text-xl font-bold text-white mb-2">You Win</h3>
+              <h3 className="text-xl font-bold text-white mb-2">Truth!</h3>
               {revealedCards.map((card, index) => (
                 <motion.div
                   key={`revealed-${index}`}
