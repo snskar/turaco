@@ -164,7 +164,7 @@ export default function Home() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4 }}
             >
-              {'To Rajkumar Rao, with love'}
+              {'To Rajkummar Rao, with love'}
             </motion.p>
           </div>
         </div>
