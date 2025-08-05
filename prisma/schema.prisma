@@ -58,7 +58,15 @@ model Heartlink {
 
 model Photo {
   id          String    @id @default(cuid())
+  publicId    String    @unique
   url         String
+  thumbnailUrl String?
+  format      String?
+  bytes       Int?
+  width       Int?
+  height      Int?
+  createdAt   DateTime  @default(now())
+  
   heartlinkId String
   heartlink   Heartlink @relation(fields: [heartlinkId], references: [id], onDelete: Cascade)
 }

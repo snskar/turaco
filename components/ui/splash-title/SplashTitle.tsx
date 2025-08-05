@@ -35,7 +35,8 @@ const SplashTitle: React.FC<SplashTitleProps> = ({
           {/* Main Title */}
           <div className="relative z-10">
             <HolographicText
-              className="text-[54px] sm:text-[48px] md:text-[56px] lg:text-[64px] leading-[1.1]"
+              // className="text-[5px] sm:text-[48px] md:text-[56px] lg:text-[64px] leading-[1.1]"
+              className="text-[64px] sm:text-[48px] md:text-[56px] lg:text-[64px] leading-[0.9]"
               strokeWidth={8}
             >
               {title}
@@ -53,8 +54,10 @@ const SplashTitle: React.FC<SplashTitleProps> = ({
           <Image
             src={imgSource || '/assets/art/cat.png'}
             alt="Decorative symbol"
-            width={300}
-            height={300}
+            // width={300}
+            // height={300}
+            width={800}
+            height={800}
             className="object-contain drop-shadow-lg"
           />
         </motion.div>

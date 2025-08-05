@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import React from 'react';
 import { motion } from 'framer-motion';
@@ -28,11 +28,12 @@ export const KawaiiBackgroundDarker: React.FC<KawaiiBackgroundDarkerProps> = ({
         <div className="absolute inset-0 bg-gradient-to-br from-pink-300 via-purple-300 to-blue-300" />
 
         {/* Grid Pattern with slightly darker lines */}
-        <div 
+        <div
           className="absolute inset-0 opacity-15"
           style={{
-            backgroundImage: 'linear-gradient(to right, rgba(255,255,255,.15) 1px, transparent 1px), linear-gradient(to bottom, rgba(255,255,255,.15) 1px, transparent 1px)',
-            backgroundSize: '20px 20px'
+            backgroundImage:
+              'linear-gradient(to right, rgba(255,255,255,.15) 1px, transparent 1px), linear-gradient(to bottom, rgba(255,255,255,.15) 1px, transparent 1px)',
+            backgroundSize: '20px 20px',
           }}
         />
 
@@ -60,16 +61,16 @@ export const KawaiiBackgroundDarker: React.FC<KawaiiBackgroundDarkerProps> = ({
               className="absolute w-1 h-1 bg-white rounded-full"
               animate={{
                 opacity: [0.2, 0.8, 0.2],
-                scale: [1, 1.2, 1]
+                scale: [1, 1.2, 1],
               }}
               transition={{
                 duration: 2 + (i % 2),
                 repeat: Infinity,
-                delay: i * 0.1
+                delay: i * 0.1,
               }}
               style={{
                 left: `${(i * 13 + 7) % 100}%`,
-                top: `${(i * 17 + 3) % 100}%`
+                top: `${(i * 17 + 3) % 100}%`,
               }}
             />
           ))}
@@ -77,9 +78,7 @@ export const KawaiiBackgroundDarker: React.FC<KawaiiBackgroundDarkerProps> = ({
       </div>
 
       {/* Content */}
-      <div className="relative z-20">
-        {children}
-      </div>
+      <div className="relative z-20">{children}</div>
     </div>
   );
 };

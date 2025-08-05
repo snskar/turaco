@@ -4,26 +4,28 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import TwinklingStars from './TwinklingStars';
 
-const KawaiiBackgroundDarker: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+const KawaiiBackgroundDarker: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
   return (
     <div className="min-h-screen w-full relative bg-[#0f0f1a] text-white overflow-hidden">
       {/* Full-screen animated holographic gradient */}
       <motion.div
         className="fixed inset-0 -z-20"
         animate={{
-          backgroundPosition: ['0% 50%', '100% 50%', '0% 50%']
+          backgroundPosition: ['0% 50%', '100% 50%', '0% 50%'],
         }}
         transition={{
           duration: 30,
           repeat: Infinity,
-          ease: 'linear'
+          ease: 'linear',
         }}
         style={{
           backgroundImage: `
             linear-gradient(130deg, rgba(255,153,255,0.3), rgba(102,253,253,0.25), rgba(255,200,125,0.2), rgba(173,255,196,0.2))
           `,
           backgroundSize: '300% 300%',
-          filter: 'blur(100px)'
+          filter: 'blur(100px)',
         }}
       />
 
@@ -33,8 +35,9 @@ const KawaiiBackgroundDarker: React.FC<{ children: React.ReactNode }> = ({ child
         animate={{ rotate: 360 }}
         transition={{ duration: 60, repeat: Infinity, ease: 'linear' }}
         style={{
-          background: 'radial-gradient(circle at center, #ff99ff55, #66fdfd33, #ffc87722, transparent)',
-          filter: 'blur(140px)'
+          background:
+            'radial-gradient(circle at center, #ff99ff55, #66fdfd33, #ffc87722, transparent)',
+          filter: 'blur(140px)',
         }}
       />
 
@@ -44,7 +47,7 @@ const KawaiiBackgroundDarker: React.FC<{ children: React.ReactNode }> = ({ child
         style={{
           backgroundImage:
             'linear-gradient(to right, rgba(255,255,255,.1) 1px, transparent 1px), linear-gradient(to bottom, rgba(255,255,255,.1) 1px, transparent 1px)',
-          backgroundSize: '20px 20px'
+          backgroundSize: '20px 20px',
         }}
       />
 
@@ -52,7 +55,7 @@ const KawaiiBackgroundDarker: React.FC<{ children: React.ReactNode }> = ({ child
       {[
         { size: 32, top: '15%', left: '-10%', opacity: 0.4 },
         { size: 40, top: '45%', right: '-10%', opacity: 0.3 },
-        { size: 36, top: '70%', left: '-15%', opacity: 0.35 }
+        { size: 36, top: '70%', left: '-15%', opacity: 0.35 },
       ].map((blob, i) => (
         <motion.div
           key={i}
@@ -64,16 +67,16 @@ const KawaiiBackgroundDarker: React.FC<{ children: React.ReactNode }> = ({ child
             left: blob.left,
             right: blob.right,
             background: 'linear-gradient(135deg, #ff99ff80, #66fdfd66)',
-            opacity: blob.opacity
+            opacity: blob.opacity,
           }}
           animate={{
             x: ['-10%', '10%', '-10%'],
-            y: ['0%', '3%', '0%']
+            y: ['0%', '3%', '0%'],
           }}
           transition={{
             duration: 18 + i * 3,
             repeat: Infinity,
-            ease: 'easeInOut'
+            ease: 'easeInOut',
           }}
         />
       ))}
@@ -86,16 +89,16 @@ const KawaiiBackgroundDarker: React.FC<{ children: React.ReactNode }> = ({ child
             className="absolute w-1 h-1 bg-white rounded-full"
             animate={{
               opacity: [0.2, 0.8, 0.2],
-              scale: [1, 1.2, 1]
+              scale: [1, 1.2, 1],
             }}
             transition={{
               duration: 2 + (i % 2),
               repeat: Infinity,
-              delay: i * 0.2
+              delay: i * 0.2,
             }}
             style={{
               left: `${(i * 37 + 7) % 100}%`,
-              top: `${(i * 53 + 3) % 100}%`
+              top: `${(i * 53 + 3) % 100}%`,
             }}
           />
         ))}

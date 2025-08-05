@@ -1,13 +1,8 @@
-"use client";
+'use client';
 
-import React, {
-  useEffect,
-  useState,
-  useRef,
-  useCallback,
-} from "react";
-import Image from "next/image";
-import { motion, useAnimation } from "framer-motion";
+import React, { useEffect, useState, useRef, useCallback } from 'react';
+import Image from 'next/image';
+import { motion, useAnimation } from 'framer-motion';
 
 interface CloudProps {
   children?: React.ReactNode;
@@ -32,12 +27,12 @@ interface Cloud {
 }
 
 const CLOUD_IMAGES = [
-  "/assets/clouds/cloud1.png",
-  "/assets/clouds/cloud2.png",
-  "/assets/clouds/cloud3.png",
-  "/assets/clouds/cloud4.png",
-  "/assets/clouds/cloud5.png",
-  "/assets/clouds/cloud6.png",
+  '/assets/clouds/cloud1.png',
+  '/assets/clouds/cloud2.png',
+  '/assets/clouds/cloud3.png',
+  '/assets/clouds/cloud4.png',
+  '/assets/clouds/cloud5.png',
+  '/assets/clouds/cloud6.png',
 ];
 
 function debounce<T extends (...args: unknown[]) => void>(fn: T, wait: number) {
@@ -89,9 +84,7 @@ const CloudItem = React.memo(
 
     useEffect(() => {
       const { x, y, size, speed, direction, id } = cloud;
-      const toX = direction === 1
-        ? dimensions.width + size
-        : -size;
+      const toX = direction === 1 ? dimensions.width + size : -size;
 
       controls.set({ x, y });
 
@@ -99,9 +92,9 @@ const CloudItem = React.memo(
         y: [y, y + Math.sin(x) * 30, y],
         transition: {
           duration: 15 + Math.random() * 10,
-          ease: "easeInOut",
+          ease: 'easeInOut',
           repeat: Infinity,
-          repeatType: "reverse",
+          repeatType: 'reverse',
         },
       });
 
@@ -110,7 +103,7 @@ const CloudItem = React.memo(
           x: toX,
           transition: {
             duration: (dimensions.width + size * 2) / speed,
-            ease: "linear",
+            ease: 'linear',
           },
         })
         .then(() => regenerate(id));
@@ -157,17 +150,13 @@ export const Clouds: React.FC<CloudProps> = ({
 
   const initializeClouds = useCallback(() => {
     if (!containerRef.current) return;
-    const { width, height } =
-      containerRef.current.getBoundingClientRect();
+    const { width, height } = containerRef.current.getBoundingClientRect();
     if (width === 0 || height === 0) return;
 
     setDimensions({ width, height });
 
     const area = width * height;
-    const count = Math.max(
-      1,
-      Math.floor((area / 1_000_000) * density)
-    );
+    const count = Math.max(1, Math.floor((area / 1_000_000) * density));
 
     const newClouds: Cloud[] = [];
     for (let i = 0; i < count; i++) {
@@ -189,8 +178,8 @@ export const Clouds: React.FC<CloudProps> = ({
 
   const regenerate = useCallback(
     (id: number) => {
-      setClouds((prev) =>
-        prev.map((c) =>
+      setClouds(prev =>
+        prev.map(c =>
           c.id !== id
             ? c
             : generateCloud(
@@ -218,7 +207,7 @@ export const Clouds: React.FC<CloudProps> = ({
   }, [initializeClouds]);
 
   useEffect(() => {
-    CLOUD_IMAGES.forEach((src) => new window.Image().src = src);
+    CLOUD_IMAGES.forEach(src => (new window.Image().src = src));
   }, []);
 
   return (
@@ -227,7 +216,7 @@ export const Clouds: React.FC<CloudProps> = ({
       className="absolute inset-0 w-full h-full overflow-hidden"
       style={{ zIndex }}
     >
-      {clouds.map((cloud) => (
+      {clouds.map(cloud => (
         <CloudItem
           key={cloud.id}
           cloud={cloud}
