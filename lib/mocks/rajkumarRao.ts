@@ -19,27 +19,27 @@ export const rajkumarRao = {
   photos: [
     {
       id: 'photo-2',
-      url: '/sample_photos/rajkumar_rao/rao_1.JPG',
+      url: '/sample_photos/rajkumar_rao/rao_1.jpg',
       heartlinkId: 'mock-id',
     },
     {
       id: 'photo-3',
-      url: '/sample_photos/rajkumar_rao/rao_2.JPG',
+      url: '/sample_photos/rajkumar_rao/rao_2.jpg',
       heartlinkId: 'mock-id',
     },
     {
       id: 'photo-4',
-      url: '/sample_photos/rajkumar_rao/rao_3.JPG',
+      url: '/sample_photos/rajkumar_rao/rao_3.jpg',
       heartlinkId: 'mock-id',
     },
     {
       id: 'photo-5',
-      url: '/sample_photos/rajkumar_rao/rao_4.JPG',
+      url: '/sample_photos/rajkumar_rao/rao_4.jpg',
       heartlinkId: 'mock-id',
     },
     {
       id: 'photo-1',
-      url: '/sample_photos/rajkumar_rao/rao_5.JPG',
+      url: '/sample_photos/rajkumar_rao/rao_5.jpg',
       heartlinkId: 'mock-id',
     },
   ],

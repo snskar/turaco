@@ -135,36 +135,38 @@ export default function Home() {
           />
           <SpinTheWheel {...spinTheWheelProps} />
           <FancyDivider />
-          <motion.p
-            className={cn(
-              'text-base sm:text-lg md:text-xl',
-              'text-white/90 font-medium mt-4',
-              'max-w-4xl mx-auto',
-              'drop-shadow-[0_2px_4px_rgba(0,0,0,0.3)]',
-              'text-justify',
-              'm-5'
-            )}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 }}
-          >
-            {message2}
-          </motion.p>
-          <motion.p
-            className={cn(
-              'text-base sm:text-lg md:text-xl',
-              'text-white/90 font-medium mt-4',
-              'max-w-4xl mx-auto',
-              'drop-shadow-[0_2px_4px_rgba(0,0,0,0.3)]',
-              'text-justify',
-              'm-5'
-            )}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 }}
-          >
-            {'To Rajkumar Rao, with love'}
-          </motion.p>
+          <div className="flex flex-col items-center">
+            <motion.p
+              className={cn(
+                'text-base sm:text-lg md:text-xl',
+                'text-white/90 font-medium mt-4',
+                'max-w-4xl',
+                'drop-shadow-[0_2px_4px_rgba(0,0,0,0.3)]',
+                'text-justify',
+                'm-5'
+              )}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4 }}
+            >
+              {message2}
+            </motion.p>
+            <motion.p
+              className={cn(
+                'text-base sm:text-lg md:text-xl',
+                'text-white/90 font-medium mt-4',
+                'max-w-4xl',
+                'drop-shadow-[0_2px_4px_rgba(0,0,0,0.3)]',
+                'text-justify',
+                'm-5'
+              )}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4 }}
+            >
+              {'To Rajkumar Rao, with love'}
+            </motion.p>
+          </div>
         </div>
       </KawaiiBackgroundDarker>
     </main>
