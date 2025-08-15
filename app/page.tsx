@@ -9,11 +9,12 @@ import Slideshow from '@/components/slideshow/Slideshow';
 import SplashTitle from '@/components/ui/splash-title/SplashTitle';
 import { ComponentHeader } from '@/components/ui/ComponentHeader/ComponentHeader';
 import { COMPONENT_HEADERS } from '@/components/ui/ComponentHeader/constants';
-import { rajkumarRao } from '@/lib/mocks/rajkumarRao';
 import { getPropifiedHeartlink } from '@/lib/utils';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import FancyDivider from './components/ui/FancyDivider';
+import { fathersDay } from '@/lib/mocks/fathersDay';
+import { OCCASION_CONTENT_MAPPING } from '@/components/ui/splash-title/constants';
 
 export default function Home() {
   // const images = [
@@ -83,25 +84,25 @@ export default function Home() {
     complimentShowerProps,
     cardStackProps,
     spinTheWheelProps,
-  } = getPropifiedHeartlink(rajkumarRao);
+  } = getPropifiedHeartlink(fathersDay);
 
-  const message2 =
-    'Your performances from Bareilly Ki Barfi to Badhaai Do, have left a lasting impact. It’s refreshing to see someone not only excel on screen but also use their influence for good, supporting causes and inspiring change with quiet grace.';
+  const message2 = 'Thank you for being the best father I could have asked for';
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center">
       <KawaiiBackgroundDarker>
         <div className="p-3">
           <SplashTitle
-            title="To You, With Love"
-            imgSource="/sample_photos/rajkumar_rao/rajkumar_rao.png"
+            title={OCCASION_CONTENT_MAPPING.FATHERS_DAY.title}
+            // message={OCCASION_CONTENT_MAPPING.FATHERS_DAY.displayMessage}
+            imgSource={OCCASION_CONTENT_MAPPING.FATHERS_DAY.img}
           />
           <div className="relative mb-16">
             <ComponentHeader
-              // title={COMPONENT_HEADERS.SLIDESHOW.title}
-              // subtitle={COMPONENT_HEADERS.SLIDESHOW.subtitle}
-              title="The best view"
-              subtitle="... is from a seat in the house"
+              title={COMPONENT_HEADERS.SLIDESHOW.title}
+              subtitle={COMPONENT_HEADERS.SLIDESHOW.subtitle}
+              // title="The best view"
+              // subtitle="... is from a seat in the house"
             />
             <div className="my-4">
               <Slideshow {...slideshowProps} />
@@ -111,27 +112,27 @@ export default function Home() {
           <div className="relative mb-16">
             <ComponentHeader
               title={COMPONENT_HEADERS.COMPLIMENT_SHOWER.title}
-              // subtitle={COMPONENT_HEADERS.COMPLIMENT_SHOWER.subtitle}
-              subtitle="What makes us your fans..."
+              subtitle={COMPONENT_HEADERS.COMPLIMENT_SHOWER.subtitle}
+              // subtitle="What makes us your fans..."
             />
             <ComplimentShower {...complimentShowerProps} />
           </div>
           <FancyDivider variant="start" />
           <ComponentHeader
-            // title={COMPONENT_HEADERS.SCRATCH_CARD.title}
-            // subtitle={COMPONENT_HEADERS.SCRATCH_CARD.subtitle}
-            title="Scratch the card"
-            subtitle="Scratch to reveal the truth"
+            title={COMPONENT_HEADERS.SCRATCH_CARD.title}
+            subtitle={COMPONENT_HEADERS.SCRATCH_CARD.subtitle}
+            // title="Scratch the card"
+            // subtitle="Scratch to reveal the truth"
           />
           <div className="py-50 items-center justify-center">
             <CardStack {...cardStackProps} />
           </div>
           <FancyDivider variant="end" />
           <ComponentHeader
-            // title={COMPONENT_HEADERS.SPIN_THE_WHEEL.title}
-            // subtitle={COMPONENT_HEADERS.SPIN_THE_WHEEL.subtitle}
-            title="Spin the wheel"
-            subtitle="We want to see ..."
+            title={COMPONENT_HEADERS.SPIN_THE_WHEEL.title}
+            subtitle={COMPONENT_HEADERS.SPIN_THE_WHEEL.subtitle}
+            // title="Spin the wheel"
+            // subtitle="We want to see ..."
           />
           <SpinTheWheel {...spinTheWheelProps} />
           <FancyDivider />
@@ -164,7 +165,7 @@ export default function Home() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4 }}
             >
-              {'To Rajkummar Rao, with love'}
+              {'Happy fathers day'}
             </motion.p>
           </div>
         </div>
