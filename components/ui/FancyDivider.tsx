@@ -77,4 +77,4 @@ const FancyDivider: React.FC<FancyDividerProps> = ({
   </div>
 );
 
-export default FancyDivider;
+export { FancyDivider };

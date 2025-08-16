@@ -12,7 +12,7 @@ import { COMPONENT_HEADERS } from '@/components/ui/ComponentHeader/constants';
 import { getPropifiedHeartlink } from '@/lib/utils';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
-import FancyDivider from './components/ui/FancyDivider';
+import { FancyDivider } from '@/components/ui/FancyDivider';
 import { fathersDay } from '@/lib/mocks/fathersDay';
 import { OCCASION_CONTENT_MAPPING } from '@/components/ui/splash-title/constants';
 

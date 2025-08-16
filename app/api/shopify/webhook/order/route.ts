@@ -10,12 +10,16 @@ import { nanoid } from 'nanoid';
 
 const prisma = new PrismaClient();
 
+// Add a constant for the Shopify webhook secret so we can easily configure/override via env
+const SHOPIFY_WEBHOOK_SECRET =
+  process.env.SHOPIFY_WEBHOOK_SECRET || 'placeholder_secret';
+
 // Verify Shopify webhook
 function verifyShopifyWebhook(data: string, hmac: string | null) {
   if (!hmac) return false;
 
   const calculated_hmac = crypto
-    .createHmac('sha256', process.env.SHOPIFY_WEBHOOK_SECRET || '')
+    .createHmac('sha256', SHOPIFY_WEBHOOK_SECRET)
     .update(data)
     .digest('base64');
 
