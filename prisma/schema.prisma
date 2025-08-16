@@ -16,6 +16,10 @@ enum HeartlinkRelation {
   BROTHER
   FRIEND
   OTHER
+  BOYFRIEND
+  GIRLFRIEND
+  HUSBAND
+  WIFE
 }
 
 enum HeartlinkOccasion {
@@ -54,6 +58,23 @@ model Heartlink {
   activities  Activity[]
   compliments Compliment[]
   scratchCard ScratchCard[]
+
+  // ADD THE FOLLOWING NEW FIELDS FOR SHOPIFY INTEGRATION AND ORDER TRACKING
+  shopifyOrderId       String?
+  shopifyOrderNumber   Int?
+  shopifyLineItemId    String?
+  shopifyProductId     String?
+  status               HeartlinkStatus    @default(PENDING)
+  // END NEW FIELDS
+}
+
+// NEW ENUM FOR ORDER STATUS
+
+enum HeartlinkStatus {
+  PENDING
+  ACTIVE
+  REDEEMED
+  CANCELLED
 }
 
 model Photo {
@@ -86,7 +107,6 @@ model SpotifyTrack {
 model Activity {
   id          String    @id @default(cuid())
   content     String
-  isCustom    Boolean   @default(false)
   heartlinkId String
   heartlink   Heartlink @relation(fields: [heartlinkId], references: [id], onDelete: Cascade)
 }
@@ -94,7 +114,6 @@ model Activity {
 model Compliment {
   id          String    @id @default(cuid())
   content     String
-  isCustom    Boolean   @default(false)
   heartlinkId String
   heartlink   Heartlink @relation(fields: [heartlinkId], references: [id], onDelete: Cascade)
 }
@@ -102,7 +121,6 @@ model Compliment {
 model ScratchCard {
   id          String    @id @default(cuid())
   content     String
-  isCustom    Boolean   @default(false)
   heartlinkId String
   heartlink   Heartlink @relation(fields: [heartlinkId], references: [id], onDelete: Cascade)
 } 

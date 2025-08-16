@@ -54,7 +54,6 @@ const HeartlinkFormSchema = z.object({
     .array(
       z.object({
         content: z.string().min(1),
-        isCustom: z.boolean(),
       })
     )
     .optional(),
@@ -63,7 +62,6 @@ const HeartlinkFormSchema = z.object({
     .array(
       z.object({
         content: z.string().min(1),
-        isCustom: z.boolean(),
       })
     )
     .optional(),
@@ -72,7 +70,6 @@ const HeartlinkFormSchema = z.object({
     .array(
       z.object({
         content: z.string().min(1),
-        isCustom: z.boolean(),
       })
     )
     .optional(),

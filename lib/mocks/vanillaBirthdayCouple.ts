@@ -50,17 +50,17 @@ export const vanillaBirthdayCouple = {
   },
 
   activities: [
-    { id: 'activity-1', content: 'Movie Night', isCustom: false },
-    { id: 'activity-2', content: 'Cooking Together', isCustom: false },
+    { id: 'activity-1', content: 'Movie Night' },
+    { id: 'activity-2', content: 'Cooking Together' },
   ],
 
   compliments: [
-    { id: 'compliment-1', content: "You're amazing!", isCustom: false },
-    { id: 'compliment-2', content: 'You light up my world!', isCustom: false },
+    { id: 'compliment-1', content: "You're amazing!" },
+    { id: 'compliment-2', content: 'You light up my world!' },
   ],
 
   scratchCard: [
-    { id: 'scratch-1', content: 'Free Hug Coupon!', isCustom: false },
-    { id: 'scratch-2', content: 'Breakfast in Bed', isCustom: false },
+    { id: 'scratch-1', content: 'Free Hug Coupon!' },
+    { id: 'scratch-2', content: 'Breakfast in Bed' },
   ],
 };
