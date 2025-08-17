@@ -1,0 +1,16 @@
+
+x-shopify-webhook-id	44689a6b-8127-4bcd-aae8-51e035d4508c
+x-shopify-triggered-at	2025-08-17T10:48:16.043390637Z
+x-shopify-topic	orders/create
+x-shopify-test	true
+x-shopify-shop-domain	rz6htf-gj.myshopify.com
+x-shopify-order-id	6280233713890
+x-shopify-hmac-sha256	09DqLQJMm9sv6CVsO0DpqKva41kVKW+9y3vv/S8NoZ4=
+x-shopify-event-id	c67ed697-65ad-42d6-9bb9-b79e0b463482
+x-shopify-api-version	2025-07
+content-type	application/json
+accept-encoding	gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+accept	*/*
+content-length	17607
+user-agent	Shopify-Captain-Hook
+host	webhook.site

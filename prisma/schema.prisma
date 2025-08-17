@@ -67,6 +67,23 @@ model Heartlink {
   shopifyProductId     String?
   status               HeartlinkStatus    @default(PENDING)
 
+  // Customer and shipping details (duplicated per Heartlink for simplicity)
+  customerEmail        String?
+  customerPhone        String?
+
+  shippingName         String?
+  shippingAddress1     String?
+  shippingAddress2     String?
+  shippingCity         String?
+  shippingProvince     String?
+  shippingZip          String?
+  shippingCountry      String?
+
+  // Line item / variant details for manufacturing
+  variantTitle         String?
+  variantId            String?
+  variantSku           String?
+
   @@index([shopifyOrderId])
   @@index([shopifyOrderNumber])
   // END NEW FIELDS

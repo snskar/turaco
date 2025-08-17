@@ -35,6 +35,10 @@ interface LineItem {
   product_id: string | number;
   properties: Property[];
   quantity?: number;
+  variant_title?: string;
+  variant_id?: string | number;
+  sku?: string | null;
+  title?: string;
 }
 
 interface Property {
@@ -217,6 +221,38 @@ export async function POST(req: Request) {
         // Generate a short unique slug. Include unit index to avoid collisions within the same order.
         const slug = `${data.order_number}-${idx + 1}-${nanoid(6)}`;
 
+        // Pull customer-level identity
+        const customerEmail: string | undefined =
+          data.email || data.customer?.email || undefined;
+        const customerPhone: string | undefined =
+          data.phone ||
+          data.customer?.phone ||
+          data.shipping_address?.phone ||
+          data.billing_address?.phone ||
+          undefined;
+
+        // Shipping address (prefer shipping_address, fallback to default customer address)
+        const shipping =
+          data.shipping_address || data.customer?.default_address || {};
+        const shippingName: string | undefined = shipping?.name || undefined;
+        const shippingAddress1: string | undefined =
+          shipping?.address1 || undefined;
+        const shippingAddress2: string | undefined =
+          shipping?.address2 || undefined;
+        const shippingCity: string | undefined = shipping?.city || undefined;
+        const shippingProvince: string | undefined =
+          shipping?.province || undefined;
+        const shippingZip: string | undefined = shipping?.zip || undefined;
+        const shippingCountry: string | undefined =
+          shipping?.country || undefined;
+
+        // Variant details from line item
+        const variantTitle: string | undefined =
+          item.variant_title || undefined;
+        const variantId: string | undefined =
+          item.variant_id != null ? String(item.variant_id) : undefined;
+        const variantSku: string | undefined = item.sku || undefined;
+
         // Persist this Heartlink to DB
         const heartlink = await prisma.heartlink.create({
           data: {
@@ -231,6 +267,22 @@ export async function POST(req: Request) {
             shopifyOrderNumber: data.order_number,
             shopifyLineItemId: String(item.id),
             shopifyProductId: String(item.product_id),
+
+            // Customer + shipping
+            customerEmail,
+            customerPhone,
+            shippingName,
+            shippingAddress1,
+            shippingAddress2,
+            shippingCity,
+            shippingProvince,
+            shippingZip,
+            shippingCountry,
+
+            // Variant
+            variantTitle,
+            variantId,
+            variantSku,
 
             // Photos – create if any URLs provided
             photos: photoUrls.length
