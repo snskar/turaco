@@ -3,11 +3,15 @@ name: Migrate and Deploy
 on:
   push:
     branches: [ main ]
-  workflow_dispatch: {}
+  workflow_dispatch:
 
 jobs:
   migrate:
     runs-on: ubuntu-latest
+    env:
+      DATABASE_URL: ${{ secrets.SUPABASE_DATABASE_URL }}
+      DIRECT_URL: ${{ secrets.SUPABASE_DIRECT_URL }}
+      VERCEL_DEPLOY_HOOK_URL: ${{ secrets.VERCEL_DEPLOY_HOOK_URL }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -22,11 +26,8 @@ jobs:
         run: npm ci
 
       - name: Run Prisma migrations on Supabase (production)
-        env:
-          DIRECT_URL: ${{ secrets.SUPABASE_DIRECT_URL }}
         run: npx prisma migrate deploy
 
       - name: Trigger Vercel Deploy Hook (optional)
-        if: ${{ secrets.VERCEL_DEPLOY_HOOK_URL != '' }}
-        run: curl -X POST "${{ secrets.VERCEL_DEPLOY_HOOK_URL }}"
-
+        if: ${{ env.VERCEL_DEPLOY_HOOK_URL && env.VERCEL_DEPLOY_HOOK_URL != '' }}
+        run: curl -fsSL -X POST "$VERCEL_DEPLOY_HOOK_URL"
