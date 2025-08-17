@@ -1,3 +1,5 @@
+'use client';
+
 import { useRef, useState, useEffect, useCallback } from 'react';
 import confetti from 'canvas-confetti';
 
@@ -14,7 +16,7 @@ export const useScratchCard = ({
   height,
   isInteractive,
   onComplete,
-  text
+  text,
 }: UseScratchCardProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -25,11 +27,11 @@ export const useScratchCard = ({
 
   const triggerConfetti = useCallback(() => {
     if (!containerRef.current) return;
-    
+
     const rect = containerRef.current.getBoundingClientRect();
     const centerX = (rect.left + rect.right) / 2 / window.innerWidth;
     const centerY = (rect.top + rect.bottom) / 2 / window.innerHeight;
-    
+
     const duration = 1000;
     const end = Date.now() + duration;
     const colors = ['#ffd6eb', '#d6f5ff', '#f9c8d9', '#a5b4fc'];
@@ -82,7 +84,8 @@ export const useScratchCard = ({
 
     // Check if enough of the area around the text is scratched
     const transparency = transparentPixels / totalPixels;
-    if (transparency > 0.9) { // Increased threshold to 90% to require almost complete scratching
+    if (transparency > 0.9) {
+      // Increased threshold to 90% to require almost complete scratching
       setIsScratched(true);
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       triggerConfetti();
@@ -94,7 +97,15 @@ export const useScratchCard = ({
 
       setTimeout(() => setCleared(true), 300);
     }
-  }, [canvasRef, isScratched, onComplete, triggerConfetti, setIsScratched, setCleared, hasCalledComplete]);
+  }, [
+    canvasRef,
+    isScratched,
+    onComplete,
+    triggerConfetti,
+    setIsScratched,
+    setCleared,
+    hasCalledComplete,
+  ]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -105,25 +116,25 @@ export const useScratchCard = ({
 
     // Get device pixel ratio
     const dpr = window.devicePixelRatio || 1;
-    
+
     // Set canvas dimensions accounting for pixel ratio
     canvas.width = width * dpr;
     canvas.height = height * dpr;
-    
+
     // Scale canvas context to match pixel ratio
     ctx.scale(dpr, dpr);
-    
+
     // Set canvas display size
     canvas.style.width = `${width}px`;
     canvas.style.height = `${height}px`;
 
     // Create gradient
     const gradient = ctx.createLinearGradient(0, 0, width, height);
-    gradient.addColorStop(0, '#FFD6F3');    // Light pastel pink
+    gradient.addColorStop(0, '#FFD6F3'); // Light pastel pink
     gradient.addColorStop(0.25, '#F7B3E5'); // Warm bubblegum pink
-    gradient.addColorStop(0.5, '#D0B7FF');  // Lavender-violet
+    gradient.addColorStop(0.5, '#D0B7FF'); // Lavender-violet
     gradient.addColorStop(0.75, '#A6D3FA'); // Baby blue
-    gradient.addColorStop(1, '#C7F1FF');    // Very light cyan blue
+    gradient.addColorStop(1, '#C7F1FF'); // Very light cyan blue
 
     // Draw gradient
     ctx.fillStyle = gradient;
@@ -134,7 +145,8 @@ export const useScratchCard = ({
     ctx.imageSmoothingQuality = 'high';
 
     // Draw text
-    ctx.font = 'bold 18px "Baloo 2", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
+    ctx.font =
+      'bold 18px "Baloo 2", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
     ctx.fillStyle = '#fff';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
@@ -147,7 +159,12 @@ export const useScratchCard = ({
     // Set composite operation for scratching
     ctx.globalCompositeOperation = 'destination-out';
 
-    const drawLine = (startX: number, startY: number, endX: number, endY: number) => {
+    const drawLine = (
+      startX: number,
+      startY: number,
+      endX: number,
+      endY: number
+    ) => {
       ctx.beginPath();
       ctx.moveTo(startX, startY);
       ctx.lineTo(endX, endY);
@@ -159,8 +176,12 @@ export const useScratchCard = ({
     const scratchHandler = (e: TouchEvent | MouseEvent) => {
       if (!isInteractive) return;
       const rect = canvas.getBoundingClientRect();
-      const x = 'touches' in e ? e.touches[0].clientX - rect.left : e.clientX - rect.left;
-      const y = 'touches' in e ? e.touches[0].clientY - rect.top : e.clientY - rect.top;
+      const x =
+        'touches' in e
+          ? e.touches[0].clientX - rect.left
+          : e.clientX - rect.left;
+      const y =
+        'touches' in e ? e.touches[0].clientY - rect.top : e.clientY - rect.top;
 
       if (lastPoint.current) {
         drawLine(lastPoint.current.x, lastPoint.current.y, x, y);

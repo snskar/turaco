@@ -34,11 +34,82 @@ interface LineItem {
   id: string;
   product_id: string | number;
   properties: Property[];
+  quantity?: number;
 }
 
 interface Property {
   name: string;
   value: string;
+}
+
+// Normalize Relation coming from Shopify to Prisma enum
+function mapRelationToPrismaEnum(input: string): HeartlinkRelation {
+  const normalized = (input || '').trim().toUpperCase();
+
+  // Group couple-like relations under COUPLE for better defaults in UI
+  const coupleSet = new Set(['BOYFRIEND', 'GIRLFRIEND', 'HUSBAND', 'WIFE']);
+  if (coupleSet.has(normalized)) {
+    return HeartlinkRelation.COUPLE;
+  }
+
+  // Direct mappings that match Prisma enums
+  const direct = new Set<HeartlinkRelation>([
+    HeartlinkRelation.COUPLE,
+    HeartlinkRelation.FATHER,
+    HeartlinkRelation.MOTHER,
+    HeartlinkRelation.SISTER,
+    HeartlinkRelation.BROTHER,
+    HeartlinkRelation.FRIEND,
+    HeartlinkRelation.OTHER,
+  ]);
+
+  if ((Array.from(direct) as string[]).includes(normalized)) {
+    return normalized as HeartlinkRelation;
+  }
+
+  return HeartlinkRelation.OTHER;
+}
+
+// Normalize Occasion coming from Shopify to Prisma enum
+function mapOccasionToPrismaEnum(input: string): HeartlinkOccasion {
+  const raw = (input || '').trim();
+  const upper = raw.toUpperCase();
+  const underscored = upper.replace(/\s+/g, '_');
+
+  // Special cases from Shopify options → Prisma enum
+  const specialMap: Record<string, HeartlinkOccasion> = {
+    // "Valentine's Day" → VALENTINES
+    "VALENTINE'S_DAY": HeartlinkOccasion.VALENTINES,
+    VALENTINES: HeartlinkOccasion.VALENTINES,
+    // "Just because I love them" → I_LOVE_YOU
+    JUST_BECAUSE_I_LOVE_THEM: HeartlinkOccasion.I_LOVE_YOU,
+  };
+
+  if (underscored in specialMap) {
+    return specialMap[underscored];
+  }
+
+  // Direct mappings
+  const valid = new Set<HeartlinkOccasion>([
+    HeartlinkOccasion.BIRTHDAY,
+    HeartlinkOccasion.NEW_YEAR,
+    HeartlinkOccasion.DIWALI,
+    HeartlinkOccasion.RAKSHA_BANDHAN,
+    HeartlinkOccasion.CHRISTMAS,
+    HeartlinkOccasion.VALENTINES,
+    HeartlinkOccasion.ANNIVERSARY,
+    HeartlinkOccasion.CONGRATULATIONS,
+    HeartlinkOccasion.GET_WELL_SOON,
+    HeartlinkOccasion.I_AM_SORRY,
+    HeartlinkOccasion.I_LOVE_YOU,
+    HeartlinkOccasion.OTHER,
+  ]);
+
+  if ((Array.from(valid) as string[]).includes(underscored)) {
+    return underscored as HeartlinkOccasion;
+  }
+
+  return HeartlinkOccasion.OTHER;
 }
 
 export async function POST(req: Request) {
@@ -60,11 +131,26 @@ export async function POST(req: Request) {
     // Parse the body
     const data = JSON.parse(rawBody);
 
-    // Check if this order contains any Heartlink products (cast to string because Shopify IDs can be numeric)
+    // Check if this order contains any Heartlink products.
+    // Prefer product_id check when env is provided, else fall back to presence of custom properties.
+    const targetProductId = process.env.SHOPIFY_HEARTLINK_PRODUCT_ID
+      ? String(process.env.SHOPIFY_HEARTLINK_PRODUCT_ID)
+      : null;
+
     const heartlinkLineItems: LineItem[] = (data.line_items || []).filter(
-      (item: LineItem) =>
-        String(item.product_id) ===
-        String(process.env.SHOPIFY_HEARTLINK_PRODUCT_ID)
+      (item: LineItem) => {
+        if (targetProductId) {
+          return String(item.product_id) === targetProductId;
+        }
+        // Fallback: heartlink items always carry our custom properties
+        const props = (item.properties || []) as Property[];
+        return (
+          Array.isArray(props) &&
+          props.some(
+            p => (p?.name || '').toLowerCase() === 'gifter name'.toLowerCase()
+          )
+        );
+      }
     );
 
     // If there are no Heartlink items in this order, we can safely acknowledge and exit early.
@@ -100,37 +186,35 @@ export async function POST(req: Request) {
             .filter(Boolean)
         : [];
 
-    // Iterate over each Heartlink item and create individual records.
+    // Expand items by quantity (create one Heartlink per quantity unit)
+    const itemsToCreate: LineItem[] = heartlinkLineItems.flatMap(item => {
+      const qty = Math.max(1, Number(item.quantity || 1));
+      return Array.from({ length: qty }, () => item);
+    });
+
+    // Iterate over each Heartlink unit and create individual records.
     const createdHeartlinks = await Promise.all(
-      heartlinkLineItems.map(async (item, idx) => {
+      itemsToCreate.map(async (item, idx) => {
         const propsRecord = heartlinkPropsByLineItem[item.id] || {};
 
         // Map Shopify property keys -> Heartlink fields
         const senderName = propsRecord['Gifter Name'] || 'Anonymous';
         const recipientName = propsRecord['Giftee Name'] || 'Friend';
-        const relationRaw = (propsRecord['Relation'] || 'OTHER').toUpperCase();
-        const occasionRaw = (propsRecord['Occasion'] || 'OTHER')
-          .toUpperCase()
-          .replace(/\s+/g, '_');
+        const relationRaw = propsRecord['Relation'] || 'OTHER';
+        const occasionRaw = propsRecord['Occasion'] || 'OTHER';
         const message = propsRecord['Message'] || undefined;
         const compliments = splitList(propsRecord['Compliments']);
         const activities = splitList(propsRecord['Spin the Wheel Ideas']);
         const scratchCards = splitList(propsRecord['Scratch Card Coupons']);
         const photoUrls = splitList(propsRecord['Photos']);
 
-        // Cast to Prisma enums with fallbacks
-        const relation: HeartlinkRelation = (
-          Object.values(HeartlinkRelation) as string[]
-        ).includes(relationRaw)
-          ? (relationRaw as HeartlinkRelation)
-          : HeartlinkRelation.OTHER;
-        const occasion: HeartlinkOccasion = (
-          Object.values(HeartlinkOccasion) as string[]
-        ).includes(occasionRaw)
-          ? (occasionRaw as HeartlinkOccasion)
-          : HeartlinkOccasion.OTHER;
+        // Map to Prisma enums with robust normalization
+        const relation: HeartlinkRelation =
+          mapRelationToPrismaEnum(relationRaw);
+        const occasion: HeartlinkOccasion =
+          mapOccasionToPrismaEnum(occasionRaw);
 
-        // Generate a short unique slug. Include item index to avoid collisions within the same order.
+        // Generate a short unique slug. Include unit index to avoid collisions within the same order.
         const slug = `${data.order_number}-${idx + 1}-${nanoid(6)}`;
 
         // Persist this Heartlink to DB
