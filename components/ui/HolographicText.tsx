@@ -1,3 +1,5 @@
+'use client';
+
 import React from 'react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
@@ -9,17 +11,14 @@ interface HolographicTextProps {
   strokeOpacity?: number; // Opacity of the stroke
 }
 
-const HolographicText: React.FC<HolographicTextProps> = ({ 
-  children, 
+const HolographicText: React.FC<HolographicTextProps> = ({
+  children,
   className = '',
   strokeWidth = 2,
   strokeOpacity = 0.8,
 }) => {
   // Extract the base classes that should be applied to all text layers
-  const baseClasses = cn(
-    'font-bold tracking-wider',
-    className
-  );
+  const baseClasses = cn('font-bold tracking-wider', className);
 
   // Generate star glints at specific positions
   const starGlints = [
@@ -32,9 +31,7 @@ const HolographicText: React.FC<HolographicTextProps> = ({
   return (
     <div className="relative inline-block">
       {/* Base text layer for sizing */}
-      <div className={cn(baseClasses, 'invisible')}>
-        {children}
-      </div>
+      <div className={cn(baseClasses, 'invisible')}>{children}</div>
 
       {/* Stroke layer */}
       {strokeWidth && (
@@ -45,7 +42,8 @@ const HolographicText: React.FC<HolographicTextProps> = ({
             WebkitTextStroke: `${strokeWidth}px transparent`,
             WebkitBackgroundClip: 'text',
             backgroundClip: 'text',
-            backgroundImage: 'linear-gradient(135deg, rgba(147,51,234,0.8) 0%, rgba(236,72,153,0.8) 50%, rgba(99,102,241,0.8) 100%)',
+            backgroundImage:
+              'linear-gradient(135deg, rgba(147,51,234,0.8) 0%, rgba(236,72,153,0.8) 50%, rgba(99,102,241,0.8) 100%)',
             opacity: strokeOpacity,
           }}
           animate={{
@@ -54,7 +52,7 @@ const HolographicText: React.FC<HolographicTextProps> = ({
           transition={{
             duration: 12,
             repeat: Infinity,
-            ease: "linear",
+            ease: 'linear',
           }}
         >
           {children}
@@ -63,10 +61,14 @@ const HolographicText: React.FC<HolographicTextProps> = ({
 
       {/* Main text with chrome effect */}
       <motion.div
-        className={cn(baseClasses, 'absolute inset-0 text-transparent bg-clip-text')}
+        className={cn(
+          baseClasses,
+          'absolute inset-0 text-transparent bg-clip-text'
+        )}
         style={{
           WebkitBackgroundClip: 'text',
-          backgroundImage: 'linear-gradient(135deg, #00e5ff 0%, #e0c3fc 35%, #00fff2 65%, #8ec5fc 100%)',
+          backgroundImage:
+            'linear-gradient(135deg, #00e5ff 0%, #e0c3fc 35%, #00fff2 65%, #8ec5fc 100%)',
           backgroundSize: '400% 400%',
           filter: 'brightness(1.2) contrast(1.2)',
         }}
@@ -76,7 +78,7 @@ const HolographicText: React.FC<HolographicTextProps> = ({
         transition={{
           duration: 10,
           repeat: Infinity,
-          ease: "easeInOut",
+          ease: 'easeInOut',
         }}
       >
         {children}
@@ -98,7 +100,8 @@ const HolographicText: React.FC<HolographicTextProps> = ({
       <div
         className={cn(baseClasses, 'absolute inset-0')}
         style={{
-          backgroundImage: 'linear-gradient(135deg, transparent, rgba(255,255,255,0.4), transparent)',
+          backgroundImage:
+            'linear-gradient(135deg, transparent, rgba(255,255,255,0.4), transparent)',
           WebkitBackgroundClip: 'text',
           backgroundClip: 'text',
           color: 'transparent',
@@ -112,7 +115,8 @@ const HolographicText: React.FC<HolographicTextProps> = ({
       <motion.div
         className={cn(baseClasses, 'absolute inset-0')}
         style={{
-          backgroundImage: 'linear-gradient(45deg, transparent, rgba(255,255,255,0.2), transparent)',
+          backgroundImage:
+            'linear-gradient(45deg, transparent, rgba(255,255,255,0.2), transparent)',
           WebkitBackgroundClip: 'text',
           backgroundClip: 'text',
           color: 'transparent',
@@ -132,12 +136,12 @@ const HolographicText: React.FC<HolographicTextProps> = ({
           backgroundPosition: {
             duration: 8,
             repeat: Infinity,
-            ease: "linear",
+            ease: 'linear',
           },
           filter: {
             duration: 10,
             repeat: Infinity,
-            ease: "linear",
+            ease: 'linear',
           },
         }}
       >
@@ -151,7 +155,8 @@ const HolographicText: React.FC<HolographicTextProps> = ({
           className={cn(baseClasses, 'absolute w-4 h-4 pointer-events-none')}
           style={{
             ...position,
-            background: 'radial-gradient(circle at center, rgba(255,255,255,0.9) 0%, transparent 50%)',
+            background:
+              'radial-gradient(circle at center, rgba(255,255,255,0.9) 0%, transparent 50%)',
             filter: 'blur(0.5px)',
             transform: 'translate(-50%, -50%)',
           }}
@@ -162,7 +167,7 @@ const HolographicText: React.FC<HolographicTextProps> = ({
           transition={{
             duration: 2,
             repeat: Infinity,
-            ease: "easeInOut",
+            ease: 'easeInOut',
             delay: index * 0.5,
           }}
         />
@@ -189,7 +194,8 @@ const HolographicText: React.FC<HolographicTextProps> = ({
         style={{
           filter: 'blur(20px)',
           opacity: 0.3,
-          backgroundImage: 'linear-gradient(135deg, #00e5ff 0%, #e0c3fc 50%, #00fff2 100%)',
+          backgroundImage:
+            'linear-gradient(135deg, #00e5ff 0%, #e0c3fc 50%, #00fff2 100%)',
           WebkitBackgroundClip: 'text',
           backgroundClip: 'text',
           color: 'transparent',
@@ -201,4 +207,4 @@ const HolographicText: React.FC<HolographicTextProps> = ({
   );
 };
 
-export default HolographicText; 
+export default HolographicText;

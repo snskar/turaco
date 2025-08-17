@@ -1,3 +1,5 @@
+'use client';
+
 import React from 'react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
@@ -102,7 +104,7 @@ const SplashTitle: React.FC<SplashTitleProps> = ({
 
           {/* Message with softer appearance */}
           {message && (
-            <motion.p
+            <motion.div
               className={cn(
                 'text-base sm:text-lg md:text-xl',
                 'text-white/90 font-medium mt-4',
@@ -115,7 +117,7 @@ const SplashTitle: React.FC<SplashTitleProps> = ({
               transition={{ delay: 0.4 }}
             >
               <TextBox>{message}</TextBox>
-            </motion.p>
+            </motion.div>
           )}
         </div>
       </div>

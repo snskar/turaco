@@ -1,3 +1,5 @@
+'use client';
+
 import React from 'react';
 import { motion } from 'framer-motion';
 import { useScratchCard } from './hooks';
@@ -11,11 +13,7 @@ const ScratchCard: React.FC<ScratchCardProps> = ({
   onComplete,
   isInteractive = true,
 }) => {
-  const {
-    canvasRef,
-    containerRef,
-    cleared,
-  } = useScratchCard({
+  const { canvasRef, containerRef, cleared } = useScratchCard({
     width,
     height,
     isInteractive,

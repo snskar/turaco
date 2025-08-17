@@ -1,62 +1,36 @@
-// app/page.tsx or pages/index.tsx
-'use client';
-
-import { CardStack } from '@/components/scratch-card/CardStack';
-import KawaiiBackgroundDarker from '@/components/ui/backgrounds/KawaiiBackgroundDarker';
-import ComplimentShower from '@/components/compliment-shower/Game';
-import SpinTheWheel from '@/components/spin-the-wheel/SpinTheWheel';
-import Slideshow from '@/components/slideshow/Slideshow';
-import SplashTitle from '@/components/ui/splash-title/SplashTitle';
-import { ComponentHeader } from '@/components/ui/ComponentHeader/ComponentHeader';
-import { COMPONENT_HEADERS } from '@/components/ui/ComponentHeader/constants';
-import { fathersDay } from '@/lib/mocks/fathersDay';
+import { headers } from 'next/headers';
+import { notFound } from 'next/navigation';
 import { getPropifiedHeartlink } from '@/lib/utils';
-import { motion } from 'framer-motion';
-import { cn } from '@/lib/utils';
+import type { Heartlink } from '@/app/types/heartlink';
+import ClientHeartlink from './ClientHeartlink';
 
-export default function Home() {
-  // return (
+export const revalidate = 0;
 
-  //     <main className="flex min-h-screen flex-col items-center justify-center">
-  //       <KawaiiBackgroundDarker>
-  //         <SplashTitle title="Happy Birthday" name="Random" message="Happy Birthday, legend! May your wrinkles be few, your snacks never end, and your group chats always spicy. Keep being fabulously weird—like glitter in a world full of beige!" />
-  //         <div className="relative mb-16">
-  //           <ComponentHeader
-  //             title={COMPONENT_HEADERS.SLIDESHOW.title}
-  //             subtitle={COMPONENT_HEADERS.SLIDESHOW.subtitle}
-  //           />
-  //           <div className="my-4">
-  //             <Slideshow images={images} />
-  //           </div>
-  //         </div>
-  //         <div className="relative mb-16">
-  //           <ComponentHeader
-  //             title={COMPONENT_HEADERS.COMPLIMENT_SHOWER.title}
-  //             subtitle={COMPONENT_HEADERS.COMPLIMENT_SHOWER.subtitle}
-  //           />
-  //           <ComplimentShower/>
-  //         </div>
+export default async function HeartlinkPage({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}) {
+  const { slug } = await params;
+  const headersList = await headers();
+  const host = headersList.get('host');
+  const protocol = headersList.get('x-forwarded-proto') ?? 'http';
+  const baseUrl = `${protocol}://${host}`;
 
-  //         <ComponentHeader
-  //           title={COMPONENT_HEADERS.SCRATCH_CARD.title}
-  //           subtitle={COMPONENT_HEADERS.SCRATCH_CARD.subtitle}
-  //         />
-  //         <div className="py-50 items-center justify-center">
-  //           <CardStack cards={pickRandomValues(DEFAULT_SCRATCH_CARD_OPTIONS.OTHER, 5)} />
-  //         </div>
+  const response = await fetch(
+    `${baseUrl}/api/heartlink?slug=${encodeURIComponent(slug)}`,
+    { cache: 'no-store' }
+  );
 
-  //         <ComponentHeader
-  //           title={COMPONENT_HEADERS.SPIN_THE_WHEEL.title}
-  //           subtitle={COMPONENT_HEADERS.SPIN_THE_WHEEL.subtitle}
-  //         />
-  //         <SpinTheWheel options={DEFAULT_WHEEL_OPTIONS.COUPLE} centerImageSrc="/assets/art/hamster.png" />
+  if (!response.ok) {
+    if (response.status === 404) {
+      notFound();
+    }
+    throw new Error('Failed to fetch heartlink');
+  }
 
-  //         <div className="mt-16">
-  //           <SpotifyEmbed trackId="7ouMYWpwJ422jRcDASZB7P" />
-  //         </div>
-  //       </KawaiiBackgroundDarker>
-
-  //     </main>
+  const json = await response.json();
+  const heartlink = json?.data as Heartlink;
 
   const {
     splashTitleProps,
@@ -64,64 +38,17 @@ export default function Home() {
     complimentShowerProps,
     cardStackProps,
     spinTheWheelProps,
-  } = getPropifiedHeartlink(fathersDay);
-
-  const message2 =
-    "Thanks for always being so supportive, trusting me and having confidence in me when I don't in myself. You're a role model in everything you do - your job, being the best son to dada dadi, being an amazing husband to mommy and being an absolutely father to Maadhav and I - even when we are nowhere near being good children. You're an inspiration (to all my friends who sometimes like hanging out with you more than me). Thanks for being such a kind and joyful spirit, spreading happiness wherever you are!";
+  } = getPropifiedHeartlink(heartlink);
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center">
-      <KawaiiBackgroundDarker>
-        <SplashTitle {...splashTitleProps} />
-        <div className="relative mb-16">
-          <ComponentHeader
-            title={COMPONENT_HEADERS.SLIDESHOW.title}
-            subtitle={COMPONENT_HEADERS.SLIDESHOW.subtitle}
-          />
-          <div className="my-4">
-            <Slideshow {...slideshowProps} />
-          </div>
-        </div>
-        <div className="relative mb-16">
-          <ComponentHeader
-            title={COMPONENT_HEADERS.COMPLIMENT_SHOWER.title}
-            subtitle={COMPONENT_HEADERS.COMPLIMENT_SHOWER.subtitle}
-          />
-          <ComplimentShower {...complimentShowerProps} />
-        </div>
-
-        <ComponentHeader
-          title={COMPONENT_HEADERS.SCRATCH_CARD.title}
-          subtitle={COMPONENT_HEADERS.SCRATCH_CARD.subtitle}
-        />
-        <div className="py-50 items-center justify-center">
-          <CardStack {...cardStackProps} />
-        </div>
-
-        <ComponentHeader
-          // title={COMPONENT_HEADERS.SPIN_THE_WHEEL.title}
-          // subtitle={COMPONENT_HEADERS.SPIN_THE_WHEEL.subtitle}
-          title="We wanna see you do..."
-          subtitle="Things we are looking forward to"
-        />
-        <SpinTheWheel {...spinTheWheelProps} />
-
-        <motion.p
-          className={cn(
-            'text-base sm:text-lg md:text-xl',
-            'text-white/90 font-medium mt-4',
-            'max-w-[90%]',
-            'drop-shadow-[0_2px_4px_rgba(0,0,0,0.3)]',
-            'text-center',
-            'm-16'
-          )}
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}
-        >
-          {message2}
-        </motion.p>
-      </KawaiiBackgroundDarker>
+      <ClientHeartlink
+        splashTitleProps={splashTitleProps}
+        slideshowProps={slideshowProps}
+        complimentShowerProps={complimentShowerProps}
+        cardStackProps={cardStackProps}
+        spinTheWheelProps={spinTheWheelProps}
+      />
     </main>
   );
 }

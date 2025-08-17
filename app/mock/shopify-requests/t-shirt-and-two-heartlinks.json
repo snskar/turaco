@@ -1,0 +1,794 @@
+{
+  "id": 6280233713890,
+  "admin_graphql_api_id": "gid://shopify/Order/6280233713890",
+  "app_id": 580111,
+  "browser_ip": "49.205.200.165",
+  "buyer_accepts_marketing": false,
+  "cancel_reason": null,
+  "cancelled_at": null,
+  "cart_token": "hWN1tvsCsZjRJzITJscWv5A9",
+  "checkout_id": 36594167808226,
+  "checkout_token": "a54bbede64f49686737b95eb5b50a1ae",
+  "client_details": {
+    "accept_language": "en-IN",
+    "browser_height": null,
+    "browser_ip": "49.205.200.165",
+    "browser_width": null,
+    "session_hash": null,
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36"
+  },
+  "closed_at": null,
+  "confirmation_number": "PECIAH80M",
+  "confirmed": true,
+  "contact_email": "sansk4r@gmail.com",
+  "created_at": "2025-08-17T16:18:14+05:30",
+  "currency": "INR",
+  "current_shipping_price_set": {
+    "shop_money": {
+      "amount": "0.00",
+      "currency_code": "INR"
+    },
+    "presentment_money": {
+      "amount": "0.00",
+      "currency_code": "INR"
+    }
+  },
+  "current_subtotal_price": "4197.00",
+  "current_subtotal_price_set": {
+    "shop_money": {
+      "amount": "4197.00",
+      "currency_code": "INR"
+    },
+    "presentment_money": {
+      "amount": "4197.00",
+      "currency_code": "INR"
+    }
+  },
+  "current_total_additional_fees_set": null,
+  "current_total_discounts": "0.00",
+  "current_total_discounts_set": {
+    "shop_money": {
+      "amount": "0.00",
+      "currency_code": "INR"
+    },
+    "presentment_money": {
+      "amount": "0.00",
+      "currency_code": "INR"
+    }
+  },
+  "current_total_duties_set": null,
+  "current_total_price": "4197.00",
+  "current_total_price_set": {
+    "shop_money": {
+      "amount": "4197.00",
+      "currency_code": "INR"
+    },
+    "presentment_money": {
+      "amount": "4197.00",
+      "currency_code": "INR"
+    }
+  },
+  "current_total_tax": "0.00",
+  "current_total_tax_set": {
+    "shop_money": {
+      "amount": "0.00",
+      "currency_code": "INR"
+    },
+    "presentment_money": {
+      "amount": "0.00",
+      "currency_code": "INR"
+    }
+  },
+  "customer_locale": "en-IN",
+  "device_id": null,
+  "discount_codes": [],
+  "duties_included": false,
+  "email": "sansk4r@gmail.com",
+  "estimated_taxes": false,
+  "financial_status": "paid",
+  "fulfillment_status": "partial",
+  "landing_site": "/online_store_preview",
+  "landing_site_ref": null,
+  "location_id": null,
+  "merchant_business_entity_id": "15255044322",
+  "merchant_of_record_app_id": null,
+  "name": "#1008",
+  "note": null,
+  "note_attributes": [],
+  "number": 8,
+  "order_number": 1008,
+  "order_status_url": "https://turaco-ink.com/75333304546/orders/2af39128cff6bd4f111f02a53a38c83d/authenticate?key=0e82f1b3bb8341e05fde76e03b60e2bb",
+  "original_total_additional_fees_set": null,
+  "original_total_duties_set": null,
+  "payment_gateway_names": ["1Razorpay - UPI, Cards, Wallets, NB"],
+  "phone": null,
+  "po_number": null,
+  "presentment_currency": "INR",
+  "processed_at": "2025-08-17T16:18:13+05:30",
+  "reference": null,
+  "referring_site": "https://admin.shopify.com/",
+  "source_identifier": null,
+  "source_name": "web",
+  "source_url": null,
+  "subtotal_price": "4197.00",
+  "subtotal_price_set": {
+    "shop_money": {
+      "amount": "4197.00",
+      "currency_code": "INR"
+    },
+    "presentment_money": {
+      "amount": "4197.00",
+      "currency_code": "INR"
+    }
+  },
+  "tags": "",
+  "tax_exempt": false,
+  "tax_lines": [],
+  "taxes_included": true,
+  "test": true,
+  "token": "2af39128cff6bd4f111f02a53a38c83d",
+  "total_cash_rounding_payment_adjustment_set": {
+    "shop_money": {
+      "amount": "0.00",
+      "currency_code": "INR"
+    },
+    "presentment_money": {
+      "amount": "0.00",
+      "currency_code": "INR"
+    }
+  },
+  "total_cash_rounding_refund_adjustment_set": {
+    "shop_money": {
+      "amount": "0.00",
+      "currency_code": "INR"
+    },
+    "presentment_money": {
+      "amount": "0.00",
+      "currency_code": "INR"
+    }
+  },
+  "total_discounts": "0.00",
+  "total_discounts_set": {
+    "shop_money": {
+      "amount": "0.00",
+      "currency_code": "INR"
+    },
+    "presentment_money": {
+      "amount": "0.00",
+      "currency_code": "INR"
+    }
+  },
+  "total_line_items_price": "4197.00",
+  "total_line_items_price_set": {
+    "shop_money": {
+      "amount": "4197.00",
+      "currency_code": "INR"
+    },
+    "presentment_money": {
+      "amount": "4197.00",
+      "currency_code": "INR"
+    }
+  },
+  "total_outstanding": "0.00",
+  "total_price": "4197.00",
+  "total_price_set": {
+    "shop_money": {
+      "amount": "4197.00",
+      "currency_code": "INR"
+    },
+    "presentment_money": {
+      "amount": "4197.00",
+      "currency_code": "INR"
+    }
+  },
+  "total_shipping_price_set": {
+    "shop_money": {
+      "amount": "0.00",
+      "currency_code": "INR"
+    },
+    "presentment_money": {
+      "amount": "0.00",
+      "currency_code": "INR"
+    }
+  },
+  "total_tax": "0.00",
+  "total_tax_set": {
+    "shop_money": {
+      "amount": "0.00",
+      "currency_code": "INR"
+    },
+    "presentment_money": {
+      "amount": "0.00",
+      "currency_code": "INR"
+    }
+  },
+  "total_tip_received": "0.00",
+  "total_weight": 10,
+  "updated_at": "2025-08-17T16:18:16+05:30",
+  "user_id": null,
+  "billing_address": {
+    "first_name": "Turaco",
+    "address1": "C-26 SF coral block emerald hills sector 65",
+    "phone": "+919717728614",
+    "city": "Gurgugram",
+    "zip": "122018",
+    "province": "Haryana",
+    "country": "India",
+    "last_name": "Ink",
+    "address2": null,
+    "company": null,
+    "latitude": 28.4029524,
+    "longitude": 77.075315,
+    "name": "Turaco Ink",
+    "country_code": "IN",
+    "province_code": "HR"
+  },
+  "customer": {
+    "id": 8304233152738,
+    "created_at": "2025-08-16T17:19:08+05:30",
+    "updated_at": "2025-08-17T16:18:15+05:30",
+    "first_name": "Turaco",
+    "last_name": "Ink",
+    "state": "disabled",
+    "note": null,
+    "verified_email": true,
+    "multipass_identifier": null,
+    "tax_exempt": false,
+    "email": "sansk4r@gmail.com",
+    "phone": null,
+    "currency": "INR",
+    "tax_exemptions": [],
+    "admin_graphql_api_id": "gid://shopify/Customer/8304233152738",
+    "default_address": {
+      "id": 9760455753954,
+      "customer_id": 8304233152738,
+      "first_name": "Turaco",
+      "last_name": "Ink",
+      "company": null,
+      "address1": "C-26 SF coral block emerald hills sector 65",
+      "address2": null,
+      "city": "Gurgugram",
+      "province": "Haryana",
+      "country": "India",
+      "zip": "122018",
+      "phone": "+919717728614",
+      "name": "Turaco Ink",
+      "province_code": "HR",
+      "country_code": "IN",
+      "country_name": "India",
+      "default": true
+    }
+  },
+  "discount_applications": [],
+  "fulfillments": [
+    {
+      "id": 5666565095650,
+      "admin_graphql_api_id": "gid://shopify/Fulfillment/5666565095650",
+      "created_at": "2025-08-17T16:18:16+05:30",
+      "location_id": 82513461474,
+      "name": "#1008.1",
+      "order_id": 6280233713890,
+      "origin_address": {},
+      "receipt": {},
+      "service": "manual",
+      "shipment_status": null,
+      "status": "success",
+      "tracking_company": null,
+      "tracking_number": null,
+      "tracking_numbers": [],
+      "tracking_url": null,
+      "tracking_urls": [],
+      "updated_at": "2025-08-17T16:18:16+05:30",
+      "line_items": [
+        {
+          "id": 15081734701282,
+          "admin_graphql_api_id": "gid://shopify/LineItem/15081734701282",
+          "attributed_staffs": [],
+          "current_quantity": 1,
+          "fulfillable_quantity": 0,
+          "fulfillment_service": "manual",
+          "fulfillment_status": "fulfilled",
+          "gift_card": false,
+          "grams": 5,
+          "name": "HeartLink: Smart Card For Stupid Love",
+          "price": "1499.00",
+          "price_set": {
+            "shop_money": {
+              "amount": "1499.00",
+              "currency_code": "INR"
+            },
+            "presentment_money": {
+              "amount": "1499.00",
+              "currency_code": "INR"
+            }
+          },
+          "product_exists": true,
+          "product_id": 8902922436834,
+          "properties": [
+            {
+              "name": "Gifter Name",
+              "value": "Sanskar 3"
+            },
+            {
+              "name": "Giftee Name",
+              "value": "Gopika 3"
+            },
+            {
+              "name": "Relation",
+              "value": "Friend"
+            },
+            {
+              "name": "Occasion",
+              "value": "Birthday"
+            },
+            {
+              "name": "Message",
+              "value": "I love you 3"
+            },
+            {
+              "name": "Photos",
+              "value": "https://res.cloudinary.com/dqrj6f0cm/image/upload/v1755427616/wbby4udq1uchdh4asf3c.jpg"
+            },
+            {
+              "name": "Compliments",
+              "value": "Angel voice, God's best creation, Infectious laugh, Cutest smile, In-house comedian, Really witty, Smarty pants, Softest cheeks, Kindest heart, Funnest person, Smarter than Holmes, Lotus eyes, Human sunshine, Bright spark, Heart of gold, Endless energy, Joyful soul, Master of jokes, Wise beyond years, Gentle spirit, Bright smile, Thoughtful mind, Steady rock, Creative genius, Cheerful vibe, Pure kindness, Warm hugs specialist"
+            },
+            {
+              "name": "Spin the Wheel Ideas",
+              "value": "Movie night, Coffee date, Walk in the park, Shopping spree, Cooking together, Game night, Puzzle time, Photo session, Karaoke night, Board games, Card games, Video games, Reading together, Writing letters, Drawing session, Music listening, Stargazing, Hiking, Biking, Swimming"
+            },
+            {
+              "name": "Scratch Card Coupons",
+              "value": "30 mins massage, Room cleaning service, Manicure session, Piggyback ride, Head scratch session, Hug coupon, Handwritten poem, I'll be chef"
+            }
+          ],
+          "quantity": 1,
+          "requires_shipping": true,
+          "sku": null,
+          "taxable": true,
+          "title": "HeartLink: Smart Card For Stupid Love",
+          "total_discount": "0.00",
+          "total_discount_set": {
+            "shop_money": {
+              "amount": "0.00",
+              "currency_code": "INR"
+            },
+            "presentment_money": {
+              "amount": "0.00",
+              "currency_code": "INR"
+            }
+          },
+          "variant_id": 46718886871266,
+          "variant_inventory_management": "shopify",
+          "variant_title": null,
+          "vendor": "My Store",
+          "tax_lines": [],
+          "duties": [],
+          "discount_allocations": []
+        },
+        {
+          "id": 15081734734050,
+          "admin_graphql_api_id": "gid://shopify/LineItem/15081734734050",
+          "attributed_staffs": [],
+          "current_quantity": 1,
+          "fulfillable_quantity": 0,
+          "fulfillment_service": "manual",
+          "fulfillment_status": "fulfilled",
+          "gift_card": false,
+          "grams": 5,
+          "name": "HeartLink: Smart Card For Stupid Love",
+          "price": "1499.00",
+          "price_set": {
+            "shop_money": {
+              "amount": "1499.00",
+              "currency_code": "INR"
+            },
+            "presentment_money": {
+              "amount": "1499.00",
+              "currency_code": "INR"
+            }
+          },
+          "product_exists": true,
+          "product_id": 8902922436834,
+          "properties": [
+            {
+              "name": "Gifter Name",
+              "value": "Sanskar 2"
+            },
+            {
+              "name": "Giftee Name",
+              "value": "Gopika 2"
+            },
+            {
+              "name": "Relation",
+              "value": "Friend"
+            },
+            {
+              "name": "Occasion",
+              "value": "Birthday"
+            },
+            {
+              "name": "Message",
+              "value": "I love you 2"
+            },
+            {
+              "name": "Photos",
+              "value": "https://res.cloudinary.com/dqrj6f0cm/image/upload/v1755427560/lfnerizlplzsnq8vouxf.jpg"
+            },
+            {
+              "name": "Compliments",
+              "value": "Angel voice, God's best creation, Infectious laugh, Cutest smile, In-house comedian, Really witty, Smarty pants, Softest cheeks, Kindest heart, Funnest person, Smarter than Holmes, Lotus eyes, Human sunshine, Bright spark, Heart of gold, Endless energy, Joyful soul, Master of jokes, Wise beyond years, Gentle spirit, Bright smile, Thoughtful mind, Steady rock, Creative genius, Cheerful vibe, Pure kindness, Warm hugs specialist"
+            },
+            {
+              "name": "Spin the Wheel Ideas",
+              "value": "Movie night, Coffee date, Walk in the park, Shopping spree, Cooking together, Game night, Puzzle time, Photo session, Karaoke night, Board games, Card games, Video games, Reading together, Writing letters, Drawing session, Music listening, Stargazing, Hiking, Biking, Swimming"
+            },
+            {
+              "name": "Scratch Card Coupons",
+              "value": "30 mins massage, Room cleaning service, Manicure session, Piggyback ride, Head scratch session, Hug coupon, Handwritten poem, I'll be chef"
+            }
+          ],
+          "quantity": 1,
+          "requires_shipping": true,
+          "sku": null,
+          "taxable": true,
+          "title": "HeartLink: Smart Card For Stupid Love",
+          "total_discount": "0.00",
+          "total_discount_set": {
+            "shop_money": {
+              "amount": "0.00",
+              "currency_code": "INR"
+            },
+            "presentment_money": {
+              "amount": "0.00",
+              "currency_code": "INR"
+            }
+          },
+          "variant_id": 46718886871266,
+          "variant_inventory_management": "shopify",
+          "variant_title": null,
+          "vendor": "My Store",
+          "tax_lines": [],
+          "duties": [],
+          "discount_allocations": []
+        }
+      ]
+    }
+  ],
+  "line_items": [
+    {
+      "id": 15081734668514,
+      "admin_graphql_api_id": "gid://shopify/LineItem/15081734668514",
+      "attributed_staffs": [],
+      "current_quantity": 1,
+      "fulfillable_quantity": 0,
+      "fulfillment_service": "printrove-fulfillment",
+      "fulfillment_status": null,
+      "gift_card": false,
+      "grams": 0,
+      "name": "Purrfect Blue Oversized T-shirt - Black / S",
+      "price": "1199.00",
+      "price_set": {
+        "shop_money": {
+          "amount": "1199.00",
+          "currency_code": "INR"
+        },
+        "presentment_money": {
+          "amount": "1199.00",
+          "currency_code": "INR"
+        }
+      },
+      "product_exists": true,
+      "product_id": 8904810070242,
+      "properties": [],
+      "quantity": 1,
+      "requires_shipping": true,
+      "sales_line_item_group_id": null,
+      "sku": "684939063bd55",
+      "taxable": true,
+      "title": "Purrfect Blue Oversized T-shirt",
+      "total_discount": "0.00",
+      "total_discount_set": {
+        "shop_money": {
+          "amount": "0.00",
+          "currency_code": "INR"
+        },
+        "presentment_money": {
+          "amount": "0.00",
+          "currency_code": "INR"
+        }
+      },
+      "variant_id": 46621497458914,
+      "variant_inventory_management": "shopify",
+      "variant_title": "Black / S",
+      "vendor": "Printrove",
+      "tax_lines": [],
+      "duties": [],
+      "discount_allocations": []
+    },
+    {
+      "id": 15081734701282,
+      "admin_graphql_api_id": "gid://shopify/LineItem/15081734701282",
+      "attributed_staffs": [],
+      "current_quantity": 1,
+      "fulfillable_quantity": 0,
+      "fulfillment_service": "manual",
+      "fulfillment_status": "fulfilled",
+      "gift_card": false,
+      "grams": 5,
+      "name": "HeartLink: Smart Card For Stupid Love",
+      "price": "1499.00",
+      "price_set": {
+        "shop_money": {
+          "amount": "1499.00",
+          "currency_code": "INR"
+        },
+        "presentment_money": {
+          "amount": "1499.00",
+          "currency_code": "INR"
+        }
+      },
+      "product_exists": true,
+      "product_id": 8902922436834,
+      "properties": [
+        {
+          "name": "Gifter Name",
+          "value": "Sanskar 3"
+        },
+        {
+          "name": "Giftee Name",
+          "value": "Gopika 3"
+        },
+        {
+          "name": "Relation",
+          "value": "Friend"
+        },
+        {
+          "name": "Occasion",
+          "value": "Birthday"
+        },
+        {
+          "name": "Message",
+          "value": "I love you 3"
+        },
+        {
+          "name": "Photos",
+          "value": "https://res.cloudinary.com/dqrj6f0cm/image/upload/v1755427616/wbby4udq1uchdh4asf3c.jpg"
+        },
+        {
+          "name": "Compliments",
+          "value": "Angel voice, God's best creation, Infectious laugh, Cutest smile, In-house comedian, Really witty, Smarty pants, Softest cheeks, Kindest heart, Funnest person, Smarter than Holmes, Lotus eyes, Human sunshine, Bright spark, Heart of gold, Endless energy, Joyful soul, Master of jokes, Wise beyond years, Gentle spirit, Bright smile, Thoughtful mind, Steady rock, Creative genius, Cheerful vibe, Pure kindness, Warm hugs specialist"
+        },
+        {
+          "name": "Spin the Wheel Ideas",
+          "value": "Movie night, Coffee date, Walk in the park, Shopping spree, Cooking together, Game night, Puzzle time, Photo session, Karaoke night, Board games, Card games, Video games, Reading together, Writing letters, Drawing session, Music listening, Stargazing, Hiking, Biking, Swimming"
+        },
+        {
+          "name": "Scratch Card Coupons",
+          "value": "30 mins massage, Room cleaning service, Manicure session, Piggyback ride, Head scratch session, Hug coupon, Handwritten poem, I'll be chef"
+        }
+      ],
+      "quantity": 1,
+      "requires_shipping": true,
+      "sales_line_item_group_id": null,
+      "sku": null,
+      "taxable": true,
+      "title": "HeartLink: Smart Card For Stupid Love",
+      "total_discount": "0.00",
+      "total_discount_set": {
+        "shop_money": {
+          "amount": "0.00",
+          "currency_code": "INR"
+        },
+        "presentment_money": {
+          "amount": "0.00",
+          "currency_code": "INR"
+        }
+      },
+      "variant_id": 46718886871266,
+      "variant_inventory_management": "shopify",
+      "variant_title": null,
+      "vendor": "My Store",
+      "tax_lines": [],
+      "duties": [],
+      "discount_allocations": []
+    },
+    {
+      "id": 15081734734050,
+      "admin_graphql_api_id": "gid://shopify/LineItem/15081734734050",
+      "attributed_staffs": [],
+      "current_quantity": 1,
+      "fulfillable_quantity": 0,
+      "fulfillment_service": "manual",
+      "fulfillment_status": "fulfilled",
+      "gift_card": false,
+      "grams": 5,
+      "name": "HeartLink: Smart Card For Stupid Love",
+      "price": "1499.00",
+      "price_set": {
+        "shop_money": {
+          "amount": "1499.00",
+          "currency_code": "INR"
+        },
+        "presentment_money": {
+          "amount": "1499.00",
+          "currency_code": "INR"
+        }
+      },
+      "product_exists": true,
+      "product_id": 8902922436834,
+      "properties": [
+        {
+          "name": "Gifter Name",
+          "value": "Sanskar 2"
+        },
+        {
+          "name": "Giftee Name",
+          "value": "Gopika 2"
+        },
+        {
+          "name": "Relation",
+          "value": "Friend"
+        },
+        {
+          "name": "Occasion",
+          "value": "Birthday"
+        },
+        {
+          "name": "Message",
+          "value": "I love you 2"
+        },
+        {
+          "name": "Photos",
+          "value": "https://res.cloudinary.com/dqrj6f0cm/image/upload/v1755427560/lfnerizlplzsnq8vouxf.jpg"
+        },
+        {
+          "name": "Compliments",
+          "value": "Angel voice, God's best creation, Infectious laugh, Cutest smile, In-house comedian, Really witty, Smarty pants, Softest cheeks, Kindest heart, Funnest person, Smarter than Holmes, Lotus eyes, Human sunshine, Bright spark, Heart of gold, Endless energy, Joyful soul, Master of jokes, Wise beyond years, Gentle spirit, Bright smile, Thoughtful mind, Steady rock, Creative genius, Cheerful vibe, Pure kindness, Warm hugs specialist"
+        },
+        {
+          "name": "Spin the Wheel Ideas",
+          "value": "Movie night, Coffee date, Walk in the park, Shopping spree, Cooking together, Game night, Puzzle time, Photo session, Karaoke night, Board games, Card games, Video games, Reading together, Writing letters, Drawing session, Music listening, Stargazing, Hiking, Biking, Swimming"
+        },
+        {
+          "name": "Scratch Card Coupons",
+          "value": "30 mins massage, Room cleaning service, Manicure session, Piggyback ride, Head scratch session, Hug coupon, Handwritten poem, I'll be chef"
+        }
+      ],
+      "quantity": 1,
+      "requires_shipping": true,
+      "sales_line_item_group_id": null,
+      "sku": null,
+      "taxable": true,
+      "title": "HeartLink: Smart Card For Stupid Love",
+      "total_discount": "0.00",
+      "total_discount_set": {
+        "shop_money": {
+          "amount": "0.00",
+          "currency_code": "INR"
+        },
+        "presentment_money": {
+          "amount": "0.00",
+          "currency_code": "INR"
+        }
+      },
+      "variant_id": 46718886871266,
+      "variant_inventory_management": "shopify",
+      "variant_title": null,
+      "vendor": "My Store",
+      "tax_lines": [],
+      "duties": [],
+      "discount_allocations": []
+    }
+  ],
+  "payment_terms": null,
+  "refunds": [],
+  "shipping_address": {
+    "first_name": "Turaco",
+    "address1": "C-26 SF coral block emerald hills sector 65",
+    "phone": "+919717728614",
+    "city": "Gurgugram",
+    "zip": "122018",
+    "province": "Haryana",
+    "country": "India",
+    "last_name": "Ink",
+    "address2": null,
+    "company": null,
+    "latitude": 28.4029524,
+    "longitude": 77.075315,
+    "name": "Turaco Ink",
+    "country_code": "IN",
+    "province_code": "HR"
+  },
+  "shipping_lines": [
+    {
+      "id": 5080751112418,
+      "carrier_identifier": null,
+      "code": "Free delivery",
+      "current_discounted_price_set": {
+        "shop_money": {
+          "amount": "0.00",
+          "currency_code": "INR"
+        },
+        "presentment_money": {
+          "amount": "0.00",
+          "currency_code": "INR"
+        }
+      },
+      "discounted_price": "0.00",
+      "discounted_price_set": {
+        "shop_money": {
+          "amount": "0.00",
+          "currency_code": "INR"
+        },
+        "presentment_money": {
+          "amount": "0.00",
+          "currency_code": "INR"
+        }
+      },
+      "is_removed": false,
+      "phone": null,
+      "price": "0.00",
+      "price_set": {
+        "shop_money": {
+          "amount": "0.00",
+          "currency_code": "INR"
+        },
+        "presentment_money": {
+          "amount": "0.00",
+          "currency_code": "INR"
+        }
+      },
+      "requested_fulfillment_service_id": null,
+      "source": "shopify",
+      "title": "Free delivery",
+      "tax_lines": [],
+      "discount_allocations": []
+    },
+    {
+      "id": 5080751145186,
+      "carrier_identifier": null,
+      "code": "Standard",
+      "current_discounted_price_set": {
+        "shop_money": {
+          "amount": "0.00",
+          "currency_code": "INR"
+        },
+        "presentment_money": {
+          "amount": "0.00",
+          "currency_code": "INR"
+        }
+      },
+      "discounted_price": "0.00",
+      "discounted_price_set": {
+        "shop_money": {
+          "amount": "0.00",
+          "currency_code": "INR"
+        },
+        "presentment_money": {
+          "amount": "0.00",
+          "currency_code": "INR"
+        }
+      },
+      "is_removed": false,
+      "phone": null,
+      "price": "0.00",
+      "price_set": {
+        "shop_money": {
+          "amount": "0.00",
+          "currency_code": "INR"
+        },
+        "presentment_money": {
+          "amount": "0.00",
+          "currency_code": "INR"
+        }
+      },
+      "requested_fulfillment_service_id": null,
+      "source": "shopify",
+      "title": "Standard",
+      "tax_lines": [],
+      "discount_allocations": []
+    }
+  ],
+  "returns": []
+}
