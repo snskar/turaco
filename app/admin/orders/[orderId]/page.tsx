@@ -3,9 +3,9 @@ import { prisma } from '@/lib/prisma';
 export default async function OrderDetail({
   params,
 }: {
-  params: { orderId: string };
+  params: Promise<{ orderId: string }>;
 }) {
-  const orderId = params.orderId;
+  const { orderId } = await params;
   const heartlinks = await prisma.heartlink.findMany({
     where: { shopifyOrderId: orderId },
     orderBy: { createdAt: 'asc' },
