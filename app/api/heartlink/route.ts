@@ -1,10 +1,10 @@
 import { NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '@/lib/prisma';
 import { nanoid } from 'nanoid';
 import { z } from 'zod'; // For validation
 import { headers } from 'next/headers';
 
-const prisma = new PrismaClient();
+export const runtime = 'nodejs';
 
 // Define the shape of our form data using Zod
 const HeartlinkFormSchema = z.object({
@@ -228,33 +228,84 @@ export async function GET(req: Request) {
   try {
     const { searchParams } = new URL(req.url);
     const slug = searchParams.get('slug');
+    const orderId = searchParams.get('orderId');
+    const orderNumberParam = searchParams.get('orderNumber');
 
-    if (!slug) {
+    if (!slug && !orderId && !orderNumberParam) {
       return corsResponse(
         NextResponse.json(
-          { success: false, error: 'Slug is required' },
+          {
+            success: false,
+            error: 'Provide one of: slug, orderId, or orderNumber',
+          },
           { status: 400 }
         )
       );
     }
 
-    const heartlink = await prisma.heartlink.findUnique({
-      where: { slug },
-      include: {
-        photos: true,
-        spotifyTrack: true,
-        activities: true,
-        compliments: true,
-        scratchCard: true,
-      },
-    });
+    let heartlink = null as Awaited<
+      ReturnType<typeof prisma.heartlink.findFirst>
+    > | null;
+    let heartlinks = null as Awaited<
+      ReturnType<typeof prisma.heartlink.findMany>
+    > | null;
 
-    if (!heartlink) {
+    if (slug) {
+      heartlink = await prisma.heartlink.findUnique({
+        where: { slug },
+        include: {
+          photos: true,
+          spotifyTrack: true,
+          activities: true,
+          compliments: true,
+          scratchCard: true,
+        },
+      });
+    } else if (orderId) {
+      heartlinks = await prisma.heartlink.findMany({
+        where: { shopifyOrderId: orderId },
+        include: {
+          photos: true,
+          spotifyTrack: true,
+          activities: true,
+          compliments: true,
+          scratchCard: true,
+        },
+      });
+    } else if (orderNumberParam) {
+      const orderNumber = Number(orderNumberParam);
+      if (Number.isNaN(orderNumber)) {
+        return corsResponse(
+          NextResponse.json(
+            { success: false, error: 'orderNumber must be a valid integer' },
+            { status: 400 }
+          )
+        );
+      }
+      heartlinks = await prisma.heartlink.findMany({
+        where: { shopifyOrderNumber: orderNumber },
+        include: {
+          photos: true,
+          spotifyTrack: true,
+          activities: true,
+          compliments: true,
+          scratchCard: true,
+        },
+      });
+    }
+
+    if (!heartlink && (!heartlinks || heartlinks.length === 0)) {
       return corsResponse(
         NextResponse.json(
           { success: false, error: 'Heartlink not found' },
           { status: 404 }
         )
+      );
+    }
+
+    if (heartlinks) {
+      return corsResponse(
+        NextResponse.json({ success: true, data: heartlinks })
       );
     }
 
