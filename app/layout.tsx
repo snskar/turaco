@@ -1,4 +1,4 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { Baloo_2 } from 'next/font/google';
 import './globals.css';
 
@@ -38,6 +38,9 @@ export const metadata: Metadata = {
     apple: '/assets/branding/favico/apple-touch-icon.png',
   },
   manifest: '/assets/branding/favico/site.webmanifest',
+};
+
+export const viewport: Viewport = {
   themeColor: '#ffffff',
 };
 

@@ -1,7 +1,7 @@
 'use client';
 
 import { useRef, useState, useEffect, useCallback } from 'react';
-import confetti from 'canvas-confetti';
+// Dynamic import to ensure client-side only execution
 
 interface UseScratchCardProps {
   width: number;
@@ -25,8 +25,11 @@ export const useScratchCard = ({
   const hasCalledComplete = useRef(false);
   const lastPoint = useRef<{ x: number; y: number } | null>(null);
 
-  const triggerConfetti = useCallback(() => {
-    if (!containerRef.current) return;
+  const triggerConfetti = useCallback(async () => {
+    if (!containerRef.current || typeof window === 'undefined') return;
+
+    // Dynamic import to ensure client-side only execution
+    const { default: confetti } = await import('canvas-confetti');
 
     const rect = containerRef.current.getBoundingClientRect();
     const centerX = (rect.left + rect.right) / 2 / window.innerWidth;

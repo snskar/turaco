@@ -11,7 +11,6 @@ const nextConfig: NextConfig = {
   poweredByHeader: false,
 
   // Production optimizations
-  swcMinify: true,
   compress: true,
 
   // Bundle optimization
@@ -21,8 +20,18 @@ const nextConfig: NextConfig = {
       config.optimization.moduleIds = 'named';
     }
 
-    // Production optimizations
-    if (!dev) {
+    // Prevent confetti libraries from being bundled server-side
+    if (isServer) {
+      config.externals = config.externals || [];
+      config.externals.push(
+        'canvas-confetti',
+        'react-dom-confetti',
+        'dom-confetti'
+      );
+    }
+
+    // Production optimizations (client-only)
+    if (!dev && !isServer) {
       config.optimization.splitChunks = {
         chunks: 'all',
         cacheGroups: {
@@ -84,13 +93,13 @@ const nextConfig: NextConfig = {
   },
 
   // Experimental features for performance
-  experimental: {
-    optimizeCss: true,
-    turbo: {
-      resolveAlias: {
-        underscore: 'lodash',
-        mocha: { browser: 'mocha/browser-entry.js' },
-      },
+  experimental: {},
+
+  // Turbopack configuration (stable)
+  turbopack: {
+    resolveAlias: {
+      underscore: 'lodash',
+      mocha: { browser: 'mocha/browser-entry.js' },
     },
   },
 };
