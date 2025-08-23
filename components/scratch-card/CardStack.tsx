@@ -6,7 +6,7 @@ import ScratchCard from './Card';
 import { AnimatedImageButton } from '@/components/ui/AnimatedImageButton';
 import { CardStackProps } from './types';
 
-export const CardStack: React.FC<CardStackProps> = ({ cards }) => {
+export const CardStack: React.FC<CardStackProps> = React.memo(({ cards }) => {
   const [remainingCards, setRemainingCards] = useState<string[]>(cards);
   const [revealedCards, setRevealedCards] = useState<string[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -138,4 +138,6 @@ export const CardStack: React.FC<CardStackProps> = ({ cards }) => {
       </AnimatePresence>
     </div>
   );
-};
+});
+
+CardStack.displayName = 'CardStack';

@@ -22,34 +22,35 @@ const mulberry32 = (a: number) => {
   };
 };
 
-const TwinklingStars: React.FC<TwinklingStarsProps> = ({ starCount = 40 }) => {
-  // Generate stars with deterministic values
+const TwinklingStars: React.FC<TwinklingStarsProps> = ({ starCount = 20 }) => {
+  // Reduce star count for performance and generate with deterministic values
   const stars = useMemo(() => {
     const seed = 12345; // Fixed seed for deterministic generation
     const random = mulberry32(seed);
-    return Array.from({ length: starCount }, (_, i) => ({
+    return Array.from({ length: Math.min(starCount, 20) }, (_, i) => ({
       id: i,
       position: {
         x: random() * 100,
         y: random() * 100,
       },
-      size: 10 + random() * 15,
+      size: 10 + random() * 10, // Reduced size range
       delay: random() * 2,
     }));
   }, [starCount]);
 
-  // Memoize glow effects with deterministic positions
+  // Reduce glow effects for performance
   const glowEffects = useMemo(() => {
     const seed = 67890; // Different fixed seed for glow effects
     const random = mulberry32(seed);
-    return Array.from({ length: starCount }, (_, i) => ({
+    const reducedCount = Math.min(starCount, 10); // Limit glow effects
+    return Array.from({ length: reducedCount }, (_, i) => ({
       id: i,
       position: {
         x: random() * 100,
         y: random() * 100,
       },
-      size: 20 + random() * 30,
-      opacity: 0.1 + random() * 0.2,
+      size: 20 + random() * 20, // Reduced size range
+      opacity: 0.1 + random() * 0.15, // Reduced opacity range
       delay: random() * 2,
     }));
   }, [starCount]);
@@ -72,9 +73,10 @@ const TwinklingStars: React.FC<TwinklingStarsProps> = ({ starCount = 40 }) => {
             scale: [0.8, 1.2, 0.8],
           }}
           transition={{
-            duration: 2 + (star.id % 3), // Deterministic duration based on star id
+            duration: 3 + (star.id % 2), // Simplified duration calculation
             repeat: Infinity,
             delay: star.delay,
+            ease: 'linear', // Use linear easing for better performance
           }}
         >
           <svg width={star.size} height={star.size} viewBox="0 0 24 24">
@@ -99,9 +101,10 @@ const TwinklingStars: React.FC<TwinklingStarsProps> = ({ starCount = 40 }) => {
             scale: [0.8, 1.2, 0.8],
           }}
           transition={{
-            duration: 3 + (glow.id % 2), // Deterministic duration based on glow id
+            duration: 4 + (glow.id % 2), // Deterministic duration based on glow id
             repeat: Infinity,
             delay: glow.delay,
+            ease: 'linear', // Use linear easing for better performance
           }}
         />
       ))}

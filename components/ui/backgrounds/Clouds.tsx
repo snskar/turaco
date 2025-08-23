@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useEffect, useState, useRef, useCallback } from 'react';
-import Image from 'next/image';
 import { motion, useAnimation } from 'framer-motion';
+import OptimizedImage from '@/components/ui/OptimizedImage';
 
 interface CloudProps {
   children?: React.ReactNode;
@@ -112,20 +112,24 @@ const CloudItem = React.memo(
     return (
       <motion.div
         animate={controls}
-        className="absolute"
+        className="absolute will-change-transform"
         style={{
           width: cloud.size,
           height: cloud.size,
+          transform: 'translate3d(0,0,0)', // Force hardware acceleration
         }}
       >
-        <Image
+        <OptimizedImage
           src={CLOUD_IMAGES[cloud.imageIndex]}
           alt="Cloud"
           fill
-          className="object-contain select-none pointer-events-none"
+          className="object-contain"
           style={{ opacity: cloud.opacity }}
-          priority={cloud.id < 3}
-          unoptimized
+          priority={cloud.id < 2}
+          loading={cloud.id < 2 ? 'eager' : 'lazy'}
+          sizes="(max-width: 400px) 200px, 300px"
+          quality={70}
+          useCloudinary={true}
         />
       </motion.div>
     );
