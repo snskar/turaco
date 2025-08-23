@@ -15,7 +15,7 @@ interface KawaiiBackgroundDarkerProps {
 export const KawaiiBackgroundDarker: React.FC<KawaiiBackgroundDarkerProps> = ({
   children,
   className = '',
-  cloudDensity = 5,
+  cloudDensity = 7, // Increased from 5 to 7 for higher density
   cloudOpacity = 0.3,
 }) => {
   return (
@@ -43,16 +43,17 @@ export const KawaiiBackgroundDarker: React.FC<KawaiiBackgroundDarkerProps> = ({
           animatedStarRatio={0.25} // Only 25% animate, 75% static
         />
 
-        {/* Clouds Layer - reduced density */}
+        {/* Clouds Layer - optimized with mix of static and animated */}
         <div className="absolute inset-0 w-full h-full">
           <Clouds
             density={cloudDensity}
             opacity={cloudOpacity}
             minSize={100}
             maxSize={250}
-            minSpeed={20}
-            maxSpeed={35}
+            minSpeed={20} // Reduced by 50% from 40 to 20
+            maxSpeed={40} // Reduced by 50% from 80 to 40
             zIndex={5}
+            staticRatio={0.65} // 65% static, 35% animated for better performance
           />
         </div>
 

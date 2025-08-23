@@ -13,6 +13,7 @@ interface CloudProps {
   maxSpeed?: number;
   zIndex?: number;
   opacity?: number;
+  staticRatio?: number; // Ratio of static vs animated clouds (0-1)
 }
 
 interface Cloud {
@@ -24,6 +25,7 @@ interface Cloud {
   imageIndex: number;
   direction: 1 | -1;
   opacity: number;
+  isStatic: boolean; // Whether this cloud is static or animated
 }
 
 const CLOUD_IMAGES = [
@@ -51,13 +53,23 @@ function generateCloud(
   maxSize: number,
   minSpeed: number,
   maxSpeed: number,
-  baseOpacity: number
+  baseOpacity: number,
+  staticRatio: number = 0.5
 ): Cloud {
   const size = minSize + Math.random() * (maxSize - minSize);
   const speed = minSpeed + Math.random() * (maxSpeed - minSpeed);
   const direction: 1 | -1 = Math.random() > 0.5 ? 1 : -1;
-  const x = direction === 1 ? -size : width + size;
+  const isStatic = Math.random() < staticRatio;
+
+  // Static clouds are positioned randomly across the screen
+  // Animated clouds start off-screen, but some start partially visible for immediate effect
+  const x = isStatic
+    ? Math.random() * width
+    : direction === 1
+      ? -size + Math.random() * 0.3 * width // Some start partially visible from left
+      : width + size - Math.random() * 0.3 * width; // Some start partially visible from right
   const y = Math.random() * height;
+
   return {
     id,
     x,
@@ -67,6 +79,7 @@ function generateCloud(
     imageIndex: Math.floor(Math.random() * CLOUD_IMAGES.length),
     direction,
     opacity: baseOpacity * (0.7 + Math.random() * 0.3),
+    isStatic,
   };
 }
 
@@ -83,30 +96,54 @@ const CloudItem = React.memo(
     const controls = useAnimation();
 
     useEffect(() => {
+      if (cloud.isStatic) {
+        // Static clouds just stay in place with no animations
+        controls.set({ x: cloud.x, y: cloud.y });
+        console.log(
+          `Static cloud ${cloud.id} positioned at (${cloud.x.toFixed(0)}, ${cloud.y.toFixed(0)})`
+        );
+        return;
+      }
+
+      // Animated clouds have movement animations
       const { x, y, size, speed, direction, id } = cloud;
       const toX = direction === 1 ? dimensions.width + size : -size;
 
       controls.set({ x, y });
+      console.log(
+        `Animated cloud ${cloud.id} starting at (${x.toFixed(0)}, ${y.toFixed(0)}) moving to ${toX.toFixed(0)}, speed: ${speed.toFixed(1)}`
+      );
 
+      // Subtle vertical bobbing for animated clouds only
       controls.start({
-        y: [y, y + Math.sin(x) * 30, y],
+        y: [y, y + Math.sin(x) * 15, y], // Reduced amplitude
         transition: {
-          duration: 15 + Math.random() * 10,
+          duration: 15 + Math.random() * 10, // Faster animation for more visible movement
           ease: 'easeInOut',
           repeat: Infinity,
           repeatType: 'reverse',
         },
       });
 
+      // Horizontal movement - faster for more visible effect
+      const duration = Math.max(
+        5,
+        (dimensions.width + size * 2) / (speed * 1.5)
+      ); // 50% faster movement
       controls
         .start({
           x: toX,
           transition: {
-            duration: (dimensions.width + size * 2) / speed,
+            duration,
             ease: 'linear',
           },
         })
-        .then(() => regenerate(id));
+        .then(() => {
+          console.log(
+            `Animated cloud ${cloud.id} completed movement, regenerating`
+          );
+          regenerate(id);
+        });
     }, [cloud, dimensions, controls, regenerate]);
 
     return (
@@ -140,13 +177,14 @@ CloudItem.displayName = 'CloudItem';
 
 export const Clouds: React.FC<CloudProps> = ({
   children,
-  density = 5,
+  density = 8, // Increased from 5 to 8 for higher density
   minSize = 100,
   maxSize = 300,
   minSpeed = 10,
   maxSpeed = 30,
   zIndex = -1,
   opacity = 0.3,
+  staticRatio = 0.6, // 60% static, 40% animated for better performance
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
@@ -173,30 +211,44 @@ export const Clouds: React.FC<CloudProps> = ({
           maxSize,
           minSpeed,
           maxSpeed,
-          opacity
+          opacity,
+          staticRatio
         )
       );
     }
+
+    // Debug logging
+    const staticCount = newClouds.filter(c => c.isStatic).length;
+    const animatedCount = newClouds.filter(c => !c.isStatic).length;
+    console.log(
+      `Generated ${count} clouds: ${staticCount} static, ${animatedCount} animated (${((animatedCount / count) * 100).toFixed(1)}% animated)`
+    );
+
     setClouds(newClouds);
-  }, [density, minSize, maxSize, minSpeed, maxSpeed, opacity]);
+  }, [density, minSize, maxSize, minSpeed, maxSpeed, opacity, staticRatio]);
 
   const regenerate = useCallback(
     (id: number) => {
       setClouds(prev =>
-        prev.map(c =>
-          c.id !== id
-            ? c
-            : generateCloud(
-                id,
-                dimensions.width,
-                dimensions.height,
-                minSize,
-                maxSize,
-                minSpeed,
-                maxSpeed,
-                opacity
-              )
-        )
+        prev.map(c => {
+          if (c.id !== id) return c;
+
+          // Don't regenerate static clouds - they stay in place
+          if (c.isStatic) return c;
+
+          // Only regenerate animated clouds
+          return generateCloud(
+            id,
+            dimensions.width,
+            dimensions.height,
+            minSize,
+            maxSize,
+            minSpeed,
+            maxSpeed,
+            opacity,
+            0 // Force new clouds to be animated (staticRatio = 0) to replace the one that just exited
+          );
+        })
       );
     },
     [dimensions, minSize, maxSize, minSpeed, maxSpeed, opacity]
