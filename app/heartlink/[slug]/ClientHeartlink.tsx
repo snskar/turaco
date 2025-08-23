@@ -7,6 +7,7 @@ import ComplimentShower from '@/components/compliment-shower/Game';
 import { ComponentHeader } from '@/components/ui/ComponentHeader/ComponentHeader';
 import { COMPONENT_HEADERS } from '@/components/ui/ComponentHeader/constants';
 import { CardStack } from '@/components/scratch-card/CardStack';
+import { FancyDivider } from '@/components/ui/FancyDivider';
 import SpinTheWheel from '@/components/spin-the-wheel/SpinTheWheel';
 import { PropifiedHeartlink } from '@/lib/utils';
 
@@ -21,39 +22,46 @@ export default function ClientHeartlink({
     Array.isArray(slideshowProps?.images) && slideshowProps.images.length > 0;
   return (
     <KawaiiBackgroundDarker>
-      <SplashTitle {...splashTitleProps} />
-      {hasImages && (
+      <div className="m-4">
+        <SplashTitle {...splashTitleProps} />
+        {hasImages && (
+          <div className="relative mb-16">
+            <ComponentHeader
+              title={COMPONENT_HEADERS.SLIDESHOW.title}
+              subtitle={COMPONENT_HEADERS.SLIDESHOW.subtitle}
+            />
+            <div className="my-4">
+              <Slideshow {...slideshowProps} />
+            </div>
+          </div>
+        )}
+        <FancyDivider variant="end" />
         <div className="relative mb-16">
           <ComponentHeader
-            title={COMPONENT_HEADERS.SLIDESHOW.title}
-            subtitle={COMPONENT_HEADERS.SLIDESHOW.subtitle}
+            title={COMPONENT_HEADERS.COMPLIMENT_SHOWER.title}
+            subtitle={COMPONENT_HEADERS.COMPLIMENT_SHOWER.subtitle}
           />
-          <div className="my-4">
-            <Slideshow {...slideshowProps} />
-          </div>
+          <ComplimentShower {...complimentShowerProps} />
         </div>
-      )}
-      <div className="relative mb-16">
+        <FancyDivider variant="start" />
+
         <ComponentHeader
-          title={COMPONENT_HEADERS.COMPLIMENT_SHOWER.title}
-          subtitle={COMPONENT_HEADERS.COMPLIMENT_SHOWER.subtitle}
+          title={COMPONENT_HEADERS.SCRATCH_CARD.title}
+          subtitle={COMPONENT_HEADERS.SCRATCH_CARD.subtitle}
         />
-        <ComplimentShower {...complimentShowerProps} />
-      </div>
+        <div className="py-50 items-center justify-center">
+          <CardStack {...cardStackProps} />
+        </div>
+        <FancyDivider variant="end" />
 
-      <ComponentHeader
-        title={COMPONENT_HEADERS.SCRATCH_CARD.title}
-        subtitle={COMPONENT_HEADERS.SCRATCH_CARD.subtitle}
-      />
-      <div className="py-50 items-center justify-center">
-        <CardStack {...cardStackProps} />
-      </div>
+        <ComponentHeader
+          title={COMPONENT_HEADERS.SPIN_THE_WHEEL.title}
+          subtitle={COMPONENT_HEADERS.SPIN_THE_WHEEL.subtitle}
+        />
+        <SpinTheWheel {...spinTheWheelProps} />
 
-      <ComponentHeader
-        title={COMPONENT_HEADERS.SPIN_THE_WHEEL.title}
-        subtitle={COMPONENT_HEADERS.SPIN_THE_WHEEL.subtitle}
-      />
-      <SpinTheWheel {...spinTheWheelProps} />
+        <FancyDivider variant="start" />
+      </div>
     </KawaiiBackgroundDarker>
   );
 }
