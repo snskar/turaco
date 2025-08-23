@@ -113,8 +113,9 @@ export default function AdminHome() {
 
       const clientAuth = isAuthenticated();
       if (!clientAuth) {
-        setAuthChecked(true);
-        setServerAuthValid(false);
+        // No client credentials; redirect immediately
+        sessionStorage.removeItem('admin-auth');
+        window.location.href = '/admin/signin';
         return;
       }
 

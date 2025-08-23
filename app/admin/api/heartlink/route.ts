@@ -1,10 +1,20 @@
 import { NextResponse } from 'next/server';
+import { cookies } from 'next/headers';
 import { prisma } from '@/lib/prisma';
 
 export const runtime = 'nodejs';
 
 export async function GET(req: Request) {
   try {
+    // Require admin auth cookie
+    const token = (await cookies()).get('admin-auth')?.value;
+    if (!token) {
+      return NextResponse.json(
+        { success: false, error: 'Unauthorized' },
+        { status: 401 }
+      );
+    }
+
     const { searchParams } = new URL(req.url);
     const slug = searchParams.get('slug');
     const orderId = searchParams.get('orderId');

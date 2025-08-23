@@ -9,7 +9,7 @@ const baloo2 = Baloo_2({
 });
 
 export const metadata: Metadata = {
-  title: 'Heartlink',
+  title: 'heartlink',
   description: 'A delightful app for daily positivity',
   icons: {
     icon: [
