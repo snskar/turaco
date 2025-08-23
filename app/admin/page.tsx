@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, useCallback } from 'react';
 import {
   Search,
   ExternalLink,
@@ -9,7 +9,9 @@ import {
   Phone,
   MapPin,
   Eye,
+  LogOut,
 } from 'lucide-react';
+import { useAdminAuth, authenticatedFetch } from './lib/auth';
 
 type Heartlink = {
   id: string;
@@ -37,6 +39,10 @@ export default function AdminHome() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showAll, setShowAll] = useState(true);
+  const [mounted, setMounted] = useState(false);
+  const [authChecked, setAuthChecked] = useState(false);
+  const [serverAuthValid, setServerAuthValid] = useState(false);
+  const { signOut, isAuthenticated, checkServerAuth } = useAdminAuth();
 
   const searchUrl = useMemo(() => {
     const base = '/admin/api/heartlink';
@@ -48,24 +54,12 @@ export default function AdminHome() {
     return `${base}?${params.toString()}`;
   }, [by, query]);
 
-  // Load all orders on component mount
-  useEffect(() => {
-    if (showAll) {
-      handleLoadAll();
-    }
-  }, []);
-
-  useEffect(() => {
-    setResults(null);
-    setError(null);
-  }, [by]);
-
-  async function handleLoadAll() {
+  const handleLoadAll = useCallback(async () => {
     setLoading(true);
     setError(null);
     setShowAll(true);
     try {
-      const res = await fetch('/admin/api/heartlink');
+      const res = await authenticatedFetch('/admin/api/heartlink');
       const json = await res.json();
       if (!res.ok || !json.success) {
         throw new Error(json.error || 'Failed to load orders');
@@ -77,7 +71,7 @@ export default function AdminHome() {
     } finally {
       setLoading(false);
     }
-  }
+  }, []);
 
   async function handleSearch(e: React.FormEvent) {
     e.preventDefault();
@@ -89,7 +83,7 @@ export default function AdminHome() {
     setError(null);
     setShowAll(false);
     try {
-      const res = await fetch(searchUrl);
+      const res = await authenticatedFetch(searchUrl);
       const json = await res.json();
       if (!res.ok || !json.success) {
         throw new Error(json.error || 'Search failed');
@@ -107,6 +101,80 @@ export default function AdminHome() {
     }
   }
 
+  // Handle component mounting to prevent hydration mismatch
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Check authentication after mounting
+  useEffect(() => {
+    async function verifyAuth() {
+      if (!mounted) return;
+
+      const clientAuth = isAuthenticated();
+      if (!clientAuth) {
+        setAuthChecked(true);
+        setServerAuthValid(false);
+        return;
+      }
+
+      // Check if server-side auth is also valid
+      const serverAuth = await checkServerAuth();
+      setServerAuthValid(serverAuth);
+      setAuthChecked(true);
+
+      if (!serverAuth) {
+        // Server auth failed, clear client auth and redirect
+        sessionStorage.removeItem('admin-auth');
+        setTimeout(() => {
+          window.location.href = '/admin/signin';
+        }, 1000);
+      }
+    }
+
+    verifyAuth();
+  }, [mounted, isAuthenticated, checkServerAuth]);
+
+  // Load all orders once authentication is verified
+  useEffect(() => {
+    if (authChecked && serverAuthValid && showAll) {
+      handleLoadAll();
+    }
+  }, [authChecked, serverAuthValid, showAll, handleLoadAll]);
+
+  useEffect(() => {
+    setResults(null);
+    setError(null);
+  }, [by]);
+
+  // Show loading state until authentication is verified
+  if (!mounted || !authChecked) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-pink-500 mx-auto mb-4"></div>
+          <p className="text-gray-600">
+            {!mounted ? 'Loading...' : 'Verifying authentication...'}
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  // Redirect if not authenticated
+  if (!serverAuthValid) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-pink-500 mx-auto mb-4"></div>
+          <p className="text-gray-600">
+            Authentication expired. Redirecting to signin...
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-pink-50/30 via-white to-cyan-50/30 relative">
       {/* Background decoration */}
@@ -115,11 +183,20 @@ export default function AdminHome() {
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-8">
-          <div className="flex items-center gap-3 mb-2">
-            <Package className="h-8 w-8 text-pink-500" />
-            <h1 className="text-3xl font-bold text-gray-900">
-              Orders Dashboard
-            </h1>
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-3">
+              <Package className="h-8 w-8 text-pink-500" />
+              <h1 className="text-3xl font-bold text-gray-900">
+                Orders Dashboard
+              </h1>
+            </div>
+            <button
+              onClick={signOut}
+              className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-gray-900 hover:bg-white/50 rounded-lg transition-all duration-200"
+            >
+              <LogOut className="h-4 w-4" />
+              <span className="hidden sm:inline">Sign Out</span>
+            </button>
           </div>
           <p className="text-gray-600">Manage and view all heartlink orders</p>
         </div>
