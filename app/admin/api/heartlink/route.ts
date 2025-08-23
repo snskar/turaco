@@ -10,14 +10,20 @@ export async function GET(req: Request) {
     const orderId = searchParams.get('orderId');
     const orderNumberParam = searchParams.get('orderNumber');
 
+    // If no search parameters, return all heartlinks
     if (!slug && !orderId && !orderNumberParam) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: 'Provide one of: slug, orderId, or orderNumber',
+      const allHeartlinks = await prisma.heartlink.findMany({
+        orderBy: {
+          id: 'desc', // Most recent first
         },
-        { status: 400 }
-      );
+        take: 100, // Limit to 100 records for performance
+      });
+
+      return NextResponse.json({
+        success: true,
+        data: allHeartlinks,
+        total: allHeartlinks.length,
+      });
     }
 
     let heartlink = null as Awaited<

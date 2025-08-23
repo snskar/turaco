@@ -3,7 +3,7 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useSpinTheWheel } from './utils';
-import Image from 'next/image';
+import OptimizedImage from '@/components/ui/OptimizedImage';
 import { SpinTheWheelProps } from './types';
 
 const SpinTheWheel: React.FC<SpinTheWheelProps> = ({
@@ -39,13 +39,14 @@ const SpinTheWheel: React.FC<SpinTheWheelProps> = ({
           willChange: 'transform',
         }}
       >
-        <Image
+        <OptimizedImage
           src="/assets/ui/win-pointer.png"
           alt="Winner Pointer"
           width={80}
           height={80}
           className="w-full h-full object-contain"
           draggable={false}
+          useCloudinary={true}
         />
         <div
           className="absolute inset-0 -z-10 blur-md opacity-50"
@@ -69,6 +70,8 @@ const SpinTheWheel: React.FC<SpinTheWheelProps> = ({
           willChange: 'transform',
           transform: 'translate3d(0,0,0)',
           WebkitTransform: 'translate3d(0,0,0)',
+          backfaceVisibility: 'hidden', // Improve rendering performance
+          WebkitBackfaceVisibility: 'hidden',
         }}
       >
         {/* Won State Overlay */}
@@ -99,24 +102,26 @@ const SpinTheWheel: React.FC<SpinTheWheelProps> = ({
                 }}
               />
 
-              {/* Floating stars */}
-              {[...Array(8)].map((_, i) => (
+              {/* Floating stars - reduced count */}
+              {[...Array(4)].map((_, i) => (
                 <motion.div
                   key={i}
-                  className="absolute w-1 h-1 bg-white rounded-full"
+                  className="absolute w-1 h-1 bg-white rounded-full will-change-transform"
                   animate={{
-                    opacity: [0.3, 0.8, 0.3],
-                    scale: [1, 1.3, 1],
-                    y: [0, -10, 0],
+                    opacity: [0.4, 0.7, 0.4],
+                    scale: [1, 1.2, 1],
+                    y: [0, -8, 0],
                   }}
                   transition={{
-                    duration: 3 + (i % 2),
+                    duration: 4 + (i % 2),
                     repeat: Infinity,
-                    delay: i * 0.2,
+                    delay: i * 0.3,
+                    ease: 'linear',
                   }}
                   style={{
-                    left: `${20 + ((i * 10) % 60)}%`,
-                    top: `${15 + ((i * 12) % 70)}%`,
+                    left: `${25 + ((i * 15) % 50)}%`,
+                    top: `${20 + ((i * 12) % 60)}%`,
+                    transform: 'translate3d(0,0,0)',
                   }}
                 />
               ))}

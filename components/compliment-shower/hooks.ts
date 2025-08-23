@@ -1,7 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { DROP_INTERVAL, DROP_SPEED, JAR_SIZE, DROP_SIZE } from './constants';
-import {DropType} from './Drop';
-
+import { DropType } from './Drop';
 
 interface Viewport {
   width: number;
@@ -31,7 +30,7 @@ export const useGameState = () => {
     playing,
     setPlaying,
     viewport,
-    setViewport
+    setViewport,
   };
 };
 
@@ -47,7 +46,7 @@ export const useGameRefs = () => {
     animationFrameRef,
     complimentTimeoutRef,
     lastTimeRef,
-    jarMovementRef
+    jarMovementRef,
   };
 };
 
@@ -58,7 +57,8 @@ export const useJarMovement = (
 ) => {
   const setJarPosition = (newRatio: number): void => {
     const now = Date.now();
-    if (now - lastTimeRef.current! > 16) {
+    // Throttle updates to 60fps for smoother performance
+    if (now - lastTimeRef.current! > 16.67) {
       jarMovementRef.current = newRatio;
       setJarXRatio(newRatio);
       lastTimeRef.current = now;
@@ -77,19 +77,19 @@ export const useGameInitialization = (
   useEffect(() => {
     setHasMounted(true);
     jarMovementRef.current = jarXRatio;
-    
+
     const updateSize = (): void => {
       if (typeof window !== 'undefined') {
-        setViewport({ 
-          width: window.innerWidth, 
-          height: window.innerHeight 
+        setViewport({
+          width: window.innerWidth,
+          height: window.innerHeight,
         });
       }
     };
-    
+
     updateSize();
-    window.addEventListener("resize", updateSize);
-    return () => window.removeEventListener("resize", updateSize);
+    window.addEventListener('resize', updateSize);
+    return () => window.removeEventListener('resize', updateSize);
   }, [jarXRatio, setHasMounted, setViewport, jarMovementRef]);
 };
 
@@ -101,19 +101,28 @@ export const useDropGeneration = (
 ) => {
   useEffect(() => {
     if (!playing || !viewport.width) return;
-    
-    const interval = setInterval(() => {
-      setDrops((prev) => [
-        ...prev,
-        {
-          id: dropId.current++,
-          xRatio: Math.random(),
-          yRatio: 0,
-          lastUpdate: Date.now(),
-        },
-      ]);
-    }, DROP_INTERVAL);
-    
+
+    const interval = setInterval(
+      () => {
+        // Limit the maximum number of drops for performance
+        setDrops(prev => {
+          const maxDrops = 15; // Limit concurrent drops
+          if (prev.length >= maxDrops) return prev;
+
+          return [
+            ...prev,
+            {
+              id: dropId.current++,
+              xRatio: Math.random(),
+              yRatio: 0,
+              lastUpdate: Date.now(),
+            },
+          ];
+        });
+      },
+      Math.max(DROP_INTERVAL, 100)
+    ); // Ensure minimum interval
+
     return () => clearInterval(interval);
   }, [playing, viewport.width, dropId, setDrops]);
 };
@@ -150,32 +159,32 @@ export const useGameAnimation = (
     const animate = (): void => {
       const currentTime = Date.now();
 
-      setDrops((prev) => {
+      setDrops(prev => {
         return prev
-          .map((drop) => {
+          .map(drop => {
             const timeSinceLastUpdate = (currentTime - drop.lastUpdate) / 1000;
             const pixelsToMove = DROP_SPEED * timeSinceLastUpdate;
             const ratioToMove = pixelsToMove / viewport.height;
-            
+
             return {
               ...drop,
               yRatio: drop.yRatio + ratioToMove,
               lastUpdate: currentTime,
             };
           })
-          .filter((drop) => {
+          .filter(drop => {
             const dropX = drop.xRatio * viewport.width;
             const dropY = drop.yRatio * viewport.height;
             const jarX = jarXRatio * (viewport.width - JAR_SIZE.width);
-            
+
             const caught =
               dropY > viewport.height - JAR_SIZE.height - 16 &&
               dropY < viewport.height - 16 &&
               dropX + DROP_SIZE.width > jarX &&
               dropX < jarX + JAR_SIZE.width;
-            
+
             if (caught) {
-              setScore((s) => s + 1);
+              setScore(s => s + 1);
               setCompliment(
                 compliments[Math.floor(Math.random() * compliments.length)]
               );
@@ -183,7 +192,7 @@ export const useGameAnimation = (
                 clearTimeout(complimentTimeoutRef.current);
               }
               complimentTimeoutRef.current = setTimeout(
-                () => setCompliment(null), 
+                () => setCompliment(null),
                 2000
               );
             }
@@ -192,15 +201,25 @@ export const useGameAnimation = (
       });
       animationFrameRef.current = requestAnimationFrame(animate);
     };
-    
+
     animationFrameRef.current = requestAnimationFrame(animate);
-    
+
     return () => {
       if (animationFrameRef.current) {
         cancelAnimationFrame(animationFrameRef.current);
       }
     };
-  }, [jarXRatio, playing, viewport, setDrops, setScore, setCompliment, compliments, complimentTimeoutRef, animationFrameRef]);
+  }, [
+    jarXRatio,
+    playing,
+    viewport,
+    setDrops,
+    setScore,
+    setCompliment,
+    compliments,
+    complimentTimeoutRef,
+    animationFrameRef,
+  ]);
 };
 
 export const useKeyboardControls = (
@@ -211,19 +230,19 @@ export const useKeyboardControls = (
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent): void => {
       if (!playing) return;
-      
+
       const delta = 0.05;
       const currentRatio = jarMovementRef.current!;
-      
-      if (e.key === "ArrowLeft") {
+
+      if (e.key === 'ArrowLeft') {
         setJarPosition(Math.max(0, currentRatio - delta));
-      } else if (e.key === "ArrowRight") {
+      } else if (e.key === 'ArrowRight') {
         setJarPosition(Math.min(1, currentRatio + delta));
       }
     };
-    
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
   }, [playing, jarMovementRef, setJarPosition]);
 };
 
@@ -236,7 +255,8 @@ export const useTouchControls = (
     if (!playing) return;
     e.preventDefault();
     const touchX = e.touches[0].clientX;
-    const newRatio = (touchX - JAR_SIZE.width / 2) / (viewport.width - JAR_SIZE.width);
+    const newRatio =
+      (touchX - JAR_SIZE.width / 2) / (viewport.width - JAR_SIZE.width);
     setJarPosition(Math.max(0, Math.min(1, newRatio)));
   };
 

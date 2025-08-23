@@ -4,7 +4,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import HolographicText from '../HolographicText';
-import Image from 'next/image';
+import OptimizedImage from '../OptimizedImage';
 import { SplashTitleProps } from './types';
 import TextBox from '../TextBox';
 
@@ -53,14 +53,13 @@ const SplashTitle: React.FC<SplashTitleProps> = ({
           animate={{ opacity: 1 }}
           transition={{ delay: 0.3, duration: 0.5 }}
         >
-          <Image
+          <OptimizedImage
             src={imgSource || '/assets/art/cat.png'}
             alt="Decorative symbol"
-            // width={300}
-            // height={300}
             width={800}
             height={800}
             className="object-contain drop-shadow-lg"
+            useCloudinary={true}
           />
         </motion.div>
 

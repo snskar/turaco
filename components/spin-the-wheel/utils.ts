@@ -1,5 +1,7 @@
+'use client';
+
 import { useState, useRef, useCallback, useEffect } from 'react';
-import confetti from 'canvas-confetti';
+// Dynamic import to ensure client-side only execution
 
 interface UseSpinTheWheelProps {
   options: string[];
@@ -68,8 +70,11 @@ export const useSpinTheWheel = ({
     [sectorAngle]
   );
 
-  const triggerConfetti = useCallback(() => {
-    if (!containerRef.current) return;
+  const triggerConfetti = useCallback(async () => {
+    if (!containerRef.current || typeof window === 'undefined') return;
+
+    // Dynamic import to ensure client-side only execution
+    const { default: confetti } = await import('canvas-confetti');
 
     const rect = containerRef.current.getBoundingClientRect();
     const centerX = (rect.left + rect.right) / 2 / window.innerWidth;
