@@ -1,6 +1,25 @@
 import { NextResponse } from 'next/server';
+import { cookies } from 'next/headers';
 
 export const runtime = 'nodejs';
+
+export async function GET() {
+  try {
+    const token = (await cookies()).get('admin-auth')?.value;
+    if (token) {
+      return NextResponse.json({ success: true, message: 'Authenticated' });
+    }
+    return NextResponse.json(
+      { success: false, message: 'Not authenticated' },
+      { status: 401 }
+    );
+  } catch {
+    return NextResponse.json(
+      { success: false, message: 'Authentication check failed' },
+      { status: 500 }
+    );
+  }
+}
 
 export async function POST(request: Request) {
   try {

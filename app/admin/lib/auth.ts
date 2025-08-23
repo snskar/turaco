@@ -29,9 +29,9 @@ export function useAdminAuth() {
   };
 
   const checkServerAuth = async () => {
-    // Test if server-side authentication is valid by making a simple API call
+    // Validate server-side auth by pinging auth validator endpoint
     try {
-      const response = await fetch('/admin/api/heartlink?test=1');
+      const response = await fetch('/admin/api/auth', { method: 'GET' });
       return response.ok;
     } catch {
       return false;
