@@ -178,9 +178,9 @@ const ThreeDBusinessCard: React.FC<ThreeDBusinessCardProps> = ({
     const start = async () => {
       try {
         // iOS requires explicit permission
-        // @ts-expect-error - requestPermission not in TS lib for some targets
         if (
           typeof DeviceOrientationEvent !== 'undefined' &&
+          // @ts-expect-error - requestPermission is iOS-specific and not in standard DOM types
           typeof DeviceOrientationEvent.requestPermission === 'function'
         ) {
           // We wait for the first user gesture (pointerdown) to request permission
