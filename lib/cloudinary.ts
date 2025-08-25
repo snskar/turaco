@@ -130,10 +130,14 @@ export function assetToCloudinaryId(assetPath: string): string {
 
     // Branding assets
     'turaco-logo': 'turaco-logo_tgd6o2',
+    'heartlink-logo': 'heartlink-logo_bvdpcq',
     favicon: 'favicon_wsyssq',
     'apple-touch-icon': 'apple-touch-icon_lsr2zx',
     'android-chrome-192x192': 'android-chrome-192x192_fh92fd',
     'android-chrome-512x512': 'android-chrome-512x512_wlsdic',
+
+    // Card assets
+    card_2_front: 'card_2_front_mv29yx',
   };
 
   // Return mapped ID or fallback to original filename
