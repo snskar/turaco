@@ -54,6 +54,7 @@ model Heartlink {
   // Media and content
   photos      Photo[]
   spotifyTrack SpotifyTrack?
+  coverPhotoUrl String?
   
   // Interactive elements
   activities  Activity[]
