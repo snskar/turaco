@@ -211,6 +211,7 @@ export async function POST(req: Request) {
         const activities = splitList(propsRecord['Spin the Wheel Ideas']);
         const scratchCards = splitList(propsRecord['Scratch Card Coupons']);
         const photoUrls = splitList(propsRecord['Photos']);
+        const coverPhotoUrl = propsRecord['Cover Photo'] || undefined;
 
         // Map to Prisma enums with robust normalization
         const relation: HeartlinkRelation =
@@ -254,62 +255,67 @@ export async function POST(req: Request) {
         const variantSku: string | undefined = item.sku || undefined;
 
         // Persist this Heartlink to DB
-        const heartlink = await prisma.heartlink.create({
-          data: {
-            slug,
-            senderName,
-            recipientName,
-            relation,
-            occasion,
-            message,
-            status: HeartlinkStatus.PENDING,
-            shopifyOrderId: String(data.id),
-            shopifyOrderNumber: data.order_number,
-            shopifyLineItemId: String(item.id),
-            shopifyProductId: String(item.product_id),
+        const createData = {
+          slug,
+          senderName,
+          recipientName,
+          relation,
+          occasion,
+          message,
+          status: HeartlinkStatus.PENDING,
+          shopifyOrderId: String(data.id),
+          shopifyOrderNumber: data.order_number,
+          shopifyLineItemId: String(item.id),
+          shopifyProductId: String(item.product_id),
 
-            // Customer + shipping
-            customerEmail,
-            customerPhone,
-            shippingName,
-            shippingAddress1,
-            shippingAddress2,
-            shippingCity,
-            shippingProvince,
-            shippingZip,
-            shippingCountry,
+          // Customer + shipping
+          customerEmail,
+          customerPhone,
+          shippingName,
+          shippingAddress1,
+          shippingAddress2,
+          shippingCity,
+          shippingProvince,
+          shippingZip,
+          shippingCountry,
 
-            // Variant
-            variantTitle,
-            variantId,
-            variantSku,
+          // Variant
+          variantTitle,
+          variantId,
+          variantSku,
 
-            // Photos – create if any URLs provided
-            photos: photoUrls.length
-              ? {
-                  create: photoUrls.map(url => ({
-                    url,
-                    publicId: nanoid(10),
-                  })),
-                }
-              : undefined,
+          // Photos – create if any URLs provided
+          photos: photoUrls.length
+            ? {
+                create: photoUrls.map(url => ({
+                  url,
+                  publicId: nanoid(10),
+                })),
+              }
+            : undefined,
 
-            // Compliments
-            compliments: compliments.length
-              ? { create: compliments.map(c => ({ content: c })) }
-              : undefined,
+          // Compliments
+          compliments: compliments.length
+            ? { create: compliments.map(c => ({ content: c })) }
+            : undefined,
 
-            // Activities (Spin-the-Wheel ideas)
-            activities: activities.length
-              ? { create: activities.map(a => ({ content: a })) }
-              : undefined,
+          // Activities (Spin-the-Wheel ideas)
+          activities: activities.length
+            ? { create: activities.map(a => ({ content: a })) }
+            : undefined,
 
-            // Scratch cards
-            scratchCard: scratchCards.length
-              ? { create: scratchCards.map(s => ({ content: s })) }
-              : undefined,
-          },
-        });
+          // Scratch cards
+          scratchCard: scratchCards.length
+            ? { create: scratchCards.map(s => ({ content: s })) }
+            : undefined,
+        };
+
+        if (coverPhotoUrl) {
+          (createData as { coverPhotoUrl?: string }).coverPhotoUrl =
+            coverPhotoUrl;
+        }
+
+        const heartlink = await prisma.heartlink.create({ data: createData });
 
         return heartlink.slug;
       })

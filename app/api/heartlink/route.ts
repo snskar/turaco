@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import type { Prisma } from '@prisma/client';
 import { nanoid } from 'nanoid';
 import { z } from 'zod'; // For validation
 import { headers } from 'next/headers';
@@ -38,6 +39,9 @@ const HeartlinkFormSchema = z.object({
 
   // Optional fields with validation
   photos: z.array(z.string().url('Invalid photo URL')).optional(),
+
+  // Optional cover photo url
+  coverPhotoUrl: z.string().url('Invalid cover photo URL').optional(),
 
   spotifyTrack: z
     .object({
@@ -116,64 +120,71 @@ export async function POST(req: Request) {
     // Generate a unique slug
     const slug = nanoid(10);
 
-    // Create the heartlink with all related data
+    // Build the create data object with explicit Prisma typing
+    const createData: Prisma.HeartlinkCreateInput = {
+      slug,
+      senderName: data.senderName,
+      recipientName: data.recipientName,
+      occasion: data.occasion,
+      relation: data.relation,
+      message: data.message,
+
+      // Create photos if provided
+      photos:
+        data.photos && data.photos.length > 0
+          ? {
+              // Each photo needs both a URL and a unique publicId to satisfy the Prisma schema
+              create: data.photos.map((url: string) => ({
+                url,
+                // Generate a unique publicId if one isn't provided by the client
+                publicId: nanoid(12),
+              })),
+            }
+          : undefined,
+
+      // Create Spotify track if provided
+      spotifyTrack: data.spotifyTrack
+        ? {
+            create: {
+              spotifyId: data.spotifyTrack.spotifyId,
+              type: data.spotifyTrack.type,
+              name: data.spotifyTrack.name,
+              artist: data.spotifyTrack.artist,
+              imageUrl: data.spotifyTrack.imageUrl,
+              previewUrl: data.spotifyTrack.previewUrl,
+            },
+          }
+        : undefined,
+
+      // Create activities if provided
+      activities: data.activities
+        ? {
+            create: data.activities,
+          }
+        : undefined,
+
+      // Create compliments if provided
+      compliments: data.compliments
+        ? {
+            create: data.compliments,
+          }
+        : undefined,
+
+      // Create scratch cards if provided
+      scratchCard: data.scratchCard
+        ? {
+            create: data.scratchCard,
+          }
+        : undefined,
+    };
+
+    if (data.coverPhotoUrl) {
+      (createData as { coverPhotoUrl?: string }).coverPhotoUrl =
+        data.coverPhotoUrl;
+    }
+
     const heartlink = await prisma.heartlink.create({
-      data: {
-        slug,
-        senderName: data.senderName,
-        recipientName: data.recipientName,
-        occasion: data.occasion,
-        relation: data.relation,
-        message: data.message,
-
-        // Create photos if provided
-        photos:
-          data.photos && data.photos.length > 0
-            ? {
-                // Each photo needs both a URL and a unique publicId to satisfy the Prisma schema
-                create: data.photos.map((url: string) => ({
-                  url,
-                  // Generate a unique publicId if one isn't provided by the client
-                  publicId: nanoid(12),
-                })),
-              }
-            : undefined,
-
-        // Create Spotify track if provided
-        spotifyTrack: data.spotifyTrack
-          ? {
-              create: {
-                spotifyId: data.spotifyTrack.spotifyId,
-                type: data.spotifyTrack.type,
-                name: data.spotifyTrack.name,
-                artist: data.spotifyTrack.artist,
-                imageUrl: data.spotifyTrack.imageUrl,
-                previewUrl: data.spotifyTrack.previewUrl,
-              },
-            }
-          : undefined,
-
-        // Create activities if provided
-        activities: data.activities
-          ? {
-              create: data.activities,
-            }
-          : undefined,
-
-        // Create compliments if provided
-        compliments: data.compliments
-          ? {
-              create: data.compliments,
-            }
-          : undefined,
-
-        // Create scratch cards if provided
-        scratchCard: data.scratchCard
-          ? {
-              create: data.scratchCard,
-            }
-          : undefined,
-      },
+      data: createData,
       // Include all related data in the response
       include: {
         photos: true,

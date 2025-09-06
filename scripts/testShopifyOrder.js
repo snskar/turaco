@@ -53,6 +53,10 @@ function buildDefaultBody() {
           { name: 'Spin the Wheel Ideas', value: 'Karaoke,Movie night' },
           { name: 'Scratch Card Coupons', value: 'Free Pizza' },
           { name: 'Photos', value: 'https://picsum.photos/400' },
+          {
+            name: 'Cover Photo',
+            value: 'https://picsum.photos/seed/cover/800/600',
+          },
         ],
       },
       // add another Heartlink item to prove multiple-item handling
