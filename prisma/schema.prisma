@@ -67,6 +67,8 @@ model Heartlink {
   shopifyLineItemId    String?
   shopifyProductId     String?
   status               HeartlinkStatus    @default(PENDING)
+  // Idempotency key to prevent duplicate records for Shopify webhooks (order + line item + unit)
+  shopifyDedupKey      String?     @unique
 
   // Customer and shipping details (duplicated per Heartlink for simplicity)
   customerEmail        String?

@@ -46,6 +46,15 @@ interface Property {
   value: string;
 }
 
+// Build idempotency key per order + line item + unit index
+function buildDedupKey(
+  orderId: string | number,
+  lineItemId: string | number,
+  unitIndex: number
+) {
+  return `${orderId}:${lineItemId}:${unitIndex}`;
+}
+
 // Normalize Relation coming from Shopify to Prisma enum
 function mapRelationToPrismaEnum(input: string): HeartlinkRelation {
   const normalized = (input || '').trim().toUpperCase();
@@ -120,6 +129,7 @@ export async function POST(req: Request) {
   try {
     // Get the HMAC header
     const hmac = req.headers.get('x-shopify-hmac-sha256');
+    const topic = req.headers.get('x-shopify-topic');
 
     // Get the raw body
     const rawBody = await req.text();
@@ -134,6 +144,16 @@ export async function POST(req: Request) {
 
     // Parse the body
     const data = JSON.parse(rawBody);
+
+    // Only process order creation events to avoid duplicate processing from other topics
+    if (topic && topic !== 'orders/create') {
+      return NextResponse.json({
+        success: true,
+        skipped: true,
+        reason: 'Unsupported topic',
+        topic,
+      });
+    }
 
     // Check if this order contains any Heartlink products.
     // Prefer product_id check when env is provided, else fall back to presence of custom properties.
@@ -190,15 +210,18 @@ export async function POST(req: Request) {
             .filter(Boolean)
         : [];
 
-    // Expand items by quantity (create one Heartlink per quantity unit)
-    const itemsToCreate: LineItem[] = heartlinkLineItems.flatMap(item => {
+    // Expand items by quantity (create one Heartlink per quantity unit) and carry the unit index explicitly
+    const itemsToCreate = heartlinkLineItems.flatMap(item => {
       const qty = Math.max(1, Number(item.quantity || 1));
-      return Array.from({ length: qty }, () => item);
+      return Array.from({ length: qty }, (_, i) => ({
+        item,
+        unitIndex: i + 1,
+      }));
     });
 
     // Iterate over each Heartlink unit and create individual records.
     const createdHeartlinks = await Promise.all(
-      itemsToCreate.map(async (item, idx) => {
+      itemsToCreate.map(async ({ item, unitIndex }) => {
         const propsRecord = heartlinkPropsByLineItem[item.id] || {};
 
         // Map Shopify property keys -> Heartlink fields
@@ -219,8 +242,8 @@ export async function POST(req: Request) {
         const occasion: HeartlinkOccasion =
           mapOccasionToPrismaEnum(occasionRaw);
 
-        // Generate a short unique slug. Include unit index to avoid collisions within the same order.
-        const slug = `${data.order_number}-${idx + 1}-${nanoid(6)}`;
+        // Generate a short unique slug. Randomized but created only once due to upsert idempotency.
+        const slug = `${data.order_number}-${unitIndex}-${nanoid(6)}`;
 
         // Pull customer-level identity
         const customerEmail: string | undefined =
@@ -267,6 +290,7 @@ export async function POST(req: Request) {
           shopifyOrderNumber: data.order_number,
           shopifyLineItemId: String(item.id),
           shopifyProductId: String(item.product_id),
+          shopifyDedupKey: buildDedupKey(data.id, item.id, unitIndex),
 
           // Customer + shipping
           customerEmail,
@@ -315,9 +339,27 @@ export async function POST(req: Request) {
             coverPhotoUrl;
         }
 
-        const heartlink = await prisma.heartlink.create({ data: createData });
-
-        return heartlink.slug;
+        try {
+          const result = await prisma.heartlink.create({
+            data: createData,
+            select: { slug: true },
+          });
+          return result.slug;
+        } catch (e: unknown) {
+          // If a unique constraint is hit (duplicate webhook), return existing slug
+          if (
+            e &&
+            typeof e === 'object' &&
+            'code' in e &&
+            (e as { code?: string }).code === 'P2002'
+          ) {
+            const rows = await prisma.$queryRaw<{ slug: string }[]>`
+              SELECT "slug" FROM "Heartlink" WHERE "shopifyDedupKey" = ${createData.shopifyDedupKey!} LIMIT 1
+            `;
+            if (rows && rows.length > 0) return rows[0].slug;
+          }
+          throw e;
+        }
       })
     );
 

@@ -22,7 +22,7 @@ export default function ClientHeartlink({
     Array.isArray(slideshowProps?.images) && slideshowProps.images.length > 0;
   return (
     <KawaiiBackgroundDarker>
-      <div className="m-4">
+      <div className="m-7">
         <SplashTitle {...splashTitleProps} />
         {hasImages && (
           <div className="relative mb-16">
