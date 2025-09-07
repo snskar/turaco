@@ -6,6 +6,7 @@ import {
   Package,
   ExternalLink,
   Image as ImageIcon,
+  Download as DownloadIcon,
 } from 'lucide-react';
 import Image from 'next/image';
 
@@ -14,6 +15,7 @@ export default async function OrderDetail({
 }: {
   params: Promise<{ orderId: string }>;
 }) {
+  type WithCoverPhoto = { coverPhotoUrl: string | null };
   const { orderId } = await params;
   const heartlinks = await prisma.heartlink.findMany({
     where: { shopifyOrderId: orderId },
@@ -113,126 +115,151 @@ export default async function OrderDetail({
                 </tr>
               </thead>
               <tbody>
-                {heartlinks.map((h, index) => (
-                  <tr
-                    key={h.id}
-                    className={
-                      index % 2 === 0 ? 'bg-white/50' : 'bg-gray-50/50'
-                    }
-                  >
-                    <td className="px-6 py-4 border-b border-gray-100 font-mono text-sm">
-                      {h.slug}
-                    </td>
-                    <td className="px-6 py-4 border-b border-gray-100">
-                      <a
-                        href={`/heartlink/${h.slug}`}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="text-pink-600 hover:text-pink-700 flex items-center gap-1"
-                      >
-                        <span className="font-mono text-sm">{`heartlink.turaco.com/heartlink/${h.slug}`}</span>
-                        <ExternalLink className="h-4 w-4" />
-                      </a>
-                    </td>
-                    <td className="px-6 py-4 border-b border-gray-100">
-                      {h.variantTitle || '-'}
-                    </td>
-                    <td className="px-6 py-4 border-b border-gray-100">
-                      {h.variantSku || '-'}
-                    </td>
-                    <td className="px-6 py-4 border-b border-gray-100">
-                      {h.coverPhotoUrl ? (
-                        <div className="flex items-center gap-3">
-                          <a
-                            href={h.coverPhotoUrl}
-                            target="_blank"
-                            rel="noreferrer"
-                            className="block h-14 w-14 relative"
-                          >
-                            <Image
-                              src={h.coverPhotoUrl}
-                              alt="Cover"
-                              width={56}
-                              height={56}
-                              className="rounded-lg object-cover border border-gray-200"
-                            />
-                          </a>
-                          <a
-                            href={h.coverPhotoUrl}
-                            target="_blank"
-                            rel="noreferrer"
-                            className="inline-flex items-center gap-1 text-cyan-600 hover:text-cyan-700 text-sm"
-                          >
-                            <ImageIcon className="h-4 w-4" />
-                            View image
-                          </a>
-                        </div>
-                      ) : (
-                        <span className="text-gray-400">-</span>
-                      )}
-                    </td>
-                  </tr>
-                ))}
+                {heartlinks.map((h, index) => {
+                  const coverUrl = (h as unknown as WithCoverPhoto)
+                    .coverPhotoUrl;
+                  return (
+                    <tr
+                      key={h.id}
+                      className={
+                        index % 2 === 0 ? 'bg-white/50' : 'bg-gray-50/50'
+                      }
+                    >
+                      <td className="px-6 py-4 border-b border-gray-100 font-mono text-sm">
+                        {h.slug}
+                      </td>
+                      <td className="px-6 py-4 border-b border-gray-100">
+                        <a
+                          href={`/heartlink/${h.slug}`}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="text-pink-600 hover:text-pink-700 flex items-center gap-1"
+                        >
+                          <span className="font-mono text-sm">{`heartlink.turaco.com/heartlink/${h.slug}`}</span>
+                          <ExternalLink className="h-4 w-4" />
+                        </a>
+                      </td>
+                      <td className="px-6 py-4 border-b border-gray-100">
+                        {h.variantTitle || '-'}
+                      </td>
+                      <td className="px-6 py-4 border-b border-gray-100">
+                        {h.variantSku || '-'}
+                      </td>
+                      <td className="px-6 py-4 border-b border-gray-100">
+                        {coverUrl ? (
+                          <div className="flex items-center gap-3">
+                            <a
+                              href={coverUrl}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="block relative"
+                            >
+                              <Image
+                                src={coverUrl}
+                                alt="Cover"
+                                width={90}
+                                height={60}
+                                className="rounded-lg object-contain border border-gray-200 bg-gray-50"
+                              />
+                            </a>
+                            <a
+                              href={coverUrl}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="inline-flex items-center gap-1 text-cyan-600 hover:text-cyan-700 text-sm"
+                            >
+                              <ImageIcon className="h-4 w-4" />
+                              View image
+                            </a>
+                            <a
+                              href={coverUrl}
+                              download
+                              className="inline-flex items-center gap-1 text-cyan-600 hover:text-cyan-700 text-sm"
+                            >
+                              <DownloadIcon className="h-4 w-4" />
+                              Download
+                            </a>
+                          </div>
+                        ) : (
+                          <span className="text-gray-400">-</span>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
 
           {/* Mobile cards */}
           <div className="md:hidden space-y-4 p-4">
-            {heartlinks.map(h => (
-              <div
-                key={h.id}
-                className="bg-white rounded-xl p-4 shadow-sm border border-gray-200"
-              >
-                <div className="flex items-center justify-between mb-3">
-                  <div className="flex items-center gap-2">
-                    <Package className="h-5 w-5 text-pink-500" />
-                    <span className="font-semibold text-gray-900">
-                      {h.slug}
-                    </span>
-                  </div>
-                  <a
-                    href={`/heartlink/${h.slug}`}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="inline-flex items-center gap-1 text-pink-600 hover:text-pink-700 text-sm"
-                  >
-                    <ExternalLink className="h-4 w-4" />
-                    Open
-                  </a>
-                </div>
-
-                {h.coverPhotoUrl && (
-                  <a
-                    href={h.coverPhotoUrl}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="block mb-3"
-                  >
-                    <div className="relative w-full h-40">
-                      <Image
-                        src={h.coverPhotoUrl}
-                        alt="Cover"
-                        fill
-                        sizes="(max-width: 768px) 100vw, 768px"
-                        className="rounded-lg object-cover border border-gray-200"
-                      />
+            {heartlinks.map(h => {
+              const coverUrl = (h as unknown as WithCoverPhoto).coverPhotoUrl;
+              return (
+                <div
+                  key={h.id}
+                  className="bg-white rounded-xl p-4 shadow-sm border border-gray-200"
+                >
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-2">
+                      <Package className="h-5 w-5 text-pink-500" />
+                      <span className="font-semibold text-gray-900">
+                        {h.slug}
+                      </span>
                     </div>
-                  </a>
-                )}
-
-                <div className="text-sm text-gray-700 space-y-1">
-                  <div>
-                    <span className="text-gray-500">Variant:</span>
-                    <span className="ml-2">{h.variantTitle || '-'}</span>
+                    <a
+                      href={`/heartlink/${h.slug}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex items-center gap-1 text-pink-600 hover:text-pink-700 text-sm"
+                    >
+                      <ExternalLink className="h-4 w-4" />
+                      Open
+                    </a>
                   </div>
-                  <div>
-                    <span className="text-gray-500">SKU:</span>
-                    <span className="ml-2">{h.variantSku || '-'}</span>
+
+                  {coverUrl && (
+                    <>
+                      <a
+                        href={coverUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="block mb-2"
+                      >
+                        <div className="relative w-full aspect-[3/2]">
+                          <Image
+                            src={coverUrl}
+                            alt="Cover"
+                            fill
+                            sizes="(max-width: 768px) 100vw, 768px"
+                            className="rounded-lg object-contain border border-gray-200 bg-gray-50"
+                          />
+                        </div>
+                      </a>
+                      <a
+                        href={coverUrl}
+                        download
+                        className="inline-flex items-center gap-1 text-cyan-600 hover:text-cyan-700 text-sm mb-3"
+                      >
+                        <DownloadIcon className="h-4 w-4" />
+                        Download image
+                      </a>
+                    </>
+                  )}
+
+                  <div className="text-sm text-gray-700 space-y-1">
+                    <div>
+                      <span className="text-gray-500">Variant:</span>
+                      <span className="ml-2">{h.variantTitle || '-'}</span>
+                    </div>
+                    <div>
+                      <span className="text-gray-500">SKU:</span>
+                      <span className="ml-2">{h.variantSku || '-'}</span>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </div>
