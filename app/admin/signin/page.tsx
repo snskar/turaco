@@ -109,7 +109,7 @@ export default function AdminSignIn() {
                     value={username}
                     onChange={e => setUsername(e.target.value)}
                     required
-                    className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all duration-200 bg-white"
+                    className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all duration-200 bg-white text-gray-900 placeholder-gray-500"
                     placeholder="Enter your username"
                   />
                 </div>
@@ -132,7 +132,7 @@ export default function AdminSignIn() {
                     value={password}
                     onChange={e => setPassword(e.target.value)}
                     required
-                    className="block w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all duration-200 bg-white"
+                    className="block w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all duration-200 bg-white text-gray-900 placeholder-gray-500"
                     placeholder="Enter your password"
                   />
                   <button

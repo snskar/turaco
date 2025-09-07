@@ -38,7 +38,7 @@ const SplashTitle: React.FC<SplashTitleProps> = ({
           <div className="relative z-10">
             <HolographicText
               // className="text-[5px] sm:text-[48px] md:text-[56px] lg:text-[64px] leading-[1.1]"
-              className="text-[64px] sm:text-[48px] md:text-[56px] lg:text-[64px] leading-[0.9]"
+              className="text-[50px] sm:text-[40px] md:text-[40px] lg:text-[36px] leading-[1]"
               strokeWidth={8}
             >
               {title}
