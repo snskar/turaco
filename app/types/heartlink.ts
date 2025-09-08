@@ -72,6 +72,9 @@ export interface Heartlink {
   occasion: HeartlinkOccasion;
   relation: HeartlinkRelation;
   message?: string;
+  recipientEmail?: string;
+  recipientPhone?: string;
+  scheduledTime?: string | Date;
   photos?: Photo[];
   spotifyTrack?: SpotifyTrack;
   activities?: Activity[];

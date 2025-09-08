@@ -74,6 +74,11 @@ model Heartlink {
   customerEmail        String?
   customerPhone        String?
 
+  // Optional recipient contact and scheduling
+  recipientEmail       String?
+  recipientPhone       String?
+  scheduledTime        DateTime?
+
   shippingName         String?
   shippingAddress1     String?
   shippingAddress2     String?

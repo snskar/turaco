@@ -43,6 +43,17 @@ const HeartlinkFormSchema = z.object({
   // Optional cover photo url
   coverPhotoUrl: z.string().url('Invalid cover photo URL').optional(),
 
+  // Optional recipient contact and scheduling (from cart)
+  recipientEmail: z.string().email('Invalid recipient email').optional(),
+  recipientPhone: z
+    .string()
+    .regex(/^\d{10}$/u, 'Recipient phone must be 10 digits')
+    .optional(),
+  scheduledTime: z
+    .string()
+    .datetime({ message: 'Scheduled time must be an ISO date-time' })
+    .optional(),
+
   spotifyTrack: z
     .object({
       spotifyId: z.string(),
@@ -181,6 +192,23 @@ export async function POST(req: Request) {
     if (data.coverPhotoUrl) {
       (createData as { coverPhotoUrl?: string }).coverPhotoUrl =
         data.coverPhotoUrl;
+    }
+
+    // Persist scheduled time if provided
+    if (data.scheduledTime) {
+      (createData as { scheduledTime?: Date }).scheduledTime = new Date(
+        data.scheduledTime
+      );
+    }
+
+    // Optional recipient contact fields (added post object construction for type safety)
+    if (data.recipientEmail) {
+      (createData as { recipientEmail?: string }).recipientEmail =
+        data.recipientEmail;
+    }
+    if (data.recipientPhone) {
+      (createData as { recipientPhone?: string }).recipientPhone =
+        data.recipientPhone;
     }
 
     const heartlink = await prisma.heartlink.create({

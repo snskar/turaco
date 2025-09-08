@@ -230,6 +230,9 @@ export async function POST(req: Request) {
         const relationRaw = propsRecord['Relation'] || 'OTHER';
         const occasionRaw = propsRecord['Occasion'] || 'OTHER';
         const message = propsRecord['Message'] || undefined;
+        const recipientEmailRaw = propsRecord['Recipient Email'] || undefined;
+        const recipientPhone = propsRecord['Recipient Phone'] || undefined;
+        const scheduledTimeRaw = propsRecord['Scheduled Time'] || undefined;
         const compliments = splitList(propsRecord['Compliments']);
         const activities = splitList(propsRecord['Spin the Wheel Ideas']);
         const scratchCards = splitList(propsRecord['Scratch Card Coupons']);
@@ -285,6 +288,14 @@ export async function POST(req: Request) {
           relation,
           occasion,
           message,
+          recipientEmail:
+            recipientEmailRaw && /.+@.+\..+/.test(recipientEmailRaw)
+              ? recipientEmailRaw
+              : undefined,
+          recipientPhone:
+            recipientPhone && /^\d{10}$/u.test(recipientPhone)
+              ? recipientPhone
+              : undefined,
           status: HeartlinkStatus.PENDING,
           shopifyOrderId: String(data.id),
           shopifyOrderNumber: data.order_number,
@@ -337,6 +348,14 @@ export async function POST(req: Request) {
         if (coverPhotoUrl) {
           (createData as { coverPhotoUrl?: string }).coverPhotoUrl =
             coverPhotoUrl;
+        }
+
+        // Validate and attach scheduledTime if valid ISO or parseable
+        if (scheduledTimeRaw) {
+          const parsed = new Date(scheduledTimeRaw);
+          if (!isNaN(parsed.getTime())) {
+            (createData as { scheduledTime?: Date }).scheduledTime = parsed;
+          }
         }
 
         try {
