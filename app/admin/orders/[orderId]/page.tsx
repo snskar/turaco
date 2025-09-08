@@ -1,11 +1,11 @@
 import { prisma } from '@/lib/prisma';
+import type { Heartlink as PrismaHeartlink } from '@prisma/client';
 import {
   Mail,
   Phone,
   MapPin,
   Package,
   ExternalLink,
-  Image as ImageIcon,
   Download as DownloadIcon,
 } from 'lucide-react';
 import Image from 'next/image';
@@ -16,11 +16,17 @@ export default async function OrderDetail({
   params: Promise<{ orderId: string }>;
 }) {
   type WithCoverPhoto = { coverPhotoUrl: string | null };
+  type AdminHeartlink = PrismaHeartlink & {
+    recipientEmail?: string | null;
+    recipientPhone?: string | null;
+    scheduledTime?: Date | string | null;
+    coverPhotoUrl: string | null;
+  };
   const { orderId } = await params;
-  const heartlinks = await prisma.heartlink.findMany({
+  const heartlinks = (await prisma.heartlink.findMany({
     where: { shopifyOrderId: orderId },
     orderBy: { createdAt: 'asc' },
-  });
+  })) as unknown as AdminHeartlink[];
 
   if (heartlinks.length === 0) {
     return (
@@ -91,110 +97,12 @@ export default async function OrderDetail({
           </div>
         </div>
 
-        {/* Table */}
+        {/* Heartlink details - vertical cards */}
         <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg border border-white/50 overflow-hidden">
-          <div className="hidden md:block overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-gradient-to-r from-pink-50 to-cyan-50">
-                <tr>
-                  <th className="text-left px-6 py-4 font-semibold text-gray-900 border-b border-gray-200">
-                    Slug
-                  </th>
-                  <th className="text-left px-6 py-4 font-semibold text-gray-900 border-b border-gray-200">
-                    Heartlink URL
-                  </th>
-                  <th className="text-left px-6 py-4 font-semibold text-gray-900 border-b border-gray-200">
-                    Variant
-                  </th>
-                  <th className="text-left px-6 py-4 font-semibold text-gray-900 border-b border-gray-200">
-                    SKU
-                  </th>
-                  <th className="text-left px-6 py-4 font-semibold text-gray-900 border-b border-gray-200">
-                    Cover Photo
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {heartlinks.map((h, index) => {
-                  const coverUrl = (h as unknown as WithCoverPhoto)
-                    .coverPhotoUrl;
-                  return (
-                    <tr
-                      key={h.id}
-                      className={
-                        index % 2 === 0 ? 'bg-white/50' : 'bg-gray-50/50'
-                      }
-                    >
-                      <td className="px-6 py-4 border-b border-gray-100 font-mono text-sm">
-                        {h.slug}
-                      </td>
-                      <td className="px-6 py-4 border-b border-gray-100">
-                        <a
-                          href={`/heartlink/${h.slug}`}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="text-pink-600 hover:text-pink-700 flex items-center gap-1"
-                        >
-                          <span className="font-mono text-sm">{`heartlink.turaco.com/heartlink/${h.slug}`}</span>
-                          <ExternalLink className="h-4 w-4" />
-                        </a>
-                      </td>
-                      <td className="px-6 py-4 border-b border-gray-100">
-                        {h.variantTitle || '-'}
-                      </td>
-                      <td className="px-6 py-4 border-b border-gray-100">
-                        {h.variantSku || '-'}
-                      </td>
-                      <td className="px-6 py-4 border-b border-gray-100">
-                        {coverUrl ? (
-                          <div className="flex items-center gap-3">
-                            <a
-                              href={coverUrl}
-                              target="_blank"
-                              rel="noreferrer"
-                              className="block relative"
-                            >
-                              <Image
-                                src={coverUrl}
-                                alt="Cover"
-                                width={90}
-                                height={60}
-                                className="rounded-lg object-contain border border-gray-200 bg-gray-50"
-                              />
-                            </a>
-                            <a
-                              href={coverUrl}
-                              target="_blank"
-                              rel="noreferrer"
-                              className="inline-flex items-center gap-1 text-cyan-600 hover:text-cyan-700 text-sm"
-                            >
-                              <ImageIcon className="h-4 w-4" />
-                              View image
-                            </a>
-                            <a
-                              href={coverUrl}
-                              download
-                              className="inline-flex items-center gap-1 text-cyan-600 hover:text-cyan-700 text-sm"
-                            >
-                              <DownloadIcon className="h-4 w-4" />
-                              Download
-                            </a>
-                          </div>
-                        ) : (
-                          <span className="text-gray-400">-</span>
-                        )}
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
-
-          {/* Mobile cards */}
-          <div className="md:hidden space-y-4 p-4">
+          <div className="space-y-4 p-4">
             {heartlinks.map(h => {
               const coverUrl = (h as unknown as WithCoverPhoto).coverPhotoUrl;
+              const isDigital = Boolean(h.recipientEmail && h.recipientPhone);
               return (
                 <div
                   key={h.id}
@@ -237,8 +145,7 @@ export default async function OrderDetail({
                         </div>
                       </a>
                       <a
-                        href={coverUrl}
-                        download
+                        href={`/admin/api/download?url=${encodeURIComponent(coverUrl)}&filename=${encodeURIComponent('cover.jpg')}`}
                         className="inline-flex items-center gap-1 text-cyan-600 hover:text-cyan-700 text-sm mb-3"
                       >
                         <DownloadIcon className="h-4 w-4" />
@@ -249,12 +156,71 @@ export default async function OrderDetail({
 
                   <div className="text-sm text-gray-700 space-y-1">
                     <div>
+                      <span className="text-gray-500">Heartlink URL:</span>
+                      <a
+                        className="ml-2 text-pink-600 hover:text-pink-700 break-all"
+                        href={`/heartlink/${h.slug}`}
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        {`heartlink.turaco.com/heartlink/${h.slug}`}
+                      </a>
+                    </div>
+                    <div>
                       <span className="text-gray-500">Variant:</span>
                       <span className="ml-2">{h.variantTitle || '-'}</span>
                     </div>
                     <div>
                       <span className="text-gray-500">SKU:</span>
                       <span className="ml-2">{h.variantSku || '-'}</span>
+                    </div>
+                    <div>
+                      <span className="text-gray-500">Recipient:</span>
+                      <span className="ml-2">{h.recipientName || '-'}</span>
+                    </div>
+                    <div>
+                      <span className="text-gray-500">Sender:</span>
+                      <span className="ml-2">{h.senderName || '-'}</span>
+                    </div>
+                    <div>
+                      <span className="text-gray-500">Recipient Email:</span>
+                      <span className="ml-2">{h.recipientEmail || '-'}</span>
+                    </div>
+                    <div>
+                      <span className="text-gray-500">Recipient Phone:</span>
+                      <span className="ml-2">{h.recipientPhone || '-'}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-gray-500">Digital Product:</span>
+                      {isDigital ? (
+                        <span className="inline-flex items-center rounded-full bg-green-50 px-2 py-1 text-xs font-medium text-green-700 ring-1 ring-inset ring-green-600/20">
+                          Yes
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center rounded-full bg-gray-50 px-2 py-1 text-xs font-medium text-gray-600 ring-1 ring-inset ring-gray-500/10">
+                          No
+                        </span>
+                      )}
+                    </div>
+                    <div>
+                      <span className="text-gray-500">Occasion:</span>
+                      <span className="ml-2">{h.occasion || '-'}</span>
+                    </div>
+                    <div>
+                      <span className="text-gray-500">Relation:</span>
+                      <span className="ml-2">{h.relation || '-'}</span>
+                    </div>
+                    <div>
+                      <span className="text-gray-500">Scheduled:</span>
+                      <span className="ml-2">
+                        {h.scheduledTime
+                          ? new Date(h.scheduledTime).toLocaleString()
+                          : '-'}
+                      </span>
+                    </div>
+                    <div>
+                      <span className="text-gray-500">Status:</span>
+                      <span className="ml-2">{h.status || '-'}</span>
                     </div>
                   </div>
                 </div>

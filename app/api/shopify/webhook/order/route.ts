@@ -157,14 +157,24 @@ export async function POST(req: Request) {
 
     // Check if this order contains any Heartlink products.
     // Prefer product_id check when env is provided, else fall back to presence of custom properties.
-    const targetProductId = process.env.SHOPIFY_HEARTLINK_PRODUCT_ID
+    // Supports single ID via SHOPIFY_HEARTLINK_PRODUCT_ID and multiple IDs via SHOPIFY_HEARTLINK_PRODUCT_IDS (comma-separated)
+    const envSingleId = process.env.SHOPIFY_HEARTLINK_PRODUCT_ID
       ? String(process.env.SHOPIFY_HEARTLINK_PRODUCT_ID)
       : null;
+    const envMultiIdsRaw = process.env.SHOPIFY_HEARTLINK_PRODUCT_IDS || '';
+    const envMultiIds = envMultiIdsRaw
+      .split(',')
+      .map(v => v.trim())
+      .filter(Boolean);
+    const targetProductIds = new Set<string>([
+      ...envMultiIds,
+      ...(envSingleId ? [envSingleId] : []),
+    ]);
 
     const heartlinkLineItems: LineItem[] = (data.line_items || []).filter(
       (item: LineItem) => {
-        if (targetProductId) {
-          return String(item.product_id) === targetProductId;
+        if (targetProductIds.size > 0) {
+          return targetProductIds.has(String(item.product_id));
         }
         // Fallback: heartlink items always carry our custom properties
         const props = (item.properties || []) as Property[];
@@ -230,6 +240,9 @@ export async function POST(req: Request) {
         const relationRaw = propsRecord['Relation'] || 'OTHER';
         const occasionRaw = propsRecord['Occasion'] || 'OTHER';
         const message = propsRecord['Message'] || undefined;
+        const recipientEmailRaw = propsRecord['Recipient Email'] || undefined;
+        const recipientPhone = propsRecord['Recipient Phone'] || undefined;
+        const scheduledTimeRaw = propsRecord['Scheduled Time'] || undefined;
         const compliments = splitList(propsRecord['Compliments']);
         const activities = splitList(propsRecord['Spin the Wheel Ideas']);
         const scratchCards = splitList(propsRecord['Scratch Card Coupons']);
@@ -285,6 +298,14 @@ export async function POST(req: Request) {
           relation,
           occasion,
           message,
+          recipientEmail:
+            recipientEmailRaw && /.+@.+\..+/.test(recipientEmailRaw)
+              ? recipientEmailRaw
+              : undefined,
+          recipientPhone:
+            recipientPhone && /^\d{10}$/u.test(recipientPhone)
+              ? recipientPhone
+              : undefined,
           status: HeartlinkStatus.PENDING,
           shopifyOrderId: String(data.id),
           shopifyOrderNumber: data.order_number,
@@ -337,6 +358,14 @@ export async function POST(req: Request) {
         if (coverPhotoUrl) {
           (createData as { coverPhotoUrl?: string }).coverPhotoUrl =
             coverPhotoUrl;
+        }
+
+        // Validate and attach scheduledTime if valid ISO or parseable
+        if (scheduledTimeRaw) {
+          const parsed = new Date(scheduledTimeRaw);
+          if (!isNaN(parsed.getTime())) {
+            (createData as { scheduledTime?: Date }).scheduledTime = parsed;
+          }
         }
 
         try {
