@@ -15,9 +15,18 @@ const SHOPIFY_WEBHOOK_SECRET =
 const ENDPOINT =
   process.env.WEBHOOK_URL || 'http://localhost:3000/api/shopify/webhook/order';
 
-// Optional: If your server filters by product_id, set this to that product id
-const HEARTLINK_PRODUCT_ID =
+// Optional: If your server filters by product_id, set these IDs
+// Supports both single and multiple IDs via env
+const HEARTLINK_PRODUCT_IDS = (process.env.SHOPIFY_HEARTLINK_PRODUCT_IDS || '')
+  .split(',')
+  .map(v => v.trim())
+  .filter(Boolean);
+const FALLBACK_SINGLE_ID =
   process.env.SHOPIFY_HEARTLINK_PRODUCT_ID || '1234567890';
+const IDS =
+  HEARTLINK_PRODUCT_IDS.length > 0
+    ? HEARTLINK_PRODUCT_IDS
+    : [FALLBACK_SINGLE_ID];
 
 function buildDefaultBody() {
   const now = Date.now();
@@ -39,7 +48,7 @@ function buildDefaultBody() {
     line_items: [
       {
         id: `line-${now}-1`,
-        product_id: HEARTLINK_PRODUCT_ID,
+        product_id: IDS[0],
         variant_id: 46718886871266,
         variant_title: 'Standard',
         sku: 'HL-001',
@@ -62,7 +71,7 @@ function buildDefaultBody() {
       // add another Heartlink item to prove multiple-item handling
       {
         id: `line-${now}-2`,
-        product_id: HEARTLINK_PRODUCT_ID,
+        product_id: IDS[IDS.length - 1],
         variant_id: 46718886871266,
         variant_title: null,
         sku: null,
