@@ -1,4 +1,5 @@
-import { prisma } from '@/lib/prisma';
+'use client';
+
 import type { Heartlink as PrismaHeartlink } from '@prisma/client';
 import {
   Mail,
@@ -9,30 +10,120 @@ import {
   Download as DownloadIcon,
 } from 'lucide-react';
 import Image from 'next/image';
+import { useEffect, useState, useCallback } from 'react';
+import { useParams } from 'next/navigation';
+import { authenticatedFetch } from '@/app/admin/lib/auth';
 
-export default async function OrderDetail({
-  params,
-}: {
-  params: Promise<{ orderId: string }>;
-}) {
-  type WithCoverPhoto = { coverPhotoUrl: string | null };
-  type AdminHeartlink = PrismaHeartlink & {
-    recipientEmail?: string | null;
-    recipientPhone?: string | null;
-    scheduledTime?: Date | string | null;
-    coverPhotoUrl: string | null;
-  };
-  const { orderId } = await params;
-  const heartlinks = (await prisma.heartlink.findMany({
-    where: { shopifyOrderId: orderId },
-    orderBy: { createdAt: 'asc' },
-  })) as unknown as AdminHeartlink[];
+type WithCoverPhoto = { coverPhotoUrl: string | null };
+type AdminHeartlink = PrismaHeartlink & {
+  recipientEmail?: string | null;
+  recipientPhone?: string | null;
+  scheduledTime?: Date | string | null;
+  coverPhotoUrl: string | null;
+  slug: string;
+};
 
-  if (heartlinks.length === 0) {
+export default function OrderDetail() {
+  const params = useParams();
+  const [heartlinks, setHeartlinks] = useState<AdminHeartlink[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [sendingEmailId, setSendingEmailId] = useState<string | null>(null);
+  const [emailSuccess, setEmailSuccess] = useState<string | null>(null);
+  const [emailError, setEmailError] = useState<string | null>(null);
+  const orderId = params.orderId as string;
+
+  useEffect(() => {
+    const fetchHeartlinks = async () => {
+      try {
+        const res = await authenticatedFetch(
+          `/admin/api/heartlink?orderId=${orderId}`
+        );
+        const json = await res.json();
+        if (!res.ok || !json.success) {
+          throw new Error(json.error || 'Failed to load heartlinks');
+        }
+        const data = Array.isArray(json.data)
+          ? json.data
+          : json.data
+            ? [json.data]
+            : [];
+        setHeartlinks(data);
+      } catch (err) {
+        setError(
+          err instanceof Error ? err.message : 'Failed to load heartlinks'
+        );
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchHeartlinks();
+  }, [orderId]);
+
+  const handleSendEmail = useCallback(
+    async (heartlink: AdminHeartlink, email: string) => {
+      if (!email) {
+        setEmailError('No customer email found for this order');
+        setTimeout(() => setEmailError(null), 5000);
+        return;
+      }
+
+      setSendingEmailId(heartlink.id);
+      setEmailError(null);
+      setEmailSuccess(null);
+
+      try {
+        const res = await authenticatedFetch('/admin/api/send-email', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            heartlinkId: heartlink.id,
+            email: email,
+            slug: heartlink.slug,
+          }),
+        });
+
+        const json = await res.json();
+
+        if (!res.ok || !json.success) {
+          throw new Error(json.message || 'Failed to send email');
+        }
+
+        setEmailSuccess(`Email sent to ${email}`);
+        setTimeout(() => setEmailSuccess(null), 5000);
+      } catch (err) {
+        const errorMsg =
+          err instanceof Error ? err.message : 'Failed to send email';
+        setEmailError(errorMsg);
+        setTimeout(() => setEmailError(null), 5000);
+      } finally {
+        setSendingEmailId(null);
+      }
+    },
+    []
+  );
+
+  if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <p className="text-gray-600">No records for order {orderId}</p>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-pink-500 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading order details...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error || heartlinks.length === 0) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-gray-600">
+            {error || `No records for order ${orderId}`}
+          </p>
         </div>
       </div>
     );
@@ -45,14 +136,72 @@ export default async function OrderDetail({
       <div className="absolute inset-0 bg-gradient-to-br from-pink-100/20 via-transparent to-cyan-100/20 pointer-events-none" />
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Email notifications */}
+        {emailSuccess && (
+          <div className="mb-4 bg-green-50 border border-green-200 text-green-600 px-4 py-3 rounded-lg flex items-center gap-2">
+            <svg
+              className="h-5 w-5 text-green-500"
+              fill="currentColor"
+              viewBox="0 0 20 20"
+            >
+              <path
+                fillRule="evenodd"
+                d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                clipRule="evenodd"
+              />
+            </svg>
+            {emailSuccess}
+          </div>
+        )}
+
+        {emailError && (
+          <div className="mb-4 bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg flex items-center gap-2">
+            <svg
+              className="h-5 w-5 text-red-500"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+            {emailError}
+          </div>
+        )}
+
         {/* Header */}
         <div className="mb-8">
-          <div className="flex items-center gap-3 mb-2">
-            <Package className="h-8 w-8 text-pink-500" />
-            <h1 className="text-3xl font-bold text-gray-900">
-              Order {any.shopifyOrderNumber}{' '}
-              <span className="text-gray-400">({any.shopifyOrderId})</span>
-            </h1>
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-3">
+              <Package className="h-8 w-8 text-pink-500" />
+              <h1 className="text-3xl font-bold text-gray-900">
+                Order {any.shopifyOrderNumber}{' '}
+                <span className="text-gray-400">({any.shopifyOrderId})</span>
+              </h1>
+            </div>
+            {any.customerEmail && (
+              <button
+                onClick={() => handleSendEmail(any, any.customerEmail!)}
+                disabled={sendingEmailId === any.id}
+                className="inline-flex items-center gap-2 bg-pink-600 hover:bg-pink-700 text-white px-4 py-2 rounded-lg font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+              >
+                {sendingEmailId === any.id ? (
+                  <>
+                    <div className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    Sending...
+                  </>
+                ) : (
+                  <>
+                    <Mail className="h-4 w-4" />
+                    Send Email
+                  </>
+                )}
+              </button>
+            )}
           </div>
           <p className="text-gray-600">
             Detailed view for all Heartlinks in this order
