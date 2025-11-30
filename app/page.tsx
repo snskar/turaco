@@ -25,7 +25,7 @@ export default function Home() {
             {/* Logo */}
             <div className="flex justify-center lg:justify-start">
               <OptimizedImage
-                src="/assets/branding/heartlink-logo.png"
+                src="/assets/branding/heartlink-logo-2.png"
                 alt="Heartlink Logo"
                 width={240}
                 height={240}
