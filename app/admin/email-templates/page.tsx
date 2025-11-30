@@ -1,7 +1,16 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
-import { Mail, Eye, Save, AlertCircle, CheckCircle, Code } from 'lucide-react';
+import {
+  Mail,
+  Eye,
+  Save,
+  AlertCircle,
+  CheckCircle,
+  Code,
+  ChevronDown,
+  ChevronUp,
+} from 'lucide-react';
 import { useAdminAuth, authenticatedFetch } from '../lib/auth';
 import AdminNav from '../components/AdminNav';
 
@@ -31,6 +40,18 @@ export default function EmailTemplatesPage() {
   const [mounted, setMounted] = useState(false);
   const [authChecked, setAuthChecked] = useState(false);
   const [serverAuthValid, setServerAuthValid] = useState(false);
+  const [isHtmlExpanded, setIsHtmlExpanded] = useState(false);
+
+  // Editable text content fields
+  const [greetingText, setGreetingText] = useState('Hi');
+  const [mainMessage, setMainMessage] = useState(
+    "has created a personalised HeartLink just for you. It's a little something they wanted to share with you, and we hope it brings a smile to your face. 🥰"
+  );
+  const [ctaIntro, setCtaIntro] = useState('You can open it here:');
+  const [buttonText, setButtonText] = useState('Open Your HeartLink');
+  const [closingText, setClosingText] = useState('With love,');
+  const [teamName, setTeamName] = useState('Team Turaco Ink');
+
   const { signOut, checkServerAuth } = useAdminAuth();
 
   // Check authentication
@@ -71,6 +92,7 @@ export default function EmailTemplatesPage() {
         setSubject(heartlinkTemplate.subject);
         setBodyText(heartlinkTemplate.bodyText);
         setBodyHtml(heartlinkTemplate.bodyHtml);
+        extractTextFromHtml(heartlinkTemplate.bodyHtml);
       }
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Failed to load templates');
@@ -84,6 +106,106 @@ export default function EmailTemplatesPage() {
       loadTemplates();
     }
   }, [mounted, authChecked, serverAuthValid, loadTemplates]);
+
+  // Extract text content from HTML
+  const extractTextFromHtml = (html: string) => {
+    // Extract greeting
+    const greetingMatch = html.match(
+      /<p[^>]*>\s*(.*?)\s*<strong>\$\{recipientName\}<\/strong>/
+    );
+    if (greetingMatch) setGreetingText(greetingMatch[1].trim());
+
+    // Extract main message (after ${senderName})
+    const mainMessageMatch = html.match(
+      /<strong>\$\{senderName\}<\/strong>\s*([\s\S]*?)<\/p>/
+    );
+    if (mainMessageMatch) {
+      const cleanMessage = mainMessageMatch[1]
+        .replace(/<br\s*\/?>/gi, ' ')
+        .trim();
+      setMainMessage(cleanMessage);
+    }
+
+    // Extract CTA intro
+    const ctaMatch = html.match(
+      /<p[^>]*>\s*([\s\S]*?)\s*<\/p>\s*<!--\s*CTA Button/
+    );
+    if (ctaMatch) {
+      const lines = ctaMatch[1].split('</p>');
+      const lastLine = lines[lines.length - 1];
+      if (lastLine) setCtaIntro(lastLine.replace(/<[^>]+>/g, '').trim());
+    }
+
+    // Extract button text
+    const buttonMatch = html.match(/<a[^>]*>\s*(.*?)\s*<\/a>/);
+    if (buttonMatch) setButtonText(buttonMatch[1].trim());
+
+    // Extract closing and team name
+    const closingMatch = html.match(
+      /<p[^>]*>\s*(.*?)<br\/>\s*<strong[^>]*>(.*?)<\/strong>/
+    );
+    if (closingMatch) {
+      setClosingText(closingMatch[1].trim());
+      setTeamName(closingMatch[2].trim());
+    }
+  };
+
+  // Update HTML when text fields change - find and replace in existing HTML
+  useEffect(() => {
+    if (selectedTemplate && bodyHtml) {
+      let updatedHtml = bodyHtml;
+
+      // Find and replace greeting (before ${recipientName})
+      updatedHtml = updatedHtml.replace(
+        /(<p[^>]*>\s*)([^<]*?)(\s*<strong>\$\{recipientName\}<\/strong>)/,
+        `$1${greetingText}$3`
+      );
+
+      // Find and replace main message (after ${senderName})
+      updatedHtml = updatedHtml.replace(
+        /(<strong>\$\{senderName\}<\/strong>\s*)([^<]*?)(\s*<\/p>)/,
+        `$1${mainMessage}$3`
+      );
+
+      // Find and replace CTA intro
+      updatedHtml = updatedHtml.replace(
+        /(<p[^>]*>)([^<]*?)(<\/p>\s*<!--\s*CTA Button)/,
+        (match, p1, p2, p3) => {
+          // Only replace the last paragraph before CTA Button comment
+          return `${p1}${ctaIntro}${p3}`;
+        }
+      );
+
+      // Find and replace button text
+      updatedHtml = updatedHtml.replace(
+        /(<a[^>]*href="\$\{heartlinkUrl\}"[^>]*>)([^<]*?)(<\/a>)/,
+        `$1${buttonText}$3`
+      );
+
+      // Find and replace closing text (before team name)
+      updatedHtml = updatedHtml.replace(
+        /(<p[^>]*>)([^<]*?)(<br\/>\s*<strong[^>]*>[^<]*?<\/strong>)/,
+        (match, p1, p2, p3) => {
+          // Only if it's in the closing section
+          if (match.includes('color: #718096')) {
+            return `${p1}${closingText}${p3}`;
+          }
+          return match;
+        }
+      );
+
+      // Find and replace team name
+      updatedHtml = updatedHtml.replace(
+        /(<strong style="color: #4a5568;">)([^<]*?)(<\/strong>)/,
+        `$1${teamName}$3`
+      );
+
+      if (updatedHtml !== bodyHtml) {
+        setBodyHtml(updatedHtml);
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [greetingText, mainMessage, ctaIntro, buttonText, closingText, teamName]);
 
   // Handle template save
   const handleSave = async () => {
@@ -125,6 +247,7 @@ export default function EmailTemplatesPage() {
 
   // Generate preview HTML with sample data
   const generatePreviewHtml = () => {
+    // Use the current HTML from bodyHtml state (which includes both form field and direct HTML edits)
     let html = bodyHtml;
 
     // Replace placeholders with sample data
@@ -141,6 +264,18 @@ export default function EmailTemplatesPage() {
     );
 
     return html;
+  };
+
+  // Generate preview subject with sample data
+  const generatePreviewSubject = () => {
+    let subjectText = subject;
+
+    // Replace placeholders with sample data
+    subjectText = subjectText.replace(/\$\{recipientName\}/g, 'Sanskar');
+    subjectText = subjectText.replace(/\$\{senderName\}/g, 'Gopika Arora');
+    subjectText = subjectText.replace(/\$\{occasion\}/g, 'Birthday');
+
+    return subjectText;
   };
 
   // Show loading state
@@ -249,40 +384,149 @@ export default function EmailTemplatesPage() {
                   />
                 </div>
 
-                {/* Plain Text Body */}
-                <div className="mb-6">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Plain Text Version
-                  </label>
-                  <textarea
-                    value={bodyText}
-                    onChange={e => setBodyText(e.target.value)}
-                    rows={8}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent font-mono text-sm"
-                    placeholder="Plain text version of the email..."
-                  />
-                  <p className="mt-1 text-xs text-gray-500">
-                    Available placeholders: {'${recipientName}'},{' '}
-                    {'${senderName}'}, {'${heartlinkUrl}'}, {'${occasion}'}
-                  </p>
+                {/* Email Content Fields */}
+                <div className="mb-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                  <div className="flex items-start justify-between mb-3">
+                    <h3 className="text-sm font-semibold text-gray-900 flex items-center gap-2">
+                      <Mail className="h-4 w-4 text-gray-600" />
+                      Email Content
+                    </h3>
+                    <p className="text-xs text-gray-500 italic">
+                      Quick edit fields (edit HTML directly for full control)
+                    </p>
+                  </div>
+
+                  {/* Greeting */}
+                  <div className="mb-3">
+                    <label className="block text-xs font-medium text-gray-700 mb-1">
+                      Greeting
+                    </label>
+                    <input
+                      type="text"
+                      value={greetingText}
+                      onChange={e => setGreetingText(e.target.value)}
+                      className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+                      placeholder="Hi"
+                    />
+                    <p className="mt-1 text-xs text-gray-500">
+                      Shown before recipient&apos;s name
+                    </p>
+                  </div>
+
+                  {/* Main Message */}
+                  <div className="mb-3">
+                    <label className="block text-xs font-medium text-gray-700 mb-1">
+                      Main Message
+                    </label>
+                    <textarea
+                      value={mainMessage}
+                      onChange={e => setMainMessage(e.target.value)}
+                      rows={3}
+                      className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+                      placeholder="Main email message..."
+                    />
+                    <p className="mt-1 text-xs text-gray-500">
+                      Shown after sender&apos;s name
+                    </p>
+                  </div>
+
+                  {/* CTA Intro */}
+                  <div className="mb-3">
+                    <label className="block text-xs font-medium text-gray-700 mb-1">
+                      Call-to-Action Intro
+                    </label>
+                    <input
+                      type="text"
+                      value={ctaIntro}
+                      onChange={e => setCtaIntro(e.target.value)}
+                      className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+                      placeholder="You can open it here:"
+                    />
+                    <p className="mt-1 text-xs text-gray-500">
+                      Shown before the button
+                    </p>
+                  </div>
+
+                  {/* Button Text */}
+                  <div className="mb-3">
+                    <label className="block text-xs font-medium text-gray-700 mb-1">
+                      Button Text
+                    </label>
+                    <input
+                      type="text"
+                      value={buttonText}
+                      onChange={e => setButtonText(e.target.value)}
+                      className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+                      placeholder="Open Your HeartLink"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-3">
+                    {/* Closing Text */}
+                    <div>
+                      <label className="block text-xs font-medium text-gray-700 mb-1">
+                        Closing
+                      </label>
+                      <input
+                        type="text"
+                        value={closingText}
+                        onChange={e => setClosingText(e.target.value)}
+                        className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+                        placeholder="With love,"
+                      />
+                    </div>
+
+                    {/* Team Name */}
+                    <div>
+                      <label className="block text-xs font-medium text-gray-700 mb-1">
+                        Team Name
+                      </label>
+                      <input
+                        type="text"
+                        value={teamName}
+                        onChange={e => setTeamName(e.target.value)}
+                        className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+                        placeholder="Team Turaco Ink"
+                      />
+                    </div>
+                  </div>
                 </div>
 
                 {/* HTML Body */}
                 <div className="mb-6">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    HTML Template
-                  </label>
-                  <textarea
-                    value={bodyHtml}
-                    onChange={e => setBodyHtml(e.target.value)}
-                    rows={20}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent font-mono text-xs"
-                    placeholder="HTML template..."
-                  />
-                  <p className="mt-1 text-xs text-gray-500">
-                    Use template literals: {'${recipientName}'},{' '}
-                    {'${senderName}'}, {'${heartlinkUrl}'}, {'${occasion}'}
-                  </p>
+                  <button
+                    onClick={() => setIsHtmlExpanded(!isHtmlExpanded)}
+                    className="w-full flex items-center justify-between text-sm font-medium text-gray-700 mb-2 hover:text-gray-900 transition-colors"
+                  >
+                    <span>HTML Template (Full Control)</span>
+                    {isHtmlExpanded ? (
+                      <ChevronUp className="h-4 w-4" />
+                    ) : (
+                      <ChevronDown className="h-4 w-4" />
+                    )}
+                  </button>
+                  {isHtmlExpanded && (
+                    <>
+                      <textarea
+                        value={bodyHtml}
+                        onChange={e => setBodyHtml(e.target.value)}
+                        rows={20}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent font-mono text-xs"
+                        placeholder="HTML template..."
+                      />
+                      <p className="mt-1 text-xs text-gray-500">
+                        Available placeholders: {'${recipientName}'},{' '}
+                        {'${senderName}'}, {'${heartlinkUrl}'}, {'${occasion}'}{' '}
+                        - You can move these anywhere in your HTML
+                      </p>
+                    </>
+                  )}
+                  {!isHtmlExpanded && (
+                    <div className="text-xs text-gray-400 italic">
+                      Click to expand HTML template editor (edit HTML directly &
+                      move placeholders freely)
+                    </div>
+                  )}
                 </div>
 
                 {/* Action Buttons */}
@@ -320,7 +564,9 @@ export default function EmailTemplatesPage() {
                     <div className="text-xs font-medium text-gray-500 mb-1">
                       Subject:
                     </div>
-                    <div className="text-sm text-gray-900">{subject}</div>
+                    <div className="text-sm text-gray-900">
+                      {generatePreviewSubject()}
+                    </div>
                   </div>
 
                   {/* HTML Preview */}
