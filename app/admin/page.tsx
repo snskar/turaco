@@ -42,6 +42,9 @@ export default function AdminHome() {
   const [mounted, setMounted] = useState(false);
   const [authChecked, setAuthChecked] = useState(false);
   const [serverAuthValid, setServerAuthValid] = useState(false);
+  const [sendingEmailId, setSendingEmailId] = useState<string | null>(null);
+  const [emailSuccess, setEmailSuccess] = useState<string | null>(null);
+  const [emailError, setEmailError] = useState<string | null>(null);
   const { signOut, isAuthenticated, checkServerAuth } = useAdminAuth();
 
   const searchUrl = useMemo(() => {
@@ -70,6 +73,48 @@ export default function AdminHome() {
       setError(err instanceof Error ? err.message : 'Failed to load orders');
     } finally {
       setLoading(false);
+    }
+  }, []);
+
+  const handleSendEmail = useCallback(async (heartlink: Heartlink) => {
+    if (!heartlink.customerEmail) {
+      setEmailError('No customer email found for this order');
+      setTimeout(() => setEmailError(null), 5000);
+      return;
+    }
+
+    setSendingEmailId(heartlink.id);
+    setEmailError(null);
+    setEmailSuccess(null);
+
+    try {
+      const res = await authenticatedFetch('/admin/api/send-email', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          heartlinkId: heartlink.id,
+          email: heartlink.customerEmail,
+          slug: heartlink.slug,
+        }),
+      });
+
+      const json = await res.json();
+
+      if (!res.ok || !json.success) {
+        throw new Error(json.message || 'Failed to send email');
+      }
+
+      setEmailSuccess(`Email sent to ${heartlink.customerEmail}`);
+      setTimeout(() => setEmailSuccess(null), 5000);
+    } catch (err: unknown) {
+      const errorMsg =
+        err instanceof Error ? err.message : 'Failed to send email';
+      setEmailError(errorMsg);
+      setTimeout(() => setEmailError(null), 5000);
+    } finally {
+      setSendingEmailId(null);
     }
   }, []);
 
@@ -182,6 +227,42 @@ export default function AdminHome() {
       <div className="absolute inset-0 bg-gradient-to-br from-pink-100/20 via-transparent to-cyan-100/20 pointer-events-none" />
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Email notifications */}
+        {emailSuccess && (
+          <div className="mb-4 bg-green-50 border border-green-200 text-green-600 px-4 py-3 rounded-lg flex items-center gap-2">
+            <svg
+              className="h-5 w-5 text-green-500"
+              fill="currentColor"
+              viewBox="0 0 20 20"
+            >
+              <path
+                fillRule="evenodd"
+                d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                clipRule="evenodd"
+              />
+            </svg>
+            {emailSuccess}
+          </div>
+        )}
+
+        {emailError && (
+          <div className="mb-4 bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg flex items-center gap-2">
+            <svg
+              className="h-5 w-5 text-red-500"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+            {emailError}
+          </div>
+        )}
         {/* Header */}
         <div className="mb-8">
           <div className="flex items-center justify-between mb-2">
@@ -404,17 +485,40 @@ export default function AdminHome() {
                         </div>
                       </td>
                       <td className="px-6 py-4 border-b border-gray-100">
-                        {h.shopifyOrderId ? (
-                          <a
-                            href={`/admin/orders/${h.shopifyOrderId}`}
-                            className="inline-flex items-center gap-2 text-cyan-600 hover:text-cyan-700 transition-colors duration-200"
-                          >
-                            <Eye className="h-4 w-4" />
-                            View
-                          </a>
-                        ) : (
-                          '-'
-                        )}
+                        <div className="flex items-center gap-3">
+                          {h.shopifyOrderId && (
+                            <a
+                              href={`/admin/orders/${h.shopifyOrderId}`}
+                              className="inline-flex items-center gap-2 text-cyan-600 hover:text-cyan-700 transition-colors duration-200"
+                            >
+                              <Eye className="h-4 w-4" />
+                              View
+                            </a>
+                          )}
+                          {h.customerEmail && (
+                            <button
+                              onClick={() => handleSendEmail(h)}
+                              disabled={sendingEmailId === h.id}
+                              className="inline-flex items-center gap-2 text-pink-600 hover:text-pink-700 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                              title={`Send email to ${h.customerEmail}`}
+                            >
+                              {sendingEmailId === h.id ? (
+                                <>
+                                  <div className="h-4 w-4 border-2 border-pink-600 border-t-transparent rounded-full animate-spin" />
+                                  Sending...
+                                </>
+                              ) : (
+                                <>
+                                  <Mail className="h-4 w-4" />
+                                  Send
+                                </>
+                              )}
+                            </button>
+                          )}
+                          {!h.shopifyOrderId && !h.customerEmail && (
+                            <span>-</span>
+                          )}
+                        </div>
                       </td>
                     </tr>
                   ))}
@@ -436,15 +540,36 @@ export default function AdminHome() {
                         #{h.shopifyOrderNumber}
                       </span>
                     </div>
-                    {h.shopifyOrderId && (
-                      <a
-                        href={`/admin/orders/${h.shopifyOrderId}`}
-                        className="inline-flex items-center gap-1 text-cyan-600 hover:text-cyan-700 text-sm"
-                      >
-                        <Eye className="h-4 w-4" />
-                        View
-                      </a>
-                    )}
+                    <div className="flex items-center gap-2">
+                      {h.customerEmail && (
+                        <button
+                          onClick={() => handleSendEmail(h)}
+                          disabled={sendingEmailId === h.id}
+                          className="inline-flex items-center gap-1 text-pink-600 hover:text-pink-700 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                          title={`Send email to ${h.customerEmail}`}
+                        >
+                          {sendingEmailId === h.id ? (
+                            <>
+                              <div className="h-3 w-3 border-2 border-pink-600 border-t-transparent rounded-full animate-spin" />
+                            </>
+                          ) : (
+                            <>
+                              <Mail className="h-4 w-4" />
+                              Send
+                            </>
+                          )}
+                        </button>
+                      )}
+                      {h.shopifyOrderId && (
+                        <a
+                          href={`/admin/orders/${h.shopifyOrderId}`}
+                          className="inline-flex items-center gap-1 text-cyan-600 hover:text-cyan-700 text-sm"
+                        >
+                          <Eye className="h-4 w-4" />
+                          View
+                        </a>
+                      )}
+                    </div>
                   </div>
 
                   <div className="space-y-2 text-sm">
