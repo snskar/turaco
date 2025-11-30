@@ -78,6 +78,8 @@ model Heartlink {
   recipientEmail       String?
   recipientPhone       String?
   scheduledTime        DateTime?
+  emailSent            Boolean     @default(false)
+  emailSentAt          DateTime?
 
   shippingName         String?
   shippingAddress1     String?

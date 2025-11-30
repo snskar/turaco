@@ -10,6 +10,10 @@ import {
   MapPin,
   Eye,
   LogOut,
+  Send,
+  Clock,
+  CheckCircle,
+  XCircle,
 } from 'lucide-react';
 import { useAdminAuth, authenticatedFetch } from './lib/auth';
 
@@ -44,6 +48,15 @@ export default function AdminHome() {
   const [serverAuthValid, setServerAuthValid] = useState(false);
   const { signOut, isAuthenticated, checkServerAuth } = useAdminAuth();
 
+  // Scheduled emails state
+  const [cronLoading, setCronLoading] = useState(false);
+  const [cronError, setCronError] = useState<string | null>(null);
+  const [cronResult, setCronResult] = useState<{
+    emailsSent: number;
+    emailsFailed: number;
+    message: string;
+  } | null>(null);
+
   const searchUrl = useMemo(() => {
     const base = '/admin/api/heartlink';
     if (!query.trim()) return base; // Return base URL to fetch all when query is empty
@@ -72,6 +85,34 @@ export default function AdminHome() {
       setLoading(false);
     }
   }, []);
+
+  const handleTriggerScheduledEmails = async () => {
+    setCronLoading(true);
+    setCronError(null);
+    setCronResult(null);
+    try {
+      const res = await authenticatedFetch('/api/cron/send-scheduled-emails', {
+        method: 'GET',
+      });
+      const json = await res.json();
+      if (!res.ok || !json.success) {
+        throw new Error(json.error || 'Failed to trigger scheduled emails');
+      }
+      setCronResult({
+        emailsSent: json.emailsSent || 0,
+        emailsFailed: json.emailsFailed || 0,
+        message: json.message || 'Completed successfully',
+      });
+    } catch (err: unknown) {
+      setCronError(
+        err instanceof Error
+          ? err.message
+          : 'Failed to trigger scheduled emails'
+      );
+    } finally {
+      setCronLoading(false);
+    }
+  };
 
   async function handleSearch(e: React.FormEvent) {
     e.preventDefault();
@@ -200,6 +241,82 @@ export default function AdminHome() {
             </button>
           </div>
           <p className="text-gray-600">Manage and view all heartlink orders</p>
+        </div>
+
+        {/* Scheduled Emails Trigger */}
+        <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg border border-white/50 p-6 mb-8">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-3">
+              <Send className="h-6 w-6 text-cyan-500" />
+              <div>
+                <h2 className="text-xl font-semibold text-gray-900">
+                  Send Scheduled Emails
+                </h2>
+                <p className="text-sm text-gray-600 mt-1">
+                  Manually trigger the scheduled email job to send pending
+                  emails
+                </p>
+              </div>
+            </div>
+            <button
+              onClick={handleTriggerScheduledEmails}
+              disabled={cronLoading}
+              className="bg-gradient-to-r from-cyan-500 to-pink-500 text-white px-6 py-3 rounded-lg font-medium hover:from-cyan-600 hover:to-pink-600 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 flex items-center gap-2"
+            >
+              {cronLoading ? (
+                <>
+                  <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
+                  Processing...
+                </>
+              ) : (
+                <>
+                  <Send className="h-4 w-4" />
+                  Trigger Now
+                </>
+              )}
+            </button>
+          </div>
+
+          {cronError && (
+            <div className="mt-4 bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg flex items-center gap-2">
+              <XCircle className="h-5 w-5 text-red-500" />
+              {cronError}
+            </div>
+          )}
+
+          {cronResult && (
+            <div className="mt-4 bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-lg">
+              <div className="flex items-start gap-2">
+                <CheckCircle className="h-5 w-5 text-green-500 mt-0.5" />
+                <div className="flex-1">
+                  <p className="font-medium">{cronResult.message}</p>
+                  <div className="mt-2 text-sm space-y-1">
+                    <div className="flex items-center gap-2">
+                      <Mail className="h-4 w-4" />
+                      <span>
+                        {cronResult.emailsSent} email(s) sent successfully
+                      </span>
+                    </div>
+                    {cronResult.emailsFailed > 0 && (
+                      <div className="flex items-center gap-2 text-red-600">
+                        <XCircle className="h-4 w-4" />
+                        <span>{cronResult.emailsFailed} email(s) failed</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          <div className="mt-4 flex items-start gap-2 text-sm text-gray-600 bg-blue-50 border border-blue-200 px-4 py-3 rounded-lg">
+            <Clock className="h-4 w-4 text-blue-500 mt-0.5 flex-shrink-0" />
+            <p>
+              <strong>Note:</strong> The automated cron job runs daily at 9:00
+              AM UTC (2:30 PM IST). Use this manual trigger if you need to send
+              emails immediately.
+            </p>
+          </div>
         </div>
 
         {/* Search and Controls */}

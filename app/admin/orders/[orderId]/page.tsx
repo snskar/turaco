@@ -1,25 +1,19 @@
 import { prisma } from '@/lib/prisma';
 import type { Heartlink as PrismaHeartlink } from '@prisma/client';
-import {
-  Mail,
-  Phone,
-  MapPin,
-  Package,
-  ExternalLink,
-  Download as DownloadIcon,
-} from 'lucide-react';
-import Image from 'next/image';
+import { Mail, Phone, MapPin, Package } from 'lucide-react';
+import HeartlinkCard from './HeartlinkCard';
 
 export default async function OrderDetail({
   params,
 }: {
   params: Promise<{ orderId: string }>;
 }) {
-  type WithCoverPhoto = { coverPhotoUrl: string | null };
   type AdminHeartlink = PrismaHeartlink & {
     recipientEmail?: string | null;
     recipientPhone?: string | null;
     scheduledTime?: Date | string | null;
+    emailSent?: boolean;
+    emailSentAt?: Date | string | null;
     coverPhotoUrl: string | null;
   };
   const { orderId } = await params;
@@ -100,132 +94,9 @@ export default async function OrderDetail({
         {/* Heartlink details - vertical cards */}
         <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg border border-white/50 overflow-hidden">
           <div className="space-y-4 p-4">
-            {heartlinks.map(h => {
-              const coverUrl = (h as unknown as WithCoverPhoto).coverPhotoUrl;
-              const isDigital = Boolean(h.recipientEmail && h.recipientPhone);
-              return (
-                <div
-                  key={h.id}
-                  className="bg-white rounded-xl p-4 shadow-sm border border-gray-200"
-                >
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="flex items-center gap-2">
-                      <Package className="h-5 w-5 text-pink-500" />
-                      <span className="font-semibold text-gray-900">
-                        {h.slug}
-                      </span>
-                    </div>
-                    <a
-                      href={`/heartlink/${h.slug}`}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="inline-flex items-center gap-1 text-pink-600 hover:text-pink-700 text-sm"
-                    >
-                      <ExternalLink className="h-4 w-4" />
-                      Open
-                    </a>
-                  </div>
-
-                  {coverUrl && (
-                    <>
-                      <a
-                        href={coverUrl}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="block mb-2"
-                      >
-                        <div className="relative w-full aspect-[3/2]">
-                          <Image
-                            src={coverUrl}
-                            alt="Cover"
-                            fill
-                            sizes="(max-width: 768px) 100vw, 768px"
-                            className="rounded-lg object-contain border border-gray-200 bg-gray-50"
-                          />
-                        </div>
-                      </a>
-                      <a
-                        href={`/admin/api/download?url=${encodeURIComponent(coverUrl)}&filename=${encodeURIComponent('cover.jpg')}`}
-                        className="inline-flex items-center gap-1 text-cyan-600 hover:text-cyan-700 text-sm mb-3"
-                      >
-                        <DownloadIcon className="h-4 w-4" />
-                        Download image
-                      </a>
-                    </>
-                  )}
-
-                  <div className="text-sm text-gray-700 space-y-1">
-                    <div>
-                      <span className="text-gray-500">Heartlink URL:</span>
-                      <a
-                        className="ml-2 text-pink-600 hover:text-pink-700 break-all"
-                        href={`/heartlink/${h.slug}`}
-                        target="_blank"
-                        rel="noreferrer"
-                      >
-                        {`heartlink.turaco.com/heartlink/${h.slug}`}
-                      </a>
-                    </div>
-                    <div>
-                      <span className="text-gray-500">Variant:</span>
-                      <span className="ml-2">{h.variantTitle || '-'}</span>
-                    </div>
-                    <div>
-                      <span className="text-gray-500">SKU:</span>
-                      <span className="ml-2">{h.variantSku || '-'}</span>
-                    </div>
-                    <div>
-                      <span className="text-gray-500">Recipient:</span>
-                      <span className="ml-2">{h.recipientName || '-'}</span>
-                    </div>
-                    <div>
-                      <span className="text-gray-500">Sender:</span>
-                      <span className="ml-2">{h.senderName || '-'}</span>
-                    </div>
-                    <div>
-                      <span className="text-gray-500">Recipient Email:</span>
-                      <span className="ml-2">{h.recipientEmail || '-'}</span>
-                    </div>
-                    <div>
-                      <span className="text-gray-500">Recipient Phone:</span>
-                      <span className="ml-2">{h.recipientPhone || '-'}</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-gray-500">Digital Product:</span>
-                      {isDigital ? (
-                        <span className="inline-flex items-center rounded-full bg-green-50 px-2 py-1 text-xs font-medium text-green-700 ring-1 ring-inset ring-green-600/20">
-                          Yes
-                        </span>
-                      ) : (
-                        <span className="inline-flex items-center rounded-full bg-gray-50 px-2 py-1 text-xs font-medium text-gray-600 ring-1 ring-inset ring-gray-500/10">
-                          No
-                        </span>
-                      )}
-                    </div>
-                    <div>
-                      <span className="text-gray-500">Occasion:</span>
-                      <span className="ml-2">{h.occasion || '-'}</span>
-                    </div>
-                    <div>
-                      <span className="text-gray-500">Relation:</span>
-                      <span className="ml-2">{h.relation || '-'}</span>
-                    </div>
-                    <div>
-                      <span className="text-gray-500">Scheduled:</span>
-                      <span className="ml-2">
-                        {h.scheduledTime
-                          ? new Date(h.scheduledTime).toLocaleString()
-                          : '-'}
-                      </span>
-                    </div>
-                    <div>
-                      <span className="text-gray-500">Status:</span>
-                      <span className="ml-2">{h.status || '-'}</span>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
+            {heartlinks.map(h => (
+              <HeartlinkCard key={h.id} heartlink={h} />
+            ))}
           </div>
         </div>
       </div>

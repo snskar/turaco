@@ -1,0 +1,35 @@
+name: Send Scheduled Emails
+
+on:
+  # Run once daily at 9:00 AM UTC (backup for Vercel cron)
+  schedule:
+    - cron: '0 9 * * *'
+  
+  # Allow manual trigger from GitHub UI
+  workflow_dispatch:
+
+jobs:
+  send-emails:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Send scheduled emails
+        run: |
+          response=$(curl -s -w "\n%{http_code}" -X GET ${{ secrets.APP_URL }}/api/cron/send-scheduled-emails \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}")
+          
+          http_code=$(echo "$response" | tail -n1)
+          body=$(echo "$response" | sed '$d')
+          
+          echo "HTTP Status: $http_code"
+          echo "Response: $body"
+          
+          if [ "$http_code" != "200" ]; then
+            echo "Error: Cron job failed with status $http_code"
+            exit 1
+          fi
+
+      - name: Log result
+        if: always()
+        run: echo "Scheduled email cron job completed"
+

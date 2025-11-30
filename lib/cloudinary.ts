@@ -130,7 +130,7 @@ export function assetToCloudinaryId(assetPath: string): string {
 
     // Branding assets
     'turaco-logo': 'turaco-logo_tgd6o2',
-    'heartlink-logo': 'heartlink-logo_bvdpcq',
+    'heartlink-logo-2': 'IMG_0065_hvkgko',
     favicon: 'favicon_wsyssq',
     'apple-touch-icon': 'apple-touch-icon_lsr2zx',
     'android-chrome-192x192': 'android-chrome-192x192_fh92fd',
