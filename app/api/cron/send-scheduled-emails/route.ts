@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { cookies } from 'next/headers';
 import { prisma } from '@/lib/prisma';
 import { sendHeartlinkEmail } from '@/lib/email';
 
@@ -12,16 +13,22 @@ export const maxDuration = 60; // Maximum execution time: 60 seconds
  * - Vercel Cron Jobs (https://vercel.com/docs/cron-jobs)
  * - GitHub Actions
  * - External cron service (e.g., cron-job.org)
+ * - Admin UI (manual trigger)
  *
- * Security: Protected by CRON_SECRET environment variable
+ * Security: Protected by CRON_SECRET environment variable or admin cookie
  */
 export async function GET(request: Request) {
   try {
-    // Verify the request is authorized (cron secret)
+    // Verify the request is authorized
+    // Support both Bearer token (for external cron) and admin cookie (for admin UI)
     const authHeader = request.headers.get('authorization');
     const cronSecret = process.env.CRON_SECRET;
+    const adminToken = (await cookies()).get('admin-auth')?.value;
 
-    if (cronSecret && authHeader !== `Bearer ${cronSecret}`) {
+    const isCronAuth = cronSecret && authHeader === `Bearer ${cronSecret}`;
+    const isAdminAuth = !!adminToken;
+
+    if (!isCronAuth && !isAdminAuth) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
@@ -43,6 +50,15 @@ export async function GET(request: Request) {
         emailSent: false,
       },
       take: 50, // Process max 50 emails per run to avoid timeouts
+      select: {
+        id: true,
+        slug: true,
+        recipientEmail: true,
+        recipientName: true,
+        senderName: true,
+        occasion: true,
+        customerEmail: true,
+      },
     });
 
     console.log(`[Cron] Found ${heartlinksToSend.length} emails to send`);
@@ -72,6 +88,7 @@ export async function GET(request: Request) {
           senderName: heartlink.senderName,
           heartlinkSlug: heartlink.slug,
           occasion: heartlink.occasion,
+          senderEmail: heartlink.customerEmail || undefined,
         });
 
         if (emailResult.success) {

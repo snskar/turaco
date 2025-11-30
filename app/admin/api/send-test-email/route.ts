@@ -9,7 +9,7 @@ export const runtime = 'nodejs';
  * Manual endpoint to test email sending for a specific Heartlink
  *
  * Usage:
- * POST /api/admin/send-test-email
+ * POST /admin/api/send-test-email
  * Body: { "heartlinkSlug": "abc123xyz" }
  *
  * This endpoint is useful for:

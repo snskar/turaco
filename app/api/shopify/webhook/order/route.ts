@@ -5,6 +5,7 @@ import {
   HeartlinkStatus,
 } from '@prisma/client';
 import { prisma } from '@/lib/prisma';
+import { sendHeartlinkEmail } from '@/lib/email';
 import crypto from 'crypto';
 import { nanoid } from 'nanoid';
 
@@ -361,18 +362,73 @@ export async function POST(req: Request) {
         }
 
         // Validate and attach scheduledTime if valid ISO or parseable
+        let hasScheduledTime = false;
         if (scheduledTimeRaw) {
           const parsed = new Date(scheduledTimeRaw);
           if (!isNaN(parsed.getTime())) {
             (createData as { scheduledTime?: Date }).scheduledTime = parsed;
+            hasScheduledTime = true;
           }
         }
 
         try {
           const result = await prisma.heartlink.create({
             data: createData,
-            select: { slug: true },
+            select: {
+              slug: true,
+              id: true,
+              recipientEmail: true,
+              recipientName: true,
+              senderName: true,
+              occasion: true,
+              customerEmail: true,
+            },
           });
+
+          // Send email immediately if no scheduled time and recipient email exists
+          if (!hasScheduledTime && result.recipientEmail) {
+            try {
+              console.log(
+                `[Webhook] Sending immediate email for Heartlink ${result.slug} to ${result.recipientEmail}`
+              );
+
+              const emailResult = await sendHeartlinkEmail({
+                recipientEmail: result.recipientEmail,
+                recipientName: result.recipientName,
+                senderName: result.senderName,
+                heartlinkSlug: result.slug,
+                occasion: result.occasion,
+                senderEmail: result.customerEmail || undefined,
+              });
+
+              if (emailResult.success) {
+                // Mark email as sent
+                await prisma.heartlink.update({
+                  where: { id: result.id },
+                  data: {
+                    emailSent: true,
+                    emailSentAt: new Date(),
+                  },
+                });
+
+                console.log(
+                  `[Webhook] ✓ Email sent successfully for ${result.slug}`
+                );
+              } else {
+                console.error(
+                  `[Webhook] ✗ Failed to send email for ${result.slug}:`,
+                  emailResult.error
+                );
+              }
+            } catch (emailError) {
+              // Log error but don't fail the webhook - email can be retried later
+              console.error(
+                `[Webhook] ✗ Error sending email for ${result.slug}:`,
+                emailError
+              );
+            }
+          }
+
           return result.slug;
         } catch (e: unknown) {
           // If a unique constraint is hit (duplicate webhook), return existing slug

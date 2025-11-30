@@ -51,7 +51,7 @@ export default function HeartlinkCard({ heartlink: h }: HeartlinkCardProps) {
     setSendSuccess(false);
 
     try {
-      const res = await authenticatedFetch('/api/admin/send-test-email', {
+      const res = await authenticatedFetch('/admin/api/send-test-email', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
